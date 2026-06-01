@@ -5,11 +5,16 @@
   "scripts": {
     "dev": "nitro dev --port 3001",
     "build": "nitro build",
+    "start": "node .output/server/index.mjs",
     "preview": "node .output/server/index.mjs",
     "db:migrate": "node scripts/run-supabase-migrations.mjs"
   },
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.2",
+    "nitropack": "^2.13.4",
     "nodemailer": "^8.0.10",
     "pg": "^8.21.0",
     "resend": "^6.12.4",
@@ -18,7 +23,6 @@
   "devDependencies": {
     "@types/node": "^22.13.10",
     "@types/nodemailer": "^8.0.0",
-    "nitropack": "^2.13.4",
-    "typescript": "^6.0.3"
+    "typescript": "^5.8.3"
   }
 }
