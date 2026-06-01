@@ -1,0 +1,25 @@
+-- Seed admin user AFTER creating the user in Supabase Auth Dashboard.
+--
+-- 1. Supabase Dashboard → Authentication → Users → Add user
+--    Email: admin@pirttrip.com (or your email)
+--    Password: (strong password)
+--    Copy the user's UUID
+--
+-- 2. Replace the UUID below and run this script:
+
+-- INSERT INTO public.admin_users (id, full_name, email, role)
+-- VALUES (
+--   '00000000-0000-0000-0000-000000000001'::UUID,
+--   'Super Admin',
+--   'admin@pirttrip.com',
+--   'SUPER_ADMIN'
+-- );
+
+-- Optional second admin:
+-- INSERT INTO public.admin_users (id, full_name, email, role)
+-- VALUES (
+--   '00000000-0000-0000-0000-000000000002'::UUID,
+--   'Operations Admin',
+--   'ops@pirttrip.com',
+--   'ADMIN'
+-- );

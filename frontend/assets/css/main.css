@@ -1,0 +1,53 @@
+@import './fonts.css';
+@import './hero.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth antialiased;
+  }
+}
+
+@layer components {
+  .hero-category-ribbon {
+    clip-path: polygon(8% 0%, 92% 0%, 100% 100%, 0% 100%);
+  }
+
+  .hero-category-bridge {
+    @apply relative z-20 flex items-end justify-center overflow-x-auto pb-0;
+  }
+
+  .hero-category-slot {
+    @apply flex shrink-0 items-end justify-center px-3 sm:px-4;
+  }
+
+  .hero-category-badge {
+    @apply relative z-30 block object-contain drop-shadow-lg;
+    height: 5.5rem;
+    width: 5.5rem;
+    margin-bottom: -2.25rem;
+  }
+
+  @screen xl {
+    .hero-category-badge {
+      height: 6.25rem;
+      width: 6.25rem;
+      margin-bottom: -2.5rem;
+    }
+  }
+
+  .hero-search-panel {
+    @apply relative -mt-px rounded-b-[1.75rem] bg-white shadow-search;
+    padding-top: 3.75rem;
+  }
+
+  @screen xl {
+    .hero-search-panel {
+      padding-top: 4.25rem;
+    }
+  }
+
+}
