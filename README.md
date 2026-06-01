@@ -39,3 +39,13 @@ Copy keys from the old single `.env` into `backend/.env` if you had everything i
 ```bash
 npm run db:migrate
 ```
+
+## Push to GitHub
+
+Secrets (`.env`) are **not** committed — only `.env.example` files.
+
+```bash
+gh auth login
+npm run publish:github
+# optional: npm run publish:github -- MyRepoName public
+```
