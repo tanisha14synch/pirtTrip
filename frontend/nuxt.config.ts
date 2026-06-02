@@ -5,7 +5,10 @@ const apiUrl =
   || process.env.NUXT_PUBLIC_API_BASE_URL
   || ''
 
-const devApiTarget = `${(apiUrl || 'http://127.0.0.1:3001').replace(/\/$/, '')}/api`
+const normalizedApiOrigin = (apiUrl || 'http://127.0.0.1:3001')
+  .replace(/\/$/, '')
+  .replace(/\/api$/, '')
+const devApiTarget = `${normalizedApiOrigin}/api`
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',

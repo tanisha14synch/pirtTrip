@@ -35,7 +35,7 @@ npm run db:migrate
 # or: cd backend && npm run db:migrate
 ```
 
-(Requires `SUPABASE_DB_PASSWORD` or `SUPABASE_ACCESS_TOKEN` in `frontend/.env`.)
+(Requires `SUPABASE_DB_PASSWORD` or `SUPABASE_ACCESS_TOKEN` in `backend/.env`.)
 
 Also ensure `20250601000003_waitlist.sql` is applied.
 
@@ -47,7 +47,7 @@ Also ensure `20250601000003_waitlist.sql` is applied.
 2. Add and verify your domain (or use `onboarding@resend.dev` for testing).
 3. Create an API key.
 
-Add to `frontend/.env`:
+Add to `backend/.env`:
 
 ```env
 RESEND_API_KEY=re_xxxxxxxx
@@ -72,7 +72,7 @@ OTP_SECRET=your_long_random_secret
 
 **Dashboard → Project Settings → Authentication → SMTP Settings**
 
-Enable custom SMTP (SendGrid/Resend SMTP credentials), then set in `.env` either SMTP vars above **or** rely on fallback `signInWithOtp` (not recommended for waitlist; codes won’t match our custom OTP).
+Enable custom SMTP (SendGrid/Resend SMTP credentials), then set in `backend/.env` either SMTP vars above **or** rely on fallback `signInWithOtp` (not recommended for production deliverability).
 
 For Supabase Auth emails (phone/partner if used), also set:
 

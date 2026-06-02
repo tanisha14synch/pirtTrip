@@ -9,6 +9,7 @@ export async function sendTransactionalEmail(payload: MailPayload): Promise<void
   const config = useRuntimeConfig()
   const resendKey = config.resendApiKey
   const from = config.emailFrom || 'Pirttrip <onboarding@resend.dev>'
+  const isProd = process.env.NODE_ENV === 'production'
 
   if (resendKey) {
     await sendViaResend(resendKey, from, payload)
@@ -18,6 +19,14 @@ export async function sendTransactionalEmail(payload: MailPayload): Promise<void
   if (config.smtpHost && config.smtpUser && config.smtpPass) {
     await sendViaSmtp(config, from, payload)
     return
+  }
+
+  if (isProd) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'No email provider configured',
+      data: { code: 'OTP_EMAIL_PROVIDER_MISSING' },
+    })
   }
 
   // Fallback: Supabase Auth OTP email (requires dashboard Email provider + templates)

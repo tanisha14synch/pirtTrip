@@ -80,8 +80,18 @@ export async function requireAdmin(event: H3Event): Promise<User> {
 const TWO_FA_MAX_AGE_MS = 12 * 60 * 60 * 1000
 
 export function isAdmin2faVerified(event: H3Event, user: User): boolean {
-  if (getCookie(event, 'admin_2fa_verified') === '1') {
-    return true
+  const cookieValue = getCookie(event, 'admin_2fa_verified')
+  if (cookieValue) {
+    const [cookieUserId, cookieTs] = cookieValue.split(':')
+    const issuedAt = Number(cookieTs)
+    if (
+      cookieUserId === user.id
+      && Number.isFinite(issuedAt)
+      && Date.now() - issuedAt >= 0
+      && Date.now() - issuedAt < TWO_FA_MAX_AGE_MS
+    ) {
+      return true
+    }
   }
 
   const verifiedAt = user.app_metadata?.email_2fa_verified_at

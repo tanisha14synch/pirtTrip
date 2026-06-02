@@ -24,6 +24,14 @@ export function useWaitlistRegistration() {
     otpFlow.clearTimers()
   }
 
+  function beginEmailStep() {
+    step.value = 'email'
+    otpDigits.value = ['', '', '', '', '', '']
+    challengeToken.value = null
+    errorMessage.value = null
+    otpFlow.clearTimers()
+  }
+
   async function sendEmailOtp() {
     loading.value = true
     errorMessage.value = null
@@ -62,7 +70,6 @@ export function useWaitlistRegistration() {
       }
     } catch (err: unknown) {
       errorMessage.value = otpFlow.parseFetchError(err)
-      throw err
     } finally {
       loading.value = false
     }
@@ -103,7 +110,6 @@ export function useWaitlistRegistration() {
       step.value = 'success'
     } catch (err: unknown) {
       errorMessage.value = otpFlow.parseFetchError(err)
-      throw err
     } finally {
       loading.value = false
     }
@@ -144,6 +150,7 @@ export function useWaitlistRegistration() {
     errorMessage,
     otpFlow,
     reset,
+    beginEmailStep,
     sendEmailOtp,
     resendEmailOtp,
     verifyOtpAndJoin,

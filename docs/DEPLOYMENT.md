@@ -1,113 +1,77 @@
-# Deployment Guide — pirttrip + Supabase
+# Deployment Guide — pirttrip (Email OTP)
 
-## 1. Create Supabase project
+This project uses:
+- `frontend/` Nuxt 3 app
+- `backend/` Nitro API
+- Supabase (DB + Auth users)
+- Email OTP via Resend/SMTP (phone OTP is not used in current flow)
 
-1. Go to [supabase.com](https://supabase.com) and create a project.
-2. Note **Project URL**, **anon key**, and **service_role key**.
+## 1. Supabase setup
 
-## 2. Run database migrations
-
-In **SQL Editor**, run in order:
-
-1. `supabase/migrations/20250601000001_initial_schema.sql`
-2. `supabase/migrations/20250601000002_rls_policies.sql`
-
-Or with Supabase CLI:
+1. Create a Supabase project.
+2. Capture:
+   - `SUPABASE_URL`
+   - `SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+3. Run backend migrations:
 
 ```bash
-supabase link --project-ref YOUR_REF
-supabase db push
+cd backend
+npm run db:migrate
 ```
 
-## 3. Enable phone authentication
+## 2. Create admin auth user
 
-1. **Authentication → Providers → Phone** → Enable
-2. Connect your SMS provider (Twilio recommended for production)
-3. Set OTP length and expiry under Auth settings
+1. Supabase Dashboard → Authentication → Users → Add user (email + password).
+2. Use `supabase/seed.sql` (or `backend/supabase/seed.sql`) to insert matching row into `public.admin_users`.
 
-## 4. Create admin user
+## 3. Configure backend env (required)
 
-1. **Authentication → Users → Add user** — email + password
-2. Copy the user UUID
-3. Run in SQL Editor (replace UUID and email):
-
-```sql
-INSERT INTO public.admin_users (id, full_name, email, role)
-VALUES (
-  'YOUR_AUTH_USER_UUID',
-  'Super Admin',
-  'admin@pirttrip.com',
-  'SUPER_ADMIN'
-);
-```
-
-## 5. Configure Nuxt environment
-
-Copy `frontend/.env.example` to `frontend/.env`:
+Create `backend/.env` from `backend/.env.example`:
 
 ```env
-NUXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
-NUXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
-SUPABASE_SERVICE_ROLE_KEY=eyJ...
+SUPABASE_URL=
+SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+OTP_SECRET=
+
+# Email provider (choose one)
+RESEND_API_KEY=
+EMAIL_FROM=
+# or SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASS
 ```
 
-## 6. Build and deploy frontend
+`SUPABASE_SERVICE_ROLE_KEY` must never be placed in frontend public env.
 
-```bash
-cd frontend
-npm install
-npm run build
+## 4. Configure frontend env
+
+Create `frontend/.env` from `frontend/.env.example`:
+
+```env
+NUXT_PUBLIC_SUPABASE_URL=
+NUXT_PUBLIC_SUPABASE_ANON_KEY=
+NUXT_PUBLIC_API_URL=https://your-backend-domain
 ```
 
-Deploy `.output` to your host (Vercel, Netlify, Node server, etc.) and set the same env vars in the hosting dashboard.
+## 5. Railway deploy
 
-### Vercel
+Use separate services:
+- Backend service root: `backend/` (reads `backend/railway.json`)
+- Frontend service root: `frontend/` (reads `frontend/railway.json`)
 
-- Framework: Nuxt
-- Root: `frontend`
-- Env: add all three Supabase variables; mark service role as sensitive
+See [RAILWAY.md](./RAILWAY.md) for exact variables and health checks.
 
-### Node (preview)
+## 6. Verify production flows
 
-```bash
-node .output/server/index.mjs
-```
+- Waitlist OTP: `/api/waitlist/send-otp` + `/api/waitlist/verify-otp`
+- Partner OTP: `/api/partner/send-otp` + `/api/partner/verify-otp`
+- Admin 2FA OTP: `/api/admin/auth/send-otp` + `/api/admin/auth/verify-otp`
 
-## 7. Verify production flows
-
-| Route | Check |
-|--------|--------|
-| `/become-a-partner` | Submit form → receive OTP → verify → success |
-| `/admin/login` | Admin email login |
-| `/admin` | Leads list, search, filter, export CSV |
-| `/admin/leads/:id` | Update status, notes, view OTP & activity |
-
-## 8. Registration flow (reference)
-
-```
-User fills form → signInWithOtp(phone)
-→ User enters OTP → verifyOtp
-→ POST /api/partner/register (Bearer token)
-→ Row in partner_leads (status NEW, otp_verified true)
-→ Activity log LEAD_CREATED
-```
-
-## 9. MSG91 fallback
-
-If Supabase Phone Auth is not available:
-
-1. Disable phone provider or use Edge Function to send OTP via MSG91 API
-2. Replace `usePartnerRegistration.sendOtp` / `verifyOtp` with MSG91 + custom verify endpoint
-3. Still call `/api/partner/register` after verification with a signed server token
-
-Contact your SMS provider for DLT/template compliance in India.
-
-## 10. Troubleshooting
+## 7. Troubleshooting
 
 | Issue | Fix |
 |--------|-----|
-| OTP not received | Check SMS provider credits, Supabase Auth logs, +91 format |
-| 401 on register | OTP not verified; session missing |
-| 403 on admin | User not in `admin_users` table |
-| 409 duplicate phone | Lead already exists for that number |
-| RLS errors | Ensure service role used on server routes only |
+| OTP send returns 500 | Check backend env (`SUPABASE_*`, `OTP_SECRET`, email provider vars) |
+| OTP delayed/not delivered | Configure Resend/SMTP; avoid production fallback-only mode |
+| 401/403 admin | Ensure auth user exists and is mapped in `admin_users` |
+| Migration failures | Set `SUPABASE_DB_PASSWORD` or `SUPABASE_ACCESS_TOKEN` in `backend/.env` |

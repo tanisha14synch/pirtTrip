@@ -4,7 +4,10 @@
  */
 export function getApiBaseUrl(): string {
   const config = useRuntimeConfig()
-  return (config.public.apiUrl as string)?.replace(/\/$/, '') || ''
+  const raw = (config.public.apiUrl as string)?.trim() || ''
+  const noTrailing = raw.replace(/\/$/, '')
+  // Enforce origin-only contract; if someone sets .../api we normalize it.
+  return noTrailing.replace(/\/api$/, '')
 }
 
 export function apiUrl(path: string): string {

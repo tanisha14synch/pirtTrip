@@ -35,6 +35,10 @@ export function useEmailOtp(options: { resendCooldownSeconds?: number } = {}) {
   }
 
   function startResendCooldown(seconds: number) {
+    if (resendTimer) {
+      clearInterval(resendTimer)
+      resendTimer = null
+    }
     resendWaitSeconds.value = seconds
 
     resendTimer = setInterval(() => {

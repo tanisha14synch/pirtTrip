@@ -18,10 +18,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return navigateTo('/admin/login')
   }
 
-  if (!auth.adminProfile.value) {
-    await auth.fetchAdminProfile()
-  }
-
   if (auth.needsAdmin2fa.value) {
     return navigateTo('/admin/login')
   }

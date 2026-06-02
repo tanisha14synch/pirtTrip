@@ -1,4 +1,4 @@
-# Pre-Deployment Checklist — pirttrip Partner Backend
+# Pre-Deployment Checklist — pirttrip OTP (Nuxt + Nitro)
 
 Provide or complete each item before going to production.
 
@@ -10,21 +10,12 @@ Provide or complete each item before going to production.
 - [ ] Run SQL migrations in `supabase/migrations/` (SQL Editor or CLI)
 - [ ] Run `supabase/seed.sql` after creating admin auth user
 
-## Phone OTP (choose one)
+## Email OTP provider (required for production)
 
-### Option A — Supabase Phone Auth (recommended)
-
-- [ ] Enable **Phone** provider: Authentication → Providers → Phone
-- [ ] Configure **SMS provider** (Twilio, MessageBird, etc.) in Supabase
-- [ ] Add India (`+91`) to allowed countries if needed
-- [ ] Test OTP send/verify on staging with a real device
-
-### Option B — MSG91 (if Supabase Phone unavailable in your region)
-
-- [ ] MSG91 account + **Auth Key**
-- [ ] **Template ID** approved for OTP
-- [ ] **Sender ID**
-- [ ] Custom Edge Function or server integration (not included by default)
+- [ ] Configure **Resend** (`RESEND_API_KEY`, `EMAIL_FROM`) on backend service
+  - or configure SMTP (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`)
+- [ ] Set strong `OTP_SECRET` on backend service
+- [ ] Keep `OTP_DEBUG` disabled in production
 
 ## Admin access
 
@@ -34,9 +25,11 @@ Provide or complete each item before going to production.
 
 ## Hosting / Nuxt
 
-- [ ] Production **environment variables** set on host (see `.env.example`)
+- [ ] Backend variables set on backend service only (never in frontend public env)
+- [ ] Frontend variables set on frontend service (`NUXT_PUBLIC_*`)
 - [ ] **Custom domain** DNS + SSL configured
 - [ ] `npm run build` succeeds
+- [ ] `/` waitlist OTP flow tested end-to-end
 - [ ] `/become-a-partner` registration flow tested end-to-end
 - [ ] `/admin/login` and lead management tested
 
@@ -44,7 +37,7 @@ Provide or complete each item before going to production.
 
 - [ ] `SUPABASE_SERVICE_ROLE_KEY` only on server/runtime, not `NUXT_PUBLIC_*`
 - [ ] RLS enabled on all tables (migrations apply policies)
-- [ ] Rate limiting on OTP (configure in Supabase Auth settings)
+- [ ] OTP resend/attempt limits validated via API responses
 
 ## Optional
 

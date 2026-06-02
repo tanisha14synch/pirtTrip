@@ -170,6 +170,9 @@ export function useAuth() {
       if (!adminChallengeToken.value) {
         throw new Error('Verification session expired. Request a new code.')
       }
+      if (code.trim().length !== 6) {
+        throw new Error('Enter the 6-digit code from your email')
+      }
 
       await $fetch(apiUrl('/api/admin/auth/verify-otp'), {
         method: 'POST',
@@ -187,7 +190,6 @@ export function useAuth() {
       await refreshAdminAccessState()
     } catch (err: unknown) {
       errorMessage.value = otpFlow.parseFetchError(err)
-      throw err
     } finally {
       loading.value = false
     }

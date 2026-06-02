@@ -9,6 +9,7 @@ const {
   errorMessage,
   otpFlow,
   reset,
+  beginEmailStep,
   sendEmailOtp,
   resendEmailOtp,
   verifyOtpAndJoin,
@@ -28,11 +29,15 @@ watch(open, (isOpen) => {
 })
 
 async function onJoinNow() {
-  await sendEmailOtp()
+  try {
+    await sendEmailOtp()
+  } catch {}
 }
 
 async function onEnterOtp() {
-  await verifyOtpAndJoin()
+  try {
+    await verifyOtpAndJoin()
+  } catch {}
 }
 
 function onOtpInput(index, event) {
@@ -197,7 +202,7 @@ function onOtpInput(index, event) {
                 type="button"
                 class="mt-1 w-full py-2 font-plein text-[14px] text-white/45 hover:text-white"
                 :disabled="loading"
-                @click="step = 'email'"
+                @click="beginEmailStep"
               >
                 Change email
               </button>

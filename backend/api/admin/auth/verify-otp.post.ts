@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, statusMessage: metaError.message })
   }
 
-  setCookie(event, 'admin_2fa_verified', '1', {
+  setCookie(event, 'admin_2fa_verified', `${user.id}:${Date.now()}`, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',

@@ -8,47 +8,55 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event)
-  const parsed = bodySchema.safeParse(body)
+  try {
+    const body = await readBody(event)
+    const parsed = bodySchema.safeParse(body)
 
-  if (!parsed.success) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: parsed.error.errors[0]?.message ?? 'Invalid email',
+    if (!parsed.success) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: parsed.error.errors[0]?.message ?? 'Invalid email',
+      })
+    }
+
+    const email = parsed.data.email.trim().toLowerCase()
+    const admin = getSupabaseAdmin()
+
+    const { data: existing, error: lookupError } = await admin
+      .from('waitlist_subscribers')
+      .select('id')
+      .eq('email', email)
+      .maybeSingle()
+
+    if (lookupError && !lookupError.message.includes('waitlist_subscribers')) {
+      throw createError({ statusCode: 500, statusMessage: lookupError.message })
+    }
+
+    if (existing) {
+      throw createError({
+        statusCode: 409,
+        statusMessage: 'This email is already on the waitlist',
+      })
+    }
+
+    const result = await createAndSendOtp({
+      email,
+      purpose: 'waitlist',
+      challengeToken: parsed.data.challengeToken,
     })
-  }
 
-  const email = parsed.data.email.trim().toLowerCase()
-  const admin = getSupabaseAdmin()
-
-  const { data: existing, error: lookupError } = await admin
-    .from('waitlist_subscribers')
-    .select('id')
-    .eq('email', email)
-    .maybeSingle()
-
-  if (lookupError && !lookupError.message.includes('waitlist_subscribers')) {
-    throw createError({ statusCode: 500, statusMessage: lookupError.message })
-  }
-
-  if (existing) {
+    return {
+      success: true,
+      challengeToken: result.challengeToken,
+      expiresInSeconds: result.expiresInSeconds,
+      resendCooldownSeconds: result.resendCooldownSeconds,
+      ...('debugCode' in result ? { debugCode: result.debugCode } : {}),
+    }
+  } catch (err: any) {
+    if (err?.statusCode) throw err
     throw createError({
-      statusCode: 409,
-      statusMessage: 'This email is already on the waitlist',
+      statusCode: 500,
+      statusMessage: err?.message || 'Failed to send OTP',
     })
-  }
-
-  const result = await createAndSendOtp({
-    email,
-    purpose: 'waitlist',
-    challengeToken: parsed.data.challengeToken,
-  })
-
-  return {
-    success: true,
-    challengeToken: result.challengeToken,
-    expiresInSeconds: result.expiresInSeconds,
-    resendCooldownSeconds: result.resendCooldownSeconds,
-    ...('debugCode' in result ? { debugCode: result.debugCode } : {}),
   }
 })

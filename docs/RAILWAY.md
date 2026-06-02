@@ -21,7 +21,7 @@ Browser → https://your-app.up.railway.app/          (Nuxt frontend)
 
 1. Railway project → **New service** → connect `pirtTrip` repo.
 2. **Settings → Root Directory** → `backend`.
-3. **Build:** Dockerfile (`backend/Dockerfile`) — configured in `backend/railway.toml`.
+3. **Build:** Dockerfile (`backend/Dockerfile`) — configured in `backend/railway.json`.
 4. **Variables** (from `backend/.env.example`):
 
    | Variable | Notes |
@@ -64,7 +64,7 @@ Browser → https://your-app.up.railway.app/          (Nuxt frontend)
    | `PORT` | Leave unset (Railway sets it) |
    | `NUXT_PUBLIC_API_URL` | Same backend URL (for SSR) |
 
-5. Health check path: `/` (see `frontend/railway.toml`).
+5. Health check path: `/` (see `frontend/railway.json`).
 6. Open the frontend domain in a browser — homepage should load.
 
 ### Vercel (optional)
@@ -133,8 +133,8 @@ Public URL: `https://pirttrip-web.up.railway.app` (your generated domain)
 
 ## Config files
 
-- `backend/railway.toml` — API Docker build + `/api/health`
-- `frontend/railway.toml` — Nuxt Docker build + `/`
-- Root `railway.toml` — legacy single-service API from root `Dockerfile` only
+- `backend/railway.json` — API Docker build + `/api/health`
+- `frontend/railway.json` — Nuxt Docker build + `/`
+- Root `railway.json` — legacy single-service API from root `Dockerfile` only
 
-Railway reads `railway.toml` in each service’s root directory; there is no shared `railway.json` in this repo.
+Railway reads `railway.json` in each service’s root directory.

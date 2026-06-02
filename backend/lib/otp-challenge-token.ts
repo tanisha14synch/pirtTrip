@@ -1,18 +1,14 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import type { OtpPurpose } from './otp'
 import { canResendOtp, hashOtpCode, OTP_LIMITS } from './otp'
+import { getSupabaseAdmin } from './supabase'
 
 export type OtpChallengePayload = {
+  id: string
   email: string
   purpose: OtpPurpose
-  codeHash: string
   exp: number
-  resendCount: number
-  lastSentAt: number
-  metadata?: Record<string, unknown>
 }
-
-const attemptCounts = new Map<string, number>()
 
 function getSecret(): string {
   const config = useRuntimeConfig()
@@ -52,63 +48,258 @@ export function parseChallengeToken(token: string): OtpChallengePayload {
 
   const payload = JSON.parse(Buffer.from(encoded, 'base64url').toString('utf8')) as OtpChallengePayload
 
-  if (!payload.email || !payload.purpose || !payload.codeHash || !payload.exp) {
+  if (!payload.id || !payload.email || !payload.purpose || !payload.exp) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid verification session' })
   }
 
   return payload
 }
 
-export function getAttemptKey(email: string, purpose: OtpPurpose): string {
-  return `${purpose}:${email.toLowerCase()}`
+type OtpChallengeRow = {
+  id: string
+  email: string
+  purpose: string
+  code_hash: string
+  expires_at: string
+  attempts: number
+  max_attempts: number
+  resend_count: number
+  last_sent_at: string
+  verified_at: string | null
 }
 
-export function getAttemptCount(email: string, purpose: OtpPurpose): number {
-  return attemptCounts.get(getAttemptKey(email, purpose)) ?? 0
-}
+export async function getLatestActiveChallenge(email: string, purpose: OtpPurpose) {
+  const admin = getSupabaseAdmin()
+  const normalizedEmail = email.trim().toLowerCase()
+  const { data, error } = await admin
+    .from('email_otp_challenges')
+    .select(
+      'id,email,purpose,code_hash,expires_at,attempts,max_attempts,resend_count,last_sent_at,verified_at',
+    )
+    .eq('email', normalizedEmail)
+    .eq('purpose', purpose)
+    .is('verified_at', null)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
 
-export function incrementAttemptCount(email: string, purpose: OtpPurpose): number {
-  const key = getAttemptKey(email, purpose)
-  const next = (attemptCounts.get(key) ?? 0) + 1
-  attemptCounts.set(key, next)
-  return next
-}
-
-export function clearAttemptCount(email: string, purpose: OtpPurpose): void {
-  attemptCounts.delete(getAttemptKey(email, purpose))
-}
-
-export function validateResendFromToken(existingToken?: string | null) {
-  if (!existingToken) {
-    return { allowed: true as const, resendCount: 0, waitSeconds: 0 }
+  if (error) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to load OTP challenge',
+    })
   }
 
-  const payload = parseChallengeToken(existingToken)
-  const check = canResendOtp(new Date(payload.lastSentAt).toISOString(), payload.resendCount)
+  return data as OtpChallengeRow | null
+}
 
+export async function validateResendForEmail(options: {
+  email: string
+  purpose: OtpPurpose
+  existingToken?: string | null
+}) {
+  let challenge: OtpChallengeRow | null = null
+
+  if (options.existingToken) {
+    const tokenPayload = parseChallengeToken(options.existingToken)
+    const admin = getSupabaseAdmin()
+    const { data, error } = await admin
+      .from('email_otp_challenges')
+      .select(
+        'id,email,purpose,code_hash,expires_at,attempts,max_attempts,resend_count,last_sent_at,verified_at',
+      )
+      .eq('id', tokenPayload.id)
+      .eq('email', tokenPayload.email)
+      .eq('purpose', tokenPayload.purpose)
+      .is('verified_at', null)
+      .maybeSingle()
+
+    if (error) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Failed to validate OTP resend',
+      })
+    }
+
+    challenge = (data as OtpChallengeRow | null) ?? null
+  }
+
+  if (!challenge) {
+    challenge = await getLatestActiveChallenge(options.email, options.purpose)
+  }
+
+  if (!challenge) {
+    return {
+      allowed: true as const,
+      waitSeconds: 0,
+      resendCount: 0,
+      challenge,
+    }
+  }
+
+  const check = canResendOtp(challenge.last_sent_at, challenge.resend_count)
   return {
     ...check,
-    resendCount: payload.resendCount,
+    resendCount: challenge.resend_count,
+    challenge,
   }
 }
 
-export function buildChallengePayload(options: {
+export async function upsertOtpChallenge(options: {
+  challengeId?: string | null
   email: string
   purpose: OtpPurpose
   code: string
   resendCount: number
   metadata?: Record<string, unknown>
-}): OtpChallengePayload {
+}): Promise<OtpChallengeRow> {
+  const admin = getSupabaseAdmin()
   const email = options.email.trim().toLowerCase()
-  const exp = Date.now() + OTP_LIMITS.OTP_TTL_MS
+  const expiresAt = new Date(Date.now() + OTP_LIMITS.OTP_TTL_MS).toISOString()
+  const lastSentAt = new Date().toISOString()
+  const codeHash = hashOtpCode(options.code, email, options.purpose)
 
+  if (options.challengeId) {
+    const { data, error } = await admin
+      .from('email_otp_challenges')
+      .update({
+        code_hash: codeHash,
+        expires_at: expiresAt,
+        resend_count: options.resendCount,
+        last_sent_at: lastSentAt,
+        attempts: 0,
+        metadata: options.metadata || {},
+        verified_at: null,
+      })
+      .eq('id', options.challengeId)
+      .eq('email', email)
+      .eq('purpose', options.purpose)
+      .select(
+        'id,email,purpose,code_hash,expires_at,attempts,max_attempts,resend_count,last_sent_at,verified_at',
+      )
+      .maybeSingle()
+
+    if (!error && data) {
+      return data as OtpChallengeRow
+    }
+  }
+
+  const { data, error } = await admin
+    .from('email_otp_challenges')
+    .insert({
+      email,
+      purpose: options.purpose,
+      code_hash: codeHash,
+      expires_at: expiresAt,
+      resend_count: options.resendCount,
+      last_sent_at: lastSentAt,
+      max_attempts: OTP_LIMITS.MAX_VERIFY_ATTEMPTS,
+      metadata: options.metadata || {},
+    })
+    .select(
+      'id,email,purpose,code_hash,expires_at,attempts,max_attempts,resend_count,last_sent_at,verified_at',
+    )
+    .single()
+
+  if (error || !data) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to create OTP challenge',
+    })
+  }
+
+  return data as OtpChallengeRow
+}
+
+export function buildChallengePayload(options: {
+  id: string
+  email: string
+  purpose: OtpPurpose
+  expiresAt: string
+}): OtpChallengePayload {
   return {
+    id: options.id,
     email,
     purpose: options.purpose,
-    codeHash: hashOtpCode(options.code, email, options.purpose),
-    exp,
-    resendCount: options.resendCount,
-    lastSentAt: Date.now(),
-    metadata: options.metadata,
+    exp: new Date(options.expiresAt).getTime(),
+  }
+}
+
+export async function getChallengeForVerification(options: {
+  challengeToken: string
+  email: string
+  purpose: OtpPurpose
+}) {
+  const payload = parseChallengeToken(options.challengeToken)
+  const normalizedEmail = options.email.trim().toLowerCase()
+  if (payload.email !== normalizedEmail || payload.purpose !== options.purpose) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Verification session does not match this email',
+      data: { code: 'OTP_SESSION_MISMATCH' },
+    })
+  }
+
+  const admin = getSupabaseAdmin()
+  const { data, error } = await admin
+    .from('email_otp_challenges')
+    .select(
+      'id,email,purpose,code_hash,expires_at,attempts,max_attempts,resend_count,last_sent_at,verified_at',
+    )
+    .eq('id', payload.id)
+    .eq('email', normalizedEmail)
+    .eq('purpose', options.purpose)
+    .maybeSingle()
+
+  if (error || !data) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Verification session expired. Request a new code.',
+      data: { code: 'OTP_SESSION_EXPIRED' },
+    })
+  }
+
+  return data as OtpChallengeRow
+}
+
+export async function markChallengeAttempt(challengeId: string) {
+  const admin = getSupabaseAdmin()
+  const { data: row, error: rowError } = await admin
+    .from('email_otp_challenges')
+    .select('attempts')
+    .eq('id', challengeId)
+    .single()
+  if (rowError || !row) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to update OTP attempts',
+    })
+  }
+  const next = (row.attempts ?? 0) + 1
+  const { error: updateError } = await admin
+    .from('email_otp_challenges')
+    .update({ attempts: next })
+    .eq('id', challengeId)
+  if (updateError) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to update OTP attempts',
+    })
+  }
+  return next
+}
+
+export async function markChallengeVerified(challengeId: string) {
+  const admin = getSupabaseAdmin()
+  const { error } = await admin
+    .from('email_otp_challenges')
+    .update({ verified_at: new Date().toISOString() })
+    .eq('id', challengeId)
+
+  if (error) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to mark OTP as verified',
+    })
   }
 }

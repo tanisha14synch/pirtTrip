@@ -21,11 +21,15 @@ const inputClass =
   'h-[46px] w-full rounded-[8px] border border-[#3a3530] bg-[#1e1b18] px-3.5 font-plein text-[15px] font-normal leading-[140%] text-white placeholder:text-white/35 outline-none transition-colors focus:border-[#F3A81A]/70'
 
 async function onSubmitDetails() {
-  await sendOtp()
+  try {
+    await sendOtp()
+  } catch {}
 }
 
 async function onSubmitOtp() {
-  await verifyOtpAndRegister()
+  try {
+    await verifyOtpAndRegister()
+  } catch {}
 }
 
 function onOtpInput(index, event) {

@@ -66,7 +66,6 @@ export function usePartnerRegistration() {
       }
     } catch (err: unknown) {
       errorMessage.value = otpFlow.parseFetchError(err)
-      throw err
     } finally {
       loading.value = false
     }
@@ -114,7 +113,6 @@ export function usePartnerRegistration() {
       step.value = 'success'
     } catch (err: unknown) {
       errorMessage.value = otpFlow.parseFetchError(err)
-      throw err
     } finally {
       loading.value = false
     }

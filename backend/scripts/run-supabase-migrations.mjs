@@ -17,7 +17,6 @@ const pg = require('pg')
 function loadEnv() {
   for (const envPath of [
     resolve(backendRoot, '.env'),
-    resolve(repoRoot, 'frontend/.env'),
   ]) {
     if (!existsSync(envPath)) continue
     const env = {}
@@ -30,12 +29,12 @@ function loadEnv() {
     }
     return env
   }
-  console.error('Missing backend/.env (or frontend/.env fallback)')
+  console.error('Missing backend/.env')
   process.exit(1)
 }
 
 const env = loadEnv()
-const projectRef = 'fvkwophzzyaukacuiszv'
+const projectRef = env.SUPABASE_PROJECT_REF || process.env.SUPABASE_PROJECT_REF || 'fvkwophzzyaukacuiszv'
 const password = env.SUPABASE_DB_PASSWORD || process.env.SUPABASE_DB_PASSWORD
 const accessToken = env.SUPABASE_ACCESS_TOKEN || process.env.SUPABASE_ACCESS_TOKEN
 
