@@ -21,6 +21,8 @@ const timeLeft = ref({
 })
 
 const waitlistOpen = ref(false)
+const route = useRoute()
+const router = useRouter()
 
 let timerId
 
@@ -44,6 +46,13 @@ const tickCountdown = () => {
 
 onMounted(() => {
   timerId = window.setInterval(tickCountdown, 1000)
+
+  if (route.query.join === 'waitlist') {
+    waitlistOpen.value = true
+    const nextQuery = { ...route.query }
+    delete nextQuery.join
+    router.replace({ query: nextQuery })
+  }
 })
 
 onUnmounted(() => {

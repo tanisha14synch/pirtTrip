@@ -2,6 +2,7 @@
 import { FOOTER_LEGAL_LINKS, FOOTER_QUICK_LINKS } from '~/constants/legal-links'
 
 const CTA_BG = '/images/hero/hero-bg.png'
+const waitlistOpen = ref(false)
 
 const quickLinks = FOOTER_QUICK_LINKS
 
@@ -58,12 +59,13 @@ const ctaHighlights = [
               Get notified during launch
             </p>
 
-            <a
-              href="/"
+            <button
+              type="button"
               class="mt-7 inline-flex h-[50px] min-w-[220px] items-center justify-center rounded-full bg-white px-8 font-plein text-[16px] font-bold leading-[130%] tracking-[0] text-black transition-opacity hover:opacity-90"
+              @click="waitlistOpen = true"
             >
               Join Traveler Waitlist
-            </a>
+            </button>
           </div>
 
           <!-- Right -->
@@ -191,4 +193,6 @@ const ctaHighlights = [
       </p>
     </div>
   </footer>
+
+  <LandingWaitlistModal v-model:open="waitlistOpen" />
 </template>
