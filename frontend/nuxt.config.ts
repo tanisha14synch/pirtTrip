@@ -5,6 +5,8 @@ const apiUrl =
   || process.env.NUXT_PUBLIC_API_BASE_URL
   || ''
 
+const devApiTarget = `${(apiUrl || 'http://127.0.0.1:3001').replace(/\/$/, '')}/api`
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
@@ -19,7 +21,9 @@ export default defineNuxtConfig({
   nitro: {
     devProxy: {
       '/api': {
-        target: apiUrl || 'http://127.0.0.1:3001',
+        // Nitro devProxy strips the matched prefix. Point to `/api` on backend
+        // so `/api/waitlist/send-otp` stays routed to backend API handlers.
+        target: devApiTarget,
         changeOrigin: true,
       },
     },

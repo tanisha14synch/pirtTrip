@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { getSupabaseAdmin, requireAuth } from '~/lib/supabase'
 
 const bodySchema = z.object({
   email: z.string().email('Invalid email address'),

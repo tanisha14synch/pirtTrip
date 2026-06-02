@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { verifyEmailOtp } from '~/lib/email-otp-service'
+import { getSupabaseAdmin } from '~/lib/supabase'
 
 const bodySchema = z.object({
   email: z.string().email('Invalid email address'),
