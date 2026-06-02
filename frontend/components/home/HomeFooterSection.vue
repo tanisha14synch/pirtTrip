@@ -142,10 +142,10 @@ const isExternalHref = (href) =>
               </li>
               <li>
                 <a
-                  href="tel:+11234567890"
+                  href="tel:+919711104186"
                   class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/80 transition-colors hover:text-black"
                 >
-                  +1 (123) 456-7890
+                  +91-9711104186
                 </a>
               </li>
             </ul>
