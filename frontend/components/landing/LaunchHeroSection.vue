@@ -149,6 +149,12 @@ onUnmounted(() => {
       </button>
     </div>
 
+    <p
+      class="absolute bottom-0 left-0 right-0 z-20 px-4 pb-5 text-center font-plein text-[14px] font-normal leading-[140%] tracking-[0] text-white/55 sm:pb-6 sm:text-[16px]"
+    >
+      Copyright © 2026 pirttrip. All Rights Reserved.
+    </p>
+
     <LandingWaitlistModal v-model:open="waitlistOpen" />
   </section>
 </template>
