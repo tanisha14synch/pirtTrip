@@ -15,6 +15,11 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
   runtimeConfig: {
+    apiProxyOrigin:
+      process.env.API_URL
+      || process.env.NUXT_PUBLIC_API_URL
+      || process.env.NUXT_PUBLIC_API_BASE_URL
+      || '',
     public: {
       apiUrl,
       supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL || '',
