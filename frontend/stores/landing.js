@@ -8,8 +8,6 @@ export const useLandingStore = defineStore('landing', {
       },
       navLinks: [
         { id: 'home', label: 'Home', href: '/' },
-        { id: 'become-a-partner', label: 'Become a Partner', href: '/become-a-partner' },
-        { id: 'home-2', label: 'Home 2', href: '/home-2' },
       ],
       partnerCta: {
         label: 'Become a Partner',

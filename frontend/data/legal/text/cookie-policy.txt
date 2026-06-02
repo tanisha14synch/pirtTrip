@@ -1,0 +1,136 @@
+Effective Date: 8th June, 2026
+Platform: PirtTrip.com
+Operated by: Martyrs Services, Bareilly, Uttar Pradesh, India
+
+This Cookie Policy explains how PirtTrip.com uses cookies, similar technologies and consent preferences when users visit our website or use platform features.
+
+1. What Are Cookies?
+Cookies are small text files placed on your browser or device that help websites function properly, remember preferences, improve security and understand usage patterns.
+Similar technologies may include:
+• Local storage
+• Session tokens
+• Pixels
+• Tags
+• SDK identifiers
+• Preference storage tools
+
+2. Why We Use Cookies
+PirtTrip may use cookies or similar technologies for purposes such as:
+• Keeping users signed in
+• Maintaining secure sessions
+• Remembering preferences
+• Saving consent choices
+• Improving site performance
+• Measuring traffic and engagement
+• Detecting abuse or suspicious activity
+• Supporting future advertising or remarketing features
+
+3. Types of Cookies We May Use
+A. Strictly Necessary Cookies
+These are essential for core platform functionality and may include:
+• Login authentication
+• Session management
+• Security protections
+• Load balancing
+• Form submission continuity
+• Fraud prevention basics
+These cookies may remain active because the site may not function properly without them.
+B. Functional Cookies
+These help improve convenience, such as:
+• Remembering language or region
+• Saving interface preferences
+• Remembering non-sensitive settings
+C. Analytics Cookies
+When introduced, analytics cookies may help us understand:
+• Page visits
+• Feature usage
+• Navigation behavior
+• Error trends
+• Device/browser patterns
+This helps improve the website experience.
+D. Advertising / Marketing Cookies
+If advertising features are enabled in the future, cookies may be used for:
+• Measuring campaign performance
+• Retargeting users
+• Showing more relevant ads
+• Limiting repetitive ad exposure
+
+4. Current Status
+At present, certain analytics or advertising tools may not yet be active. However, this Policy is designed to support future features as the platform grows.
+
+5. Consent Management
+PirtTrip intends to provide a granular cookie consent banner, allowing users to choose among options such as:
+• Accept All
+• Reject Non-Essential
+• Customize Preferences
+Where applicable, users may separately manage categories such as:
+• Necessary
+• Functional
+• Analytics
+• Marketing
+
+6. Can You Reject Cookies?
+Yes, users may reject non-essential cookies where such controls are available.
+Please note:
+• Necessary cookies may remain active
+• Rejecting some cookies may reduce convenience or functionality
+
+7. Cookie Duration
+Different cookies may remain active for different periods depending on purpose.
+Examples:
+• Session cookies: expire when browser closes
+• Short-term cookies: days or weeks
+• Preference cookies: longer duration
+• Security cookies: as operationally necessary
+PirtTrip uses a mixed-by-type retention model.
+
+8. Login & Session Cookies
+Because PirtTrip offers user and partner accounts, cookies or tokens may be used to:
+• Keep you logged in
+• Secure sessions
+• Prevent unauthorized access
+• Remember session state
+
+9. Third-Party Services
+As the platform grows, trusted third-party tools may be integrated for services such as:
+• Hosting infrastructure
+• Analytics
+• Payment processing
+• Customer support tools
+• Advertising tools
+• Security tools
+Such providers may use their own cookies or similar technologies subject to their own policies.
+Third-party cookies should be allowed only from trusted operational vendors and only where reasonably necessary.
+
+10. Cloud Infrastructure Signals
+Even where PirtTrip does not actively run analytics tools, hosting or infrastructure providers may automatically process technical logs such as:
+• IP address
+• Browser type
+• Device metadata
+• Server requests
+• Security logs
+This is common for website delivery, security and reliability.
+
+11. Browser Controls
+Most browsers allow users to block, delete or manage cookies through settings. Doing so may affect functionality.
+
+12. Future Analytics / Ad Tools
+PirtTrip may later implement tools such as:
+• Web analytics platforms
+• Heatmap / usability tools
+• Ad conversion tools
+• Audience measurement tools
+Where required, consent choices may apply before activation.
+
+13. Privacy Relationship
+Cookies may involve personal data or identifiers in some cases. Please also review our Privacy Policy for broader data handling practices.
+
+14. Updates to This Policy
+We may revise this Cookie Policy as tools, regulations or business operations evolve.
+
+15. Contact
+For cookie or privacy questions:
+www.pirttrip.com/contact
+A brand of Martyrs Services
+Bareilly, Uttar Pradesh, India
+Email: contact@pirttrip.com

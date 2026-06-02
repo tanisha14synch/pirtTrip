@@ -1,20 +1,15 @@
 <script setup>
+import { FOOTER_LEGAL_LINKS, FOOTER_QUICK_LINKS } from '~/constants/legal-links'
+
 const CTA_BG = '/images/hero/hero-bg.png'
 
-const quickLinks = [
-  { id: 'home', label: 'Home', href: '/' },
-  { id: 'become-a-partner', label: 'Become a Partner', href: '/become-a-partner' },
-  { id: 'home-2', label: 'Home 2', href: '/home-2' },
-  { id: 'contact', label: 'Contact Us', href: '#contact' },
-]
+const quickLinks = FOOTER_QUICK_LINKS
 
-const legalLinks = [
-  { id: 'privacy', label: 'Privacy Policy', href: '#privacy' },
-  { id: 'terms', label: 'Terms of Service', href: '#terms' },
-  { id: 'cookies', label: 'Cookie Policy', href: '#cookies' },
-]
+const legalLinks = FOOTER_LEGAL_LINKS
 
 const isHashHref = (href) => typeof href === 'string' && href.startsWith('#')
+const isExternalHref = (href) =>
+  typeof href === 'string' && (href.startsWith('mailto:') || href.startsWith('http'))
 </script>
 
 <template>
@@ -97,7 +92,7 @@ const isHashHref = (href) => typeof href === 'string' && href.startsWith('#')
             <ul class="mt-5 space-y-[10px]">
               <li v-for="link in quickLinks" :key="link.id">
                 <NuxtLink
-                  v-if="!isHashHref(link.href)"
+                  v-if="!isHashHref(link.href) && !isExternalHref(link.href)"
                   :to="link.href"
                   class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/80 transition-colors hover:text-black"
                 >
@@ -119,22 +114,14 @@ const isHashHref = (href) => typeof href === 'string' && href.startsWith('#')
               Legal
             </h3>
 
-            <ul class="mt-5 space-y-[10px]">
+            <ul class="mt-5 max-w-[220px] space-y-[10px]">
               <li v-for="link in legalLinks" :key="link.id">
                 <NuxtLink
-                  v-if="!isHashHref(link.href)"
                   :to="link.href"
                   class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/80 transition-colors hover:text-black"
                 >
                   {{ link.label }}
                 </NuxtLink>
-                <a
-                  v-else
-                  :href="link.href"
-                  class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/80 transition-colors hover:text-black"
-                >
-                  {{ link.label }}
-                </a>
               </li>
             </ul>
           </div>
@@ -147,10 +134,10 @@ const isHashHref = (href) => typeof href === 'string' && href.startsWith('#')
             <ul class="mt-5 space-y-[10px]">
               <li>
                 <a
-                  href="mailto:pirttrip@gmail.com"
+                  href="mailto:contact@pirttrip.com"
                   class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/80 transition-colors hover:text-black"
                 >
-                  pirttrip@gmail.com
+                  contact@pirttrip.com
                 </a>
               </li>
               <li>

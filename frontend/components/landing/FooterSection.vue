@@ -1,17 +1,13 @@
 <script setup>
+import { FOOTER_LEGAL_LINKS, FOOTER_QUICK_LINKS } from '~/constants/legal-links'
+
 const quickLinks = [
-  { id: 'home', label: 'Home', href: '/' },
-  { id: 'become-a-partner', label: 'Become a Partner', href: '/become-a-partner' },
-  { id: 'home-2', label: 'Home 2', href: '/home-2' },
+  ...FOOTER_QUICK_LINKS.slice(0, 3),
   { id: 'benefits', label: 'Benefits', href: '/#benefits' },
   { id: 'features', label: 'Features', href: '/#features' },
 ]
 
-const legalLinks = [
-  { id: 'privacy', label: 'Privacy Policy', href: '#privacy' },
-  { id: 'terms', label: 'Terms of Service', href: '#terms' },
-  { id: 'cookies', label: 'Cookie Policy', href: '#cookies' },
-]
+const legalLinks = FOOTER_LEGAL_LINKS
 
 const isHashHref = (href) => typeof href === 'string' && href.startsWith('#')
 </script>
@@ -66,22 +62,14 @@ const isHashHref = (href) => typeof href === 'string' && href.startsWith('#')
             <h3 class="font-plein text-[18px] font-bold leading-[130%] text-black">
               Legal
             </h3>
-            <ul class="mt-5 space-y-[10px]">
+            <ul class="mt-5 max-w-[220px] space-y-[10px]">
               <li v-for="link in legalLinks" :key="link.id">
                 <NuxtLink
-                  v-if="!isHashHref(link.href)"
                   :to="link.href"
                   class="font-plein text-[16px] font-normal leading-[140%] text-black/80 transition-colors hover:text-black"
                 >
                   {{ link.label }}
                 </NuxtLink>
-                <a
-                  v-else
-                  :href="link.href"
-                  class="font-plein text-[16px] font-normal leading-[140%] text-black/80 transition-colors hover:text-black"
-                >
-                  {{ link.label }}
-                </a>
               </li>
             </ul>
           </div>
@@ -93,10 +81,10 @@ const isHashHref = (href) => typeof href === 'string' && href.startsWith('#')
             <ul class="mt-5 space-y-[10px]">
               <li>
                 <a
-                  href="mailto:pirttrip@gmail.com"
+                  href="mailto:contact@pirttrip.com"
                   class="font-plein text-[16px] font-normal leading-[140%] text-black/80 transition-colors hover:text-black"
                 >
-                  pirttrip@gmail.com
+                  contact@pirttrip.com
                 </a>
               </li>
               <li>

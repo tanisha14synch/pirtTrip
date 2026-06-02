@@ -1,0 +1,185 @@
+Effective Date: 8th June, 2026
+Platform: PirtTrip.com
+Operated by: Martyrs Services, Bareilly, Uttar Pradesh, India
+
+This Travel Business Data Privacy Policy explains how PirtTrip.com collects, uses, stores, shares, protects and manages data relating to travel businesses, prospective businesses and authorized representatives (“Businesses”, “You”, “Your”).
+By registering, onboarding, verifying, purchasing Connects, or using business features, you agree to this Policy.
+
+1. Purpose of This Policy
+PirtTrip collects business data to operate a secure and effective travel marketplace, including:
+• Onboarding businesses
+• Conducting KYC and verification
+• Managing listings
+• Delivering leads
+• Processing payments
+• Improving products
+• Preventing fraud
+• Meeting legal obligations
+
+2. Data We May Collect
+A. Identity & Contact Data
+We may collect:
+• Name of proprietor / authorized person
+• Mobile number
+• Email address
+• Designation
+• Address details
+• PAN details
+• Aadhaar or other identity information
+• Selfie / verification images
+B. Business Data
+We may collect:
+• Business name
+• GSTIN
+• GST certificate
+• Company PAN
+• Registration details
+• Office location
+• Destination/service categories
+• Website / social links
+• Operational details
+C. Commercial Data
+We may collect:
+• Connect purchases
+• Invoices
+• Billing history
+• Lead usage activity
+• Subscription or promotional participation
+• Support tickets
+D. Usage & Analytics Data
+We may collect:
+• Login history
+• Device/browser information
+• Dashboard interactions
+• Leads viewed/unlocked
+• Response activity
+• Feature usage patterns
+
+3. How We Use Business Data
+We may use data for purposes such as:
+• Creating and maintaining accounts
+• Verifying business legitimacy
+• Enabling profile visibility
+• Delivering leads and notifications
+• Billing and reconciliation
+• Detecting fraud or abuse
+• Measuring performance trends
+• Internal analytics
+• Pricing strategy and business planning
+• Product development and improvements
+• Legal compliance
+
+4. Aggregated & Anonymized Insights
+We may use aggregated or anonymized information that does not reasonably identify a specific business, such as:
+• Popular destinations
+• Inquiry demand trends
+• Seasonal booking interest
+• Category performance trends
+Such information may be used internally or externally for research, reporting, marketing, or business intelligence.
+
+5. No Sale of Business Data
+PirtTrip does not sell business personal or commercial data to third-party marketers as a commercial data brokerage activity.
+
+6. Sharing of Data
+We may share relevant data with trusted service providers where reasonably necessary, including:
+• Payment gateway providers (such as Razorpay or similar processors)
+• KYC / verification vendors
+• Cloud hosting / infrastructure providers
+• Accountants / auditors
+• Legal advisors
+• Fraud prevention or security vendors
+• Government or regulatory authorities where required by law
+All sharing is intended to support legitimate business operations.
+
+7. Marketing & Service Communications
+We may contact businesses through email, SMS, WhatsApp, calls, notifications, or dashboard alerts regarding:
+• Product updates
+• New features
+• Pricing changes
+• Promotional offers
+• Reactivation campaigns
+• Billing reminders
+• Verification requests
+• Compliance notices
+You may have opt-out options for non-essential marketing messages where applicable.
+
+8. Lead & Performance Analytics
+We may analyze business usage data such as:
+• Response speed
+• Connect consumption patterns
+• Activity frequency
+• Listing completeness
+• Demand categories
+This helps improve matchmaking, support operations, fraud detection and product decisions.
+Such analytics do not guarantee ranking or future benefits.
+
+9. Competitive Confidentiality
+PirtTrip does not intend to disclose one business’s confidential commercial performance directly to another competing business, except where required by law or in anonymized/aggregated form.
+Examples of protected information may include:
+• Individual sales outcomes
+• Lead conversion rates
+• Specific pricing strategy
+• Internal account metrics
+
+10. Data Accuracy
+Businesses are responsible for ensuring submitted information remains accurate and updated.
+Incorrect or outdated information may affect verification, payments, or account access.
+
+11. Retention of Data
+We retain business data for as long as reasonably necessary for business and legal purposes, including:
+• Active account operations
+• Fraud prevention
+• Dispute resolution
+• Tax and accounting obligations
+• Contract enforcement
+• Security reviews
+Certain data may be retained beyond account closure where legally necessary.
+
+12. Financial & Tax Records
+Invoices, payment records and related transaction data may be retained longer where required for accounting, taxation, audit, or legal compliance.
+
+13. Security Measures
+PirtTrip uses reasonable safeguards such as:
+• Access controls
+• Role-based permissions
+• Secure cloud environments
+• Monitoring controls
+• Restricted internal access
+• Operational confidentiality practices
+No system can guarantee absolute security.
+
+14. India-Preferred Data Handling
+PirtTrip prefers India-based storage or processing arrangements where feasible. However, certain trusted vendors or technical services may involve broader infrastructure depending on operational needs and applicable safeguards.
+
+15. Your Rights & Requests
+Subject to law and verification, businesses may request:
+• Correction of inaccurate data
+• Access to certain stored data
+• Copy/export of eligible data
+• Account closure requests
+• Certain communication preferences
+Requests may be subject to security checks, identity confirmation and legal limitations.
+
+16. Deletion Requests
+Deletion requests may be delayed, partially fulfilled, or declined where data must be retained for:
+• Tax records
+• Fraud investigations
+• Ongoing disputes
+• Legal obligations
+• Security purposes
+
+17. Third-Party Platforms
+If you use external integrations, payment gateways, links, or messaging channels, those third parties may apply their own privacy terms.
+
+18. Policy Updates
+PirtTrip may revise this Policy from time to time. Continued use of business services after updates may constitute acceptance of revised terms.
+
+19. Contact
+
+www.pirttrip.com/contact
+
+A brand of Martyrs Services
+
+Bareilly, Uttar Pradesh, India
+
+Email: contact@pirttrip.com
