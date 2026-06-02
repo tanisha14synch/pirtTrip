@@ -6,7 +6,7 @@
     "build": "nuxt build",
     "dev": "concurrently -k -n backend,frontend -c blue,green \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:frontend": "nuxt dev",
-    "dev:backend": "npm run dev --prefix ../backend",
+    "dev:backend": "CHOKIDAR_USEPOLLING=1 CHOKIDAR_INTERVAL=300 npm run dev --prefix ../backend",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "start": "node .output/server/index.mjs",

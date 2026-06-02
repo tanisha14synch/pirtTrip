@@ -9,7 +9,19 @@ export function getApiBaseUrl(): string {
 
 export function apiUrl(path: string): string {
   const base = getApiBaseUrl()
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+  let normalizedPath = path.startsWith('/') ? path : `/${path}`
+
+  // Safety: ensure callers don't accidentally hit Nuxt routes like
+  // "/waitlist/send-otp" instead of the Nitro backend API "/api/waitlist/send-otp".
+  // (Some builds/environments may produce relative paths that bypass the "/api" prefix.)
+  if (
+    normalizedPath.startsWith('/waitlist/') ||
+    normalizedPath.startsWith('/partner/') ||
+    normalizedPath.startsWith('/admin/')
+  ) {
+    normalizedPath = `/api${normalizedPath}`
+  }
+
   if (!base) return normalizedPath
   return `${base}${normalizedPath}`
 }
