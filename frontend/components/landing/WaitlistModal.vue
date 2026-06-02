@@ -8,6 +8,7 @@ const {
   loading,
   errorMessage,
   otpFlow,
+  otpEnabled,
   reset,
   beginEmailStep,
   sendEmailOtp,
@@ -133,12 +134,13 @@ function onOtpInput(index, event) {
                 :disabled="loading"
                 class="mt-4 flex h-[50px] w-full items-center justify-center rounded-[10px] bg-[#F3A81A] font-plein text-[16px] font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
               >
-                {{ loading ? 'Sending…' : 'Join Now' }}
+                {{ loading ? 'Joining…' : 'Join Now' }}
               </button>
             </form>
 
+            <!-- OTP step disabled until email provider is configured -->
             <form
-              v-else-if="step === 'otp'"
+              v-else-if="otpEnabled && step === 'otp'"
               class="mt-6"
               @submit.prevent="onEnterOtp"
             >

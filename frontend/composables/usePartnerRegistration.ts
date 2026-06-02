@@ -3,6 +3,9 @@ import type { PartnerLead } from '~/types/database'
 
 export type RegistrationStep = 'form' | 'otp' | 'success'
 
+/** OTP disabled temporarily — set to true when email provider is ready. */
+const OTP_ENABLED = false
+
 export function usePartnerRegistration() {
   const step = ref<RegistrationStep>('form')
   const loading = ref(false)
@@ -23,6 +26,42 @@ export function usePartnerRegistration() {
   const otpDigits = ref(['', '', '', '', '', ''])
   const otpCode = computed(() => otpDigits.value.join(''))
 
+  /** Direct partner registration (no OTP). */
+  async function registerDirect() {
+    loading.value = true
+    errorMessage.value = null
+
+    try {
+      const parsed = partnerRegistrationSchema.safeParse({
+        firstName: form.firstName,
+        lastName: form.lastName,
+        phone: form.phone,
+        email: form.email,
+      })
+
+      if (!parsed.success) {
+        throw new Error(parsed.error.errors[0]?.message ?? 'Invalid form')
+      }
+
+      const result = await $fetch<{ success: boolean; lead: PartnerLead }>(
+        apiUrl('/api/partner/register-direct'),
+        {
+          method: 'POST',
+          body: parsed.data,
+        },
+      )
+
+      normalizedEmail.value = parsed.data.email
+      successLead.value = result.lead
+      step.value = 'success'
+    } catch (err: unknown) {
+      errorMessage.value = otpFlow.parseFetchError(err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /* OTP flow — commented until email (Resend/SMTP) is configured
   async function sendOtp() {
     loading.value = true
     errorMessage.value = null
@@ -55,7 +94,6 @@ export function usePartnerRegistration() {
       })
 
       challengeToken.value = response.challengeToken
-
       normalizedEmail.value = response.email
       step.value = 'otp'
       otpDigits.value = ['', '', '', '', '', '']
@@ -117,6 +155,22 @@ export function usePartnerRegistration() {
       loading.value = false
     }
   }
+  */
+
+  async function sendOtp() {
+    if (OTP_ENABLED) {
+      return
+    }
+    await registerDirect()
+  }
+
+  async function resendOtp() {
+    if (!OTP_ENABLED) return
+  }
+
+  async function verifyOtpAndRegister() {
+    if (!OTP_ENABLED) return
+  }
 
   function setOtpDigit(index: number, value: string) {
     const digit = value.replace(/\D/g, '').slice(-1)
@@ -164,7 +218,9 @@ export function usePartnerRegistration() {
     successLead,
     normalizedEmail,
     otpFlow,
+    otpEnabled: OTP_ENABLED,
     sendOtp,
+    registerDirect,
     resendOtp,
     verifyOtpAndRegister,
     setOtpDigit,

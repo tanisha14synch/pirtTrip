@@ -2,6 +2,9 @@ import { z } from 'zod'
 
 export type WaitlistStep = 'email' | 'otp' | 'success'
 
+/** OTP disabled temporarily — set to true when email provider is ready. */
+const OTP_ENABLED = false
+
 export function useWaitlistRegistration() {
   const step = ref<WaitlistStep>('email')
   const email = ref('')
@@ -32,6 +35,34 @@ export function useWaitlistRegistration() {
     otpFlow.clearTimers()
   }
 
+  /** Direct waitlist join (no OTP). */
+  async function joinWaitlistDirect() {
+    loading.value = true
+    errorMessage.value = null
+
+    try {
+      const parsed = z.string().email('Enter a valid email address').safeParse(email.value.trim())
+      if (!parsed.success) {
+        throw new Error(parsed.error.errors[0]?.message ?? 'Invalid email')
+      }
+
+      const normalized = parsed.data.toLowerCase()
+      email.value = normalized
+
+      await $fetch(apiUrl('/api/waitlist/join'), {
+        method: 'POST',
+        body: { email: normalized },
+      })
+
+      step.value = 'success'
+    } catch (err: unknown) {
+      errorMessage.value = otpFlow.parseFetchError(err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /* OTP flow — commented until email (Resend/SMTP) is configured
   async function sendEmailOtp() {
     loading.value = true
     errorMessage.value = null
@@ -59,7 +90,6 @@ export function useWaitlistRegistration() {
       })
 
       challengeToken.value = response.challengeToken
-
       email.value = normalized
       step.value = 'otp'
       otpDigits.value = ['', '', '', '', '', '']
@@ -114,6 +144,26 @@ export function useWaitlistRegistration() {
       loading.value = false
     }
   }
+  */
+
+  async function sendEmailOtp() {
+    if (OTP_ENABLED) {
+      // await sendEmailOtpOtpFlow()
+      return
+    }
+    await joinWaitlistDirect()
+  }
+
+  async function resendEmailOtp() {
+    if (!OTP_ENABLED) return
+    // if (!otpFlow.canResend.value) return
+    // await sendEmailOtp()
+  }
+
+  async function verifyOtpAndJoin() {
+    if (!OTP_ENABLED) return
+    // OTP verify implementation above
+  }
 
   function setOtpDigit(index: number, value: string) {
     const digit = value.replace(/\D/g, '').slice(-1)
@@ -149,9 +199,11 @@ export function useWaitlistRegistration() {
     loading,
     errorMessage,
     otpFlow,
+    otpEnabled: OTP_ENABLED,
     reset,
     beginEmailStep,
     sendEmailOtp,
+    joinWaitlistDirect,
     resendEmailOtp,
     verifyOtpAndJoin,
     setOtpDigit,

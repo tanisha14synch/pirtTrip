@@ -8,6 +8,7 @@ const {
   successLead,
   normalizedEmail,
   otpFlow,
+  otpEnabled,
   sendOtp,
   resendOtp,
   verifyOtpAndRegister,
@@ -125,7 +126,7 @@ function onOtpInput(index, event) {
           :disabled="loading"
           class="mt-1 flex h-[50px] w-full items-center justify-center gap-2.5 rounded-[8px] bg-[#F3A81A] font-plein text-[16px] font-bold leading-[140%] tracking-[0] text-white transition-opacity hover:opacity-90 disabled:opacity-60"
         >
-          {{ loading ? 'Sending code…' : 'Subscribe With OTP' }}
+          {{ loading ? 'Submitting…' : 'Subscribe' }}
           <svg
             v-if="!loading"
             class="h-4 w-4 shrink-0"
@@ -140,8 +141,9 @@ function onOtpInput(index, event) {
         </button>
       </form>
 
+      <!-- OTP step disabled until email provider is configured -->
       <form
-        v-else-if="step === 'otp'"
+        v-else-if="otpEnabled && step === 'otp'"
         class="mt-6 space-y-3"
         @submit.prevent="onSubmitOtp"
       >
