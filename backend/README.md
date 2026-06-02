@@ -6,9 +6,8 @@ Standalone [Nitro](https://nitro.build/) server for all `/api/*` routes (waitlis
 
 ```
 backend/
-  server/api/     # HTTP routes
-  server/utils/   # Supabase, mailer, OTP
-  lib/            # validation, phone helpers
+  api/            # HTTP routes (/api/*)
+  lib/            # Supabase, mailer, OTP, validation
   types/          # shared DB types
   supabase/       # SQL migrations
 ```

@@ -2,6 +2,15 @@
 
 This repo is a **monorepo**. Railway must build the **backend** or **frontend** folder — not the repo root alone.
 
+## Fix: "Healthcheck failure"
+
+The API must respond on `/api/health`. If deploy succeeds but healthcheck fails:
+
+1. Ensure **Root Directory** is `backend` (or use root `Dockerfile`).
+2. Set Railway **Variables** (Supabase keys, `OTP_SECRET`) — missing env can crash startup.
+3. Do **not** hardcode `PORT=3000` in Railway; Railway injects `PORT` automatically.
+4. Redeploy after pulling latest `main` (routes live under `backend/api/`).
+
 ## Fix: "Failed to build an image"
 
 ### Option A — Backend API (recommended first)

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { verifyEmailOtp } from '~/server/utils/email-otp-service'
+import { verifyEmailOtp } from '~/lib/email-otp-service'
 
 const bodySchema = z.object({
   code: z.string().regex(/^\d{6}$/, 'Enter the 6-digit code from your email'),

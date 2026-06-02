@@ -7,4 +7,5 @@ watchPatterns = ["backend/**", "Dockerfile"]
 [deploy]
 startCommand = "node .output/server/index.mjs"
 healthcheckPath = "/api/health"
+healthcheckTimeout = 120
 restartPolicyType = "ON_FAILURE"

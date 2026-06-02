@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { verifyEmailOtp } from '~/server/utils/email-otp-service'
+import { verifyEmailOtp } from '~/lib/email-otp-service'
 
 const bodySchema = z.object({
   email: z.string().email('Invalid email address'),

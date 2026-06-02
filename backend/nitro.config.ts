@@ -1,8 +1,11 @@
+import { fileURLToPath } from 'node:url'
 import { defineNitroConfig } from 'nitropack/config'
 
+const rootDir = fileURLToPath(new URL('.', import.meta.url))
+
 export default defineNitroConfig({
+  rootDir,
   compatibilityDate: '2025-07-15',
-  srcDir: '.',
   cors: true,
   routeRules: {
     '/api/**': {
@@ -29,6 +32,6 @@ export default defineNitroConfig({
     },
   },
   alias: {
-    '~': '.',
+    '~': rootDir,
   },
 })

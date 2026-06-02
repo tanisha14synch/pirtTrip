@@ -1,8 +1,9 @@
 import { z } from 'zod'
-import { createAndSendOtp } from '~/server/utils/email-otp-service'
+import { createAndSendOtp } from '~/lib/email-otp-service'
+import { partnerRegistrationSchema } from '~/lib/validation'
+import { normalizePhone } from '~/lib/phone'
 
-const bodySchema = z.object({
-  email: z.string().email('Enter a valid email address'),
+const bodySchema = partnerRegistrationSchema.extend({
   challengeToken: z.string().optional(),
 })
 
@@ -13,38 +14,41 @@ export default defineEventHandler(async (event) => {
   if (!parsed.success) {
     throw createError({
       statusCode: 400,
-      statusMessage: parsed.error.errors[0]?.message ?? 'Invalid email',
+      statusMessage: parsed.error.errors[0]?.message ?? 'Invalid form',
     })
   }
 
   const email = parsed.data.email.trim().toLowerCase()
+  const phone = normalizePhone(parsed.data.phone)
   const admin = getSupabaseAdmin()
 
-  const { data: existing, error: lookupError } = await admin
-    .from('waitlist_subscribers')
+  const { data: existing } = await admin
+    .from('partner_leads')
     .select('id')
-    .eq('email', email)
+    .eq('phone', phone)
     .maybeSingle()
-
-  if (lookupError && !lookupError.message.includes('waitlist_subscribers')) {
-    throw createError({ statusCode: 500, statusMessage: lookupError.message })
-  }
 
   if (existing) {
     throw createError({
       statusCode: 409,
-      statusMessage: 'This email is already on the waitlist',
+      statusMessage: 'This phone number is already registered',
     })
   }
 
   const result = await createAndSendOtp({
     email,
-    purpose: 'waitlist',
+    purpose: 'partner_registration',
     challengeToken: parsed.data.challengeToken,
+    metadata: {
+      firstName: parsed.data.firstName.trim(),
+      lastName: parsed.data.lastName.trim(),
+      phone,
+    },
   })
 
   return {
     success: true,
+    email,
     challengeToken: result.challengeToken,
     expiresInSeconds: result.expiresInSeconds,
     resendCooldownSeconds: result.resendCooldownSeconds,

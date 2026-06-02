@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createAndSendOtp } from '~/server/utils/email-otp-service'
+import { createAndSendOtp } from '~/lib/email-otp-service'
 
 const bodySchema = z.object({
   challengeToken: z.string().optional(),
