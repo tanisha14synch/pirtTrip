@@ -14,6 +14,8 @@ const legalLinks = [
   { id: 'cookies', label: 'Cookie Policy', href: '#cookies' },
 ]
 
+const isHashHref = (href) => typeof href === 'string' && href.startsWith('#')
+
 const ctaHighlights = [
   'Compare experiences',
   'Discover upcoming group trips',
@@ -61,12 +63,12 @@ const ctaHighlights = [
               Get notified during launch
             </p>
 
-            <NuxtLink
-              to="#get-started"
+            <a
+              href="#get-started"
               class="mt-7 inline-flex h-[50px] min-w-[220px] items-center justify-center rounded-full bg-white px-8 font-plein text-[16px] font-bold leading-[130%] tracking-[0] text-black transition-opacity hover:opacity-90"
             >
               Join Traveler Waitlist
-            </NuxtLink>
+            </a>
           </div>
 
           <!-- Right -->
@@ -126,11 +128,19 @@ const ctaHighlights = [
             <ul class="mt-5 space-y-[10px]">
               <li v-for="link in quickLinks" :key="link.id">
                 <NuxtLink
+                  v-if="!isHashHref(link.href)"
                   :to="link.href"
                   class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/80 transition-colors hover:text-black"
                 >
                   {{ link.label }}
                 </NuxtLink>
+                <a
+                  v-else
+                  :href="link.href"
+                  class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/80 transition-colors hover:text-black"
+                >
+                  {{ link.label }}
+                </a>
               </li>
             </ul>
           </div>
@@ -143,11 +153,19 @@ const ctaHighlights = [
             <ul class="mt-5 space-y-[10px]">
               <li v-for="link in legalLinks" :key="link.id">
                 <NuxtLink
+                  v-if="!isHashHref(link.href)"
                   :to="link.href"
                   class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/80 transition-colors hover:text-black"
                 >
                   {{ link.label }}
                 </NuxtLink>
+                <a
+                  v-else
+                  :href="link.href"
+                  class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/80 transition-colors hover:text-black"
+                >
+                  {{ link.label }}
+                </a>
               </li>
             </ul>
           </div>

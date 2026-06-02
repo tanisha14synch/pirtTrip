@@ -13,6 +13,8 @@ const legalLinks = [
   { id: 'terms', label: 'Terms of Service', href: '#terms' },
   { id: 'cookies', label: 'Cookie Policy', href: '#cookies' },
 ]
+
+const isHashHref = (href) => typeof href === 'string' && href.startsWith('#')
 </script>
 
 <template>
@@ -95,11 +97,19 @@ const legalLinks = [
             <ul class="mt-5 space-y-[10px]">
               <li v-for="link in quickLinks" :key="link.id">
                 <NuxtLink
+                  v-if="!isHashHref(link.href)"
                   :to="link.href"
                   class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/80 transition-colors hover:text-black"
                 >
                   {{ link.label }}
                 </NuxtLink>
+                <a
+                  v-else
+                  :href="link.href"
+                  class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/80 transition-colors hover:text-black"
+                >
+                  {{ link.label }}
+                </a>
               </li>
             </ul>
           </div>
@@ -112,11 +122,19 @@ const legalLinks = [
             <ul class="mt-5 space-y-[10px]">
               <li v-for="link in legalLinks" :key="link.id">
                 <NuxtLink
+                  v-if="!isHashHref(link.href)"
                   :to="link.href"
                   class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/80 transition-colors hover:text-black"
                 >
                   {{ link.label }}
                 </NuxtLink>
+                <a
+                  v-else
+                  :href="link.href"
+                  class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/80 transition-colors hover:text-black"
+                >
+                  {{ link.label }}
+                </a>
               </li>
             </ul>
           </div>

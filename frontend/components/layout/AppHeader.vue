@@ -18,6 +18,9 @@ const ctaClass = (variant) => {
 const navLinkClass =
   'inline-flex items-center gap-1.5 whitespace-nowrap text-white hover:opacity-80'
 
+const isHashHref = (href) =>
+  typeof href === 'string' && href.startsWith('#')
+
 const updateHeaderScroll = () => {
   const threshold = header.value.scrollThreshold ?? 24
   store.setHeaderScrolled(window.scrollY > threshold)
@@ -85,6 +88,7 @@ watch(
               aria-hidden="true"
             />
             <NuxtLink
+              v-if="!isHashHref(link.href)"
               :to="link.href"
               :class="navLinkClass"
               :style="headerNavStyle"
@@ -96,6 +100,19 @@ watch(
               />
               {{ link.label }}
             </NuxtLink>
+            <a
+              v-else
+              :href="link.href"
+              :class="navLinkClass"
+              :style="headerNavStyle"
+            >
+              <UiAppIcon
+                v-if="link.icon === 'heart'"
+                name="heart"
+                icon-class="h-4 w-4 shrink-0"
+              />
+              {{ link.label }}
+            </a>
           </template>
         </nav>
 
@@ -103,15 +120,24 @@ watch(
           class="ml-6 flex items-center"
           :style="{ gap: `${header.buttons.gap}px` }"
         >
-          <NuxtLink
-            v-for="cta in header.ctas"
-            :key="cta.id"
-            :to="cta.href"
-            :class="ctaClass(cta.variant)"
-            :style="headerButtonStyle"
-          >
-            {{ cta.label }}
-          </NuxtLink>
+          <template v-for="cta in header.ctas" :key="cta.id">
+            <NuxtLink
+              v-if="!isHashHref(cta.href)"
+              :to="cta.href"
+              :class="ctaClass(cta.variant)"
+              :style="headerButtonStyle"
+            >
+              {{ cta.label }}
+            </NuxtLink>
+            <a
+              v-else
+              :href="cta.href"
+              :class="ctaClass(cta.variant)"
+              :style="headerButtonStyle"
+            >
+              {{ cta.label }}
+            </a>
+          </template>
         </div>
       </div>
 
@@ -148,6 +174,7 @@ watch(
         >
           <NuxtLink
             v-for="link in header.navLinks"
+            v-if="!isHashHref(link.href)"
             :key="link.id"
             :to="link.href"
             :class="`${navLinkClass} px-3 py-3`"
@@ -161,21 +188,47 @@ watch(
             />
             {{ link.label }}
           </NuxtLink>
+          <a
+            v-for="link in header.navLinks"
+            v-else
+            :key="link.id"
+            :href="link.href"
+            :class="`${navLinkClass} px-3 py-3`"
+            :style="headerNavStyle"
+            @click="store.setMobileMenuOpen(false)"
+          >
+            <UiAppIcon
+              v-if="link.icon === 'heart'"
+              name="heart"
+              icon-class="h-4 w-4"
+            />
+            {{ link.label }}
+          </a>
 
           <div
             class="mt-3 flex flex-col gap-2 border-t border-white/10 pt-4"
             :style="{ gap: `${header.buttons.gap}px` }"
           >
-            <NuxtLink
-              v-for="cta in header.ctas"
-              :key="cta.id"
-              :to="cta.href"
-              :class="`${ctaClass(cta.variant)} w-full text-center`"
-              :style="headerButtonStyle"
-              @click="store.setMobileMenuOpen(false)"
-            >
-              {{ cta.label }}
-            </NuxtLink>
+            <template v-for="cta in header.ctas" :key="cta.id">
+              <NuxtLink
+                v-if="!isHashHref(cta.href)"
+                :to="cta.href"
+                :class="`${ctaClass(cta.variant)} w-full text-center`"
+                :style="headerButtonStyle"
+                @click="store.setMobileMenuOpen(false)"
+              >
+                {{ cta.label }}
+              </NuxtLink>
+              <a
+                v-else
+                :href="cta.href"
+                :class="`${ctaClass(cta.variant)} w-full text-center`"
+                :style="headerButtonStyle"
+                @click="store.setMobileMenuOpen(false)"
+              >
+                {{ cta.label }}
+              </a>
+            </template>
           </div>
         </nav>
       </div>
