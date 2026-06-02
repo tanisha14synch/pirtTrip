@@ -2,11 +2,12 @@ import { proxyRequest } from 'h3'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
+  const isProd = process.env.NODE_ENV === 'production'
   const origin = (
     (config.apiProxyOrigin as string)
     || process.env.API_URL
     || process.env.NUXT_API_PROXY_ORIGIN
-    || ''
+    || (!isProd ? 'http://127.0.0.1:3001' : '')
   )
     .trim()
     .replace(/\/$/, '')

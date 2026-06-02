@@ -1,27 +1,33 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-const apiUrl =
-  process.env.NUXT_PUBLIC_API_URL
-  || process.env.API_URL
-  || process.env.NUXT_PUBLIC_API_BASE_URL
-  || ''
+const isProd = process.env.NODE_ENV === 'production'
 
-const normalizedApiOrigin = (apiUrl || 'http://127.0.0.1:3001')
-  .replace(/\/$/, '')
-  .replace(/\/api$/, '')
-const devApiTarget = `${normalizedApiOrigin}/api`
+function normalizeApiOrigin(raw: string): string {
+  return raw.trim().replace(/\/$/, '').replace(/\/api$/, '')
+}
+
+function resolveApiOrigin(): string {
+  const fromEnv =
+    process.env.API_URL
+    || process.env.NUXT_PUBLIC_API_URL
+    || process.env.NUXT_PUBLIC_API_BASE_URL
+    || ''
+  if (fromEnv) return normalizeApiOrigin(fromEnv)
+  // Local dev default when .env.development is missing
+  if (!isProd) return 'http://127.0.0.1:3001'
+  return ''
+}
+
+const apiOrigin = resolveApiOrigin()
+const devApiTarget = `${apiOrigin || 'http://127.0.0.1:3001'}/api`
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
   runtimeConfig: {
-    apiProxyOrigin:
-      process.env.API_URL
-      || process.env.NUXT_PUBLIC_API_URL
-      || process.env.NUXT_PUBLIC_API_BASE_URL
-      || '',
+    apiProxyOrigin: apiOrigin,
     public: {
-      apiUrl,
+      apiUrl: process.env.NUXT_PUBLIC_API_URL || '',
       // When false (default), browser calls same-origin /api (server proxies to API_URL).
       apiDirect: process.env.NUXT_PUBLIC_API_DIRECT === 'true',
       supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL || '',

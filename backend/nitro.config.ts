@@ -17,7 +17,12 @@ export default defineNitroConfig({
     },
   },
   runtimeConfig: {
-    supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
+    // Support common env aliases to avoid production outages from variable name drift.
+    supabaseServiceRoleKey:
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+      || process.env.SUPABASE_SERVICE_KEY
+      || process.env.SERVICE_ROLE_KEY
+      || '',
     otpSecret: process.env.OTP_SECRET || '',
     resendApiKey: process.env.RESEND_API_KEY || '',
     emailFrom: process.env.EMAIL_FROM || 'Pirttrip <onboarding@resend.dev>',
