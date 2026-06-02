@@ -52,7 +52,6 @@ Browser → https://your-app.up.railway.app/          (Nuxt frontend)
 
    | Variable | Example |
    |----------|---------|
-   | `NUXT_PUBLIC_API_URL` | `https://pirttrip-production.up.railway.app` |
    | `NUXT_PUBLIC_SUPABASE_URL` | Your Supabase URL |
    | `NUXT_PUBLIC_SUPABASE_ANON_KEY` | Anon key |
 
@@ -62,7 +61,8 @@ Browser → https://your-app.up.railway.app/          (Nuxt frontend)
    |----------|--------|
    | `HOST` | `0.0.0.0` |
    | `PORT` | Leave unset (Railway sets it) |
-   | `NUXT_PUBLIC_API_URL` | Same backend URL (for SSR) |
+   | `API_URL` | `https://api.pirttrip.com` (server proxy target; required) |
+   | `NUXT_PUBLIC_API_URL` | Leave **unset** at build (browser uses `/api` on frontend domain) |
 
 5. Health check path: `/` (see `frontend/railway.json`).
 6. Open the frontend domain in a browser — homepage should load.
@@ -114,7 +114,7 @@ Public URL: `https://pirttrip-production.up.railway.app`
 **Frontend (Railway service 2)**
 
 ```env
-NUXT_PUBLIC_API_URL=https://pirttrip-production.up.railway.app
+API_URL=https://api.pirttrip.com
 NUXT_PUBLIC_SUPABASE_URL=https://fvkwophzzyaukacuiszv.supabase.co
 NUXT_PUBLIC_SUPABASE_ANON_KEY=...
 HOST=0.0.0.0

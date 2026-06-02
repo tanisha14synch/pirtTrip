@@ -23,6 +23,9 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
+# Runtime proxy target (set on Railway frontend service; not baked into client bundle)
+ENV API_URL=
+ENV NUXT_API_PROXY_ORIGIN=
 
 COPY --from=builder /app/.output ./.output
 WORKDIR /app/.output/server

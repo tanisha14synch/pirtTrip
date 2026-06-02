@@ -22,6 +22,8 @@ export default defineNuxtConfig({
       || '',
     public: {
       apiUrl,
+      // When false (default), browser calls same-origin /api (server proxies to API_URL).
+      apiDirect: process.env.NUXT_PUBLIC_API_DIRECT === 'true',
       supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL || '',
       supabaseAnonKey: process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY || '',
     },

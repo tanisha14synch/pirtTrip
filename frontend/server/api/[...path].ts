@@ -2,7 +2,15 @@ import { proxyRequest } from 'h3'
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  const origin = (config.apiProxyOrigin as string || '').trim().replace(/\/$/, '').replace(/\/api$/, '')
+  const origin = (
+    (config.apiProxyOrigin as string)
+    || process.env.API_URL
+    || process.env.NUXT_API_PROXY_ORIGIN
+    || ''
+  )
+    .trim()
+    .replace(/\/$/, '')
+    .replace(/\/api$/, '')
 
   if (!origin) {
     throw createError({
