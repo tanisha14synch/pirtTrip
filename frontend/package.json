@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "nuxt build",
-    "dev": "concurrently -k -n backend,frontend -c blue,green \"npm run dev --prefix ../backend\" \"nuxt dev\"",
+    "dev": "concurrently -k -n backend,frontend -c blue,green \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:frontend": "nuxt dev",
     "dev:backend": "npm run dev --prefix ../backend",
     "generate": "nuxt generate",
