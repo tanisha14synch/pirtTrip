@@ -1,13 +1,17 @@
 /**
- * API base URL for the standalone backend.
- * Leave empty in dev to use Nuxt proxy (/api → localhost:3001).
+ * Backend API base URL (standalone Nitro service on Railway or localhost:3001).
+ * When empty in dev, Nuxt proxies /api → backend (see nuxt.config nitro.devProxy).
  */
-export function apiUrl(path: string): string {
+export function getApiBaseUrl(): string {
   const config = useRuntimeConfig()
-  const base = (config.public.apiBase as string) || ''
+  return (config.public.apiUrl as string)?.replace(/\/$/, '') || ''
+}
+
+export function apiUrl(path: string): string {
+  const base = getApiBaseUrl()
   const normalizedPath = path.startsWith('/') ? path : `/${path}`
   if (!base) return normalizedPath
-  return `${base.replace(/\/$/, '')}${normalizedPath}`
+  return `${base}${normalizedPath}`
 }
 
 export function apiFetch<T>(path: string, options?: Parameters<typeof $fetch<T>>[1]) {

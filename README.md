@@ -29,10 +29,14 @@ cd frontend && npm run dev:backend
 
 ## Environment
 
-- **Frontend:** `frontend/.env` — `NUXT_PUBLIC_SUPABASE_*` only
-- **Backend:** `backend/.env` — service role, Resend, OTP secret (see `backend/.env.example`)
+- **Frontend:** `frontend/.env` — see `frontend/.env.example`
+  - `NUXT_PUBLIC_SUPABASE_*`
+  - `NUXT_PUBLIC_API_URL` — backend URL in production; leave empty locally (proxy to :3001)
+- **Backend:** `backend/.env` — see `backend/.env.example` (service role, Resend, OTP secret)
 
-Copy keys from the old single `.env` into `backend/.env` if you had everything in `frontend/.env` before.
+## Deploy (Railway)
+
+Two services: **backend** (`/api/health`) and **frontend** (`/`). See [docs/RAILWAY.md](docs/RAILWAY.md).
 
 ## Database
 

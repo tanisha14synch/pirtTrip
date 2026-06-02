@@ -1,8 +1,10 @@
-# Second Railway service: frontend (Root Directory = /frontend)
+# Railway: create a service with Root Directory = frontend
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
 startCommand = "node .output/server/index.mjs"
+healthcheckPath = "/"
+healthcheckTimeout = 120
 restartPolicyType = "ON_FAILURE"

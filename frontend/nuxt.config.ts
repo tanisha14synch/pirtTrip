@@ -1,11 +1,17 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+const apiUrl =
+  process.env.NUXT_PUBLIC_API_URL
+  || process.env.API_URL
+  || process.env.NUXT_PUBLIC_API_BASE_URL
+  || ''
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
   runtimeConfig: {
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE_URL || '',
+      apiUrl,
       supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL || '',
       supabaseAnonKey: process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY || '',
     },
@@ -13,7 +19,7 @@ export default defineNuxtConfig({
   nitro: {
     devProxy: {
       '/api': {
-        target: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3001',
+        target: apiUrl || 'http://127.0.0.1:3001',
         changeOrigin: true,
       },
     },
