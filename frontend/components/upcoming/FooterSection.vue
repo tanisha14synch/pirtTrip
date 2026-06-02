@@ -59,7 +59,7 @@ const ctaHighlights = [
             </p>
 
             <a
-              href="#get-started"
+              href="/"
               class="mt-7 inline-flex h-[50px] min-w-[220px] items-center justify-center rounded-full bg-white px-8 font-plein text-[16px] font-bold leading-[130%] tracking-[0] text-black transition-opacity hover:opacity-90"
             >
               Join Traveler Waitlist
