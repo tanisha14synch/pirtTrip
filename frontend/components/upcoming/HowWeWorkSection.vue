@@ -67,16 +67,25 @@ const steps = {
 
 const stepsList = Object.values(steps)
 
-/** Positions aligned to step_bg.svg pin valleys (1250×1069) — content sits under each curve */
+/** Positions aligned to map-bg.svg path (1300×697) */
+const STEP_BG_SRC = '/images/how-we-work/map-bg.svg'
+const STEP_BG_SRC_2X = '/images/how-we-work/map-bg.svg'
+const STEP_BG_WIDTH = 1300
+const STEP_BG_HEIGHT = 697
+/** Map background height (viewport) */
+const STEP_BG_VIEW_HEIGHT = '80svh'
+/** White space below the map — steps can extend here without clipping */
+const STAGE_BOTTOM_PADDING = 'clamp(7rem, 14vh, 11rem)'
+const STEP_BG_ASPECT = STEP_BG_WIDTH / STEP_BG_HEIGHT
 const desktopStepPlacements = [
-  { key: 's1', class: 'absolute left-[2%] top-[8%] z-[2]' },
-  { key: 's2', class: 'absolute left-[38%] top-[20%] z-[2]' },
-  { key: 's3', class: 'absolute right-[5.5%] top-[10%] z-[2]' },
-  { key: 's4', class: 'absolute right-[16%] top-[45%] z-[2]' },
-  { key: 's5', class: 'absolute left-[21%] top-[44%] z-[2]' },
-  { key: 's6', class: 'absolute left-[2.5%] top-[68%] z-[2]' },
-  { key: 's7', class: 'absolute left-[39.5%] top-[75%] z-[2]' },
-  { key: 's8', class: 'absolute right-[6.5%] top-[78%] z-[2]' },
+  { key: 's1', class: 'absolute left-[3.5%] top-[10%] z-[2]' },
+  { key: 's2', class: 'absolute left-[41.2%] top-[15%] z-[2]' },
+  { key: 's3', class: 'absolute right-[5.5%] top-[5%] z-[2]' },
+  { key: 's4', class: 'absolute right-[20%] top-[38%] z-[2]' },
+  { key: 's5', class: 'absolute left-[30.2%] top-[46%] z-[2]' },
+  { key: 's6', class: 'absolute left-[5%] top-[56%] z-[2]' },
+  { key: 's7', class: 'absolute left-[39%] top-[80%] z-[2]' },
+  { key: 's8', class: 'absolute right-[7%] top-[76%] z-[2]' },
 ]
 
 const BG_REVEAL_MS = 700
@@ -133,6 +142,10 @@ onMounted(() => {
     return
   }
 
+  if (window.matchMedia('(min-width: 1024px)').matches) {
+    showBg.value = true
+  }
+
   sectionObserver = new IntersectionObserver(
     (entries) => {
       if (entries[0]?.isIntersecting) {
@@ -156,11 +169,11 @@ onUnmounted(() => {
 <template>
   <section
     id="how-we-work"
-    class="bg-white py-8 lg:py-10"
+    class="bg-white py-8 lg:py-0"
     aria-labelledby="how-we-work-heading"
   >
-    <div class="mx-auto w-[94%] max-w-[820px]">
-      <header class="text-center">
+    <div class="mx-auto w-[94%] max-w-[820px] lg:max-w-none lg:w-full">
+      <header class="text-center lg:px-6 lg:pt-10 lg:pb-4">
         <p class="font-plein text-[16px] font-bold leading-[130%] tracking-[0] text-[#F76517]">
           How We Work?
         </p>
@@ -175,22 +188,36 @@ onUnmounted(() => {
 
       <div
         ref="stageRef"
-        class="relative mx-auto mt-6 w-full"
+        class="relative mx-auto mt-6 w-full lg:mt-0"
+        :style="{ '--stage-bottom-pad': STAGE_BOTTOM_PADDING }"
       >
-      <!-- Desktop — width locked to step_bg.svg (1250×1069) -->
+      <!-- Desktop — map exactly 80vh; padding below has no image; content not clipped -->
       <div
-        class="relative hidden w-full lg:block"
-        style="aspect-ratio: 1250 / 1069"
+        class="relative hidden w-full bg-white lg:block lg:pb-[var(--stage-bottom-pad)]"
       >
-        <!-- Background path -->
+        <div
+          class="relative flex min-h-[512px] w-full items-center justify-center overflow-visible"
+          :style="{ height: STEP_BG_VIEW_HEIGHT }"
+        >
+        <div
+          class="how-we-work-canvas relative h-full shrink-0"
+          :style="{
+            aspectRatio: STEP_BG_ASPECT,
+            width: `min(100%, calc(${STEP_BG_VIEW_HEIGHT} * ${STEP_BG_WIDTH} / ${STEP_BG_HEIGHT}))`,
+          }"
+        >
         <img
-          src="/images/how-we-work/step_bg.svg"
+          :src="STEP_BG_SRC"
+          :srcset="`${STEP_BG_SRC} ${STEP_BG_WIDTH}w, ${STEP_BG_SRC_2X} ${STEP_BG_WIDTH * 2}w`"
+          :sizes="`min(100vw, calc(${STEP_BG_VIEW_HEIGHT} * ${STEP_BG_WIDTH} / ${STEP_BG_HEIGHT}))`"
+          :width="STEP_BG_WIDTH"
+          :height="STEP_BG_HEIGHT"
           alt=""
-          class="how-we-work-bg pointer-events-none absolute inset-0 z-[1] h-full w-full object-fill"
+          class="how-we-work-bg pointer-events-none absolute inset-0 z-[1] h-full w-full object-contain object-center"
           :class="showBg ? 'how-we-work-bg--visible' : ''"
-          aria-hidden="true"
-          loading="lazy"
+          fetchpriority="high"
           draggable="false"
+          aria-hidden="true"
         >
 
         <!-- Decorations -->
@@ -229,6 +256,8 @@ onUnmounted(() => {
             variant="flow-compact"
           />
         </div>
+        </div>
+        </div>
       </div>
 
       <!-- Mobile -->
@@ -255,15 +284,11 @@ onUnmounted(() => {
 <style scoped>
 .how-we-work-bg {
   opacity: 0;
-  transform: scale(0.97);
-  transition:
-    opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .how-we-work-bg--visible {
   opacity: 1;
-  transform: scale(1);
 }
 
 .how-we-work-deco {

@@ -25,6 +25,10 @@ const props = defineProps({
     default: 'flow',
     validator: (value) => ['flow', 'flow-compact', 'card'].includes(value),
   },
+  onDarkBg: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const isCompactFlow = computed(() => props.variant === 'flow-compact')
@@ -60,33 +64,39 @@ const isCompactFlow = computed(() => props.variant === 'flow-compact')
   <!-- Desktop flow -->
   <article
     v-else-if="variant === 'flow' || variant === 'flow-compact'"
-    class="flex max-w-full flex-col items-left text-left ml-6"
-    :class="isCompactFlow ? 'w-[162px]' : 'w-[220px]'"
+    class="flex max-w-full flex-col items-left text-left"
+    :class="isCompactFlow ? 'w-[168px]' : 'w-[220px]'"
   >
     <div
       class="flex w-full items-end justify-center"
-      :class="isCompactFlow ? 'h-[68px]' : 'h-[128px]'"
+      :class="isCompactFlow ? 'h-[64px]' : 'h-[128px]'"
     >
       <img
         :src="iconSrc"
         :alt="iconAlt"
-        class="object-contain object-bottom mix-blend-multiply"
-        :class="isCompactFlow ? 'max-h-[62px] max-w-[140px]' : 'max-h-[120px] max-w-[200px]'"
-        loading="lazy"
+        class="object-contain object-bottom"
+        :class="isCompactFlow ? 'h-[56px] w-[130px]' : 'max-h-[120px] max-w-[200px]'"
+        decoding="async"
         draggable="false"
       >
     </div>
 
     <p
-      class="font-plein font-bold leading-[130%] text-left text-black mt-3"
-      :class="isCompactFlow ? 'text-[11px]' : 'text-[13px]'"
+      class="mt-3 text-left font-plein font-bold leading-[130%]"
+      :class="[
+        isCompactFlow ? 'text-[12px]' : 'text-[13px]',
+        onDarkBg ? 'text-white' : 'text-black',
+      ]"
     >
       {{ number }}. {{ title }}
     </p>
 
     <p
-      class="font-poppins font-normal text-[#2D2D2D]"
-      :class="isCompactFlow ? 'mt-0.5 max-w-[162px] text-[10px] leading-[120%]' : 'mt-1.5 max-w-[210px] text-[12px] leading-[130%]'"
+      class="font-poppins font-normal"
+      :class="[
+        isCompactFlow ? 'mt-0.5 max-w-[168px] text-[10px] leading-[120%]' : 'mt-1.5 max-w-[210px] text-[12px] leading-[130%]',
+        onDarkBg ? 'text-white/75' : 'text-[#2D2D2D]',
+      ]"
     >
       {{ description }}
     </p>
