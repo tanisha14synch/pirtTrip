@@ -2,6 +2,7 @@ import type { H3Event } from 'h3'
 import { getRequestHost, getRequestURL } from 'h3'
 
 export const DEFAULT_DEV_PARTNER_SITE_URL = 'http://business.localhost:3000'
+export const DEFAULT_PROD_PARTNER_SITE_URL = 'https://business.pirttrip.com'
 
 export function normalizePartnerSiteUrl(url: string | undefined): string {
   return (url || '').trim().replace(/\/$/, '')
@@ -15,7 +16,7 @@ export function resolvePartnerSiteUrl(
   const fromEnv = normalizePartnerSiteUrl(partnerSiteUrl)
   if (fromEnv) return fromEnv
   if (isDev) return DEFAULT_DEV_PARTNER_SITE_URL
-  return ''
+  return DEFAULT_PROD_PARTNER_SITE_URL
 }
 
 export function resolvePartnerSiteUrlFromEvent(
@@ -32,7 +33,7 @@ export function resolvePartnerSiteUrlFromEvent(
     return `${url.protocol}//business.localhost:${port}`
   }
 
-  return ''
+  return DEFAULT_PROD_PARTNER_SITE_URL
 }
 
 /** Full URL to the partner landing page (always `/` on the partner host). */

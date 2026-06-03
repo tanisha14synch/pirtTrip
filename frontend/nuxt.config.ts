@@ -20,11 +20,15 @@ function resolveApiOrigin(): string {
 const apiOrigin = resolveApiOrigin()
 const devApiTarget = `${apiOrigin || 'http://127.0.0.1:3001'}/api`
 
-import { DEFAULT_DEV_PARTNER_SITE_URL } from './utils/partner-site-url'
+import {
+  DEFAULT_DEV_PARTNER_SITE_URL,
+  DEFAULT_PROD_PARTNER_SITE_URL,
+} from './utils/partner-site-url'
 
 const siteVariant = process.env.NUXT_PUBLIC_SITE_VARIANT || 'main'
 const partnerSiteUrl = (process.env.NUXT_PUBLIC_PARTNER_SITE_URL || '').trim().replace(/\/$/, '')
-const effectivePartnerSiteUrl = partnerSiteUrl || (!isProd ? DEFAULT_DEV_PARTNER_SITE_URL : '')
+const effectivePartnerSiteUrl = partnerSiteUrl
+  || (isProd ? DEFAULT_PROD_PARTNER_SITE_URL : DEFAULT_DEV_PARTNER_SITE_URL)
 const defaultPartnerHosts = 'business.pirttrip.com,business.localhost'
 const partnerHosts = (process.env.NUXT_PUBLIC_PARTNER_HOSTS || defaultPartnerHosts)
   .split(',')
