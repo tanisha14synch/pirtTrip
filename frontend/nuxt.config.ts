@@ -70,6 +70,7 @@ export default defineNuxtConfig({
       siteVariant,
       partnerHosts,
       partnerSiteUrl: effectivePartnerSiteUrl,
+      mainSiteUrl: process.env.NUXT_PUBLIC_MAIN_SITE_URL || '',
     },
   },
   nitro: {

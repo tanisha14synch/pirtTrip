@@ -1,4 +1,6 @@
 <script setup>
+const { homeHref, homeIsExternal } = useMainSite()
+
 const timeLeft = ref({
   days: 20,
   hours: 5,
@@ -65,7 +67,26 @@ onUnmounted(() => {
       <header
         class="flex flex-col gap-6 border-b border-white/5 pb-6 lg:flex-row lg:items-center lg:justify-between lg:gap-8"
       >
-        <NuxtLink to="/" class="inline-flex shrink-0">
+        <a
+          v-if="homeIsExternal"
+          :href="homeHref"
+          class="inline-flex shrink-0"
+          aria-label="Pirttrip home"
+        >
+          <img
+            src="/images/logo.png"
+            alt="pirttrip"
+            class="h-9 w-auto object-contain sm:h-10"
+            width="584"
+            height="192"
+          >
+        </a>
+        <NuxtLink
+          v-else
+          to="/"
+          class="inline-flex shrink-0"
+          aria-label="Pirttrip home"
+        >
           <img
             src="/images/logo.png"
             alt="pirttrip"

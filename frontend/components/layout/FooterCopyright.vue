@@ -2,6 +2,10 @@
 defineProps<{
   variant?: 'light' | 'dark'
 }>()
+
+const { mainSiteOrigin } = useMainSite()
+
+const pirttripHref = computed(() => `${mainSiteOrigin.value}/`)
 </script>
 
 <template>
@@ -11,8 +15,7 @@ defineProps<{
   >
     © 2026
     <a
-      href="https://www.pirttrip.com"
-      target="_blank"
+      :href="pirttripHref"
       rel="noopener noreferrer"
       class="underline-offset-2 transition-colors hover:underline"
       :class="variant === 'dark' ? 'text-white/70 hover:text-white' : 'text-black/70 hover:text-black'"

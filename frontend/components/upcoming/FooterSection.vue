@@ -1,6 +1,8 @@
 <script setup>
 import { FOOTER_LEGAL_LINKS, FOOTER_QUICK_LINKS } from '~/constants/legal-links'
 
+const { homeHref, homeIsExternal } = useMainSite()
+
 const CTA_BG = '/images/hero/hero-bg.png'
 const waitlistOpen = ref(false)
 
@@ -97,7 +99,24 @@ const ctaHighlights = [
         class="flex w-full flex-col items-start justify-between gap-10 py-12 md:min-h-[269px] md:py-16 lg:flex-row lg:gap-0"
       >
         <div class="max-w-[340px] shrink-0">
-          <NuxtLink to="/" aria-label="Pirttrip home">
+          <a
+            v-if="homeIsExternal"
+            :href="homeHref"
+            aria-label="Pirttrip home"
+          >
+            <img
+              src="/images/logo-black.png"
+              alt="pirttrip"
+              class="h-10 w-auto object-contain"
+              loading="lazy"
+              draggable="false"
+            >
+          </a>
+          <NuxtLink
+            v-else
+            to="/"
+            aria-label="Pirttrip home"
+          >
             <img
               src="/images/logo-black.png"
               alt="pirttrip"
