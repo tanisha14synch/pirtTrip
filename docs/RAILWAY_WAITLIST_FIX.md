@@ -1,4 +1,6 @@
-# Waitlist error fix — “Supabase service role is not configured”
+# Form submit fix — Supabase + Railway (waitlist + partner)
+
+Fixes: “Supabase service role is not configured”, waitlist join 500, partner form not saving.
 
 Code is deployed. **You must add secrets in Railway** (they are never stored in GitHub).
 
@@ -53,9 +55,20 @@ Supabase → **SQL Editor** → run file:
 
 `supabase/migrations/20250601000003_waitlist.sql`
 
-## Step 5 — Test on site
+## Step 5 — Verify frontend (after redeploy)
 
-Open https://pirttrip.com → Join Waitlist → use a test email.
+```bash
+curl https://pirttrip.com/api/health
+```
+
+Expected: `"supabase":"configured"` and `"forms":"handled on frontend (waitlist + partner)"`.
+
+## Step 6 — Test on site
+
+- https://pirttrip.com → Join Waitlist → test email  
+- https://business.pirttrip.com → Get Started form → test registration  
+
+Check Supabase Table Editor: `waitlist_subscribers`, `partner_leads`.
 
 ---
 

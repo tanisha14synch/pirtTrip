@@ -80,7 +80,11 @@ SUPABASE_SERVICE_ROLE_KEY=...   # same key as backend; never NUXT_PUBLIC_*
 **Do not** set `NUXT_PUBLIC_API_URL` to an old Railway URL.  
 Redeploy **frontend** after variable changes.
 
-`POST /api/waitlist/join` is handled on the **frontend** service when `SUPABASE_SERVICE_ROLE_KEY` is set there (recommended). Otherwise it proxies to the backend, which must have the same key.
+`POST /api/waitlist/join` and `POST /api/partner/register-direct` run on the **frontend** when Supabase env vars are set (read at **runtime**, not only at Docker build).
+
+Check: `curl https://pirttrip.com/api/health` → `"supabase":"configured"`.
+
+Otherwise requests proxy to the backend, which must have the same keys.
 
 ---
 

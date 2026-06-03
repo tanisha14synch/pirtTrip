@@ -1,18 +1,43 @@
 import { createClient, type SupabaseClient, type User } from '@supabase/supabase-js'
 import type { H3Event } from 'h3'
 
-export function getSupabaseAdmin(): SupabaseClient {
+function resolveBackendSupabaseUrl(): string {
   const config = useRuntimeConfig()
-  const serviceKey = config.supabaseServiceRoleKey
+  return (
+    process.env.SUPABASE_URL
+    || process.env.NUXT_PUBLIC_SUPABASE_URL
+    || config.public.supabaseUrl
+    || ''
+  ).trim()
+}
 
-  if (!config.public.supabaseUrl || !serviceKey) {
+function resolveBackendServiceKey(): string {
+  const config = useRuntimeConfig()
+  return (
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+    || process.env.SUPABASE_SERVICE_KEY
+    || process.env.SERVICE_ROLE_KEY
+    || config.supabaseServiceRoleKey
+    || ''
+  ).trim()
+}
+
+export function getSupabaseAdmin(): SupabaseClient {
+  const url = resolveBackendSupabaseUrl()
+  const serviceKey = resolveBackendServiceKey()
+
+  if (!url || !serviceKey) {
+    const missing = [
+      !url && 'SUPABASE_URL',
+      !serviceKey && 'SUPABASE_SERVICE_ROLE_KEY',
+    ].filter(Boolean).join(', ')
     throw createError({
       statusCode: 500,
-      statusMessage: 'Supabase service role is not configured',
+      statusMessage: `Supabase is not configured (${missing}). Set on Railway backend Variables and redeploy.`,
     })
   }
 
-  return createClient(config.public.supabaseUrl, serviceKey, {
+  return createClient(url, serviceKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,

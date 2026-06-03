@@ -1,40 +1,14 @@
-import { proxyRequest } from 'h3'
 import { z } from 'zod'
+import { proxyApiToBackend, shouldHandleWithLocalSupabase } from '../../utils/api-proxy'
 import { getSupabaseAdmin } from '../../utils/supabase-admin'
 
 const bodySchema = z.object({
   email: z.string().email('Invalid email address'),
 })
 
-function resolveApiOrigin(): string {
-  const config = useRuntimeConfig()
-  const isProd = process.env.NODE_ENV === 'production'
-  return (
-    (config.apiProxyOrigin as string)
-    || process.env.API_URL
-    || process.env.NUXT_API_PROXY_ORIGIN
-    || (!isProd ? 'http://127.0.0.1:3001' : '')
-  )
-    .trim()
-    .replace(/\/$/, '')
-    .replace(/\/api$/, '')
-}
-
-/** Prefer local handler when service role is set; else proxy to backend API. */
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
-  const serviceKey = (config.supabaseServiceRoleKey as string)?.trim()
-
-  if (!serviceKey) {
-    const origin = resolveApiOrigin()
-    if (!origin) {
-      throw createError({
-        statusCode: 500,
-        statusMessage:
-          'Supabase service role is not configured. Set SUPABASE_SERVICE_ROLE_KEY on the frontend or backend Railway service.',
-      })
-    }
-    return proxyRequest(event, `${origin}${event.path}`)
+  if (!shouldHandleWithLocalSupabase()) {
+    return proxyApiToBackend(event)
   }
 
   const body = await readBody(event)

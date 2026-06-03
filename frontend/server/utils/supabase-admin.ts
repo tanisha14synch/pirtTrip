@@ -1,15 +1,24 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import {
+  getSupabaseConfigStatus,
+  resolveSupabaseServiceKey,
+  resolveSupabaseUrl,
+} from './supabase-config'
 
 export function getSupabaseAdmin(): SupabaseClient {
-  const config = useRuntimeConfig()
-  const url = config.public.supabaseUrl as string
-  const serviceKey = config.supabaseServiceRoleKey as string
+  const url = resolveSupabaseUrl()
+  const serviceKey = resolveSupabaseServiceKey()
 
   if (!url || !serviceKey) {
+    const status = getSupabaseConfigStatus()
+    const missing = [
+      !status.supabaseUrl && 'SUPABASE_URL or NUXT_PUBLIC_SUPABASE_URL',
+      !status.serviceRoleKey && 'SUPABASE_SERVICE_ROLE_KEY',
+    ].filter(Boolean).join(', ')
+
     throw createError({
       statusCode: 500,
-      statusMessage:
-        'Supabase service role is not configured. Set SUPABASE_URL, NUXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY on the frontend Railway service (server-only, not NUXT_PUBLIC).',
+      statusMessage: `Supabase is not configured (${missing}). Add these on the Railway frontend service Variables, then redeploy.`,
     })
   }
 

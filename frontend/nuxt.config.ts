@@ -61,15 +61,13 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
   runtimeConfig: {
     apiProxyOrigin: apiOrigin,
-    supabaseServiceRoleKey:
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-      || process.env.SUPABASE_SERVICE_KEY
-      || '',
+    supabaseServiceRoleKey: '',
+    supabaseUrl: '',
     public: {
       apiUrl: process.env.NUXT_PUBLIC_API_URL || '',
       // When false (default), browser calls same-origin /api (server proxies to API_URL).
       apiDirect: process.env.NUXT_PUBLIC_API_DIRECT === 'true',
-      supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL || '',
+      supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '',
       supabaseAnonKey: process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY || '',
       siteVariant,
       partnerHosts,
