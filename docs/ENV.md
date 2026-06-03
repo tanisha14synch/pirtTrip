@@ -71,10 +71,16 @@ NUXT_PUBLIC_SUPABASE_URL=https://fvkwophzzyaukacuiszv.supabase.co
 NUXT_PUBLIC_SUPABASE_ANON_KEY=...
 API_URL=https://api.pirttrip.com
 HOST=0.0.0.0
+
+# Waitlist join on pirttrip.com (server-only — fixes "service role is not configured")
+SUPABASE_URL=https://fvkwophzzyaukacuiszv.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=...   # same key as backend; never NUXT_PUBLIC_*
 ```
 
 **Do not** set `NUXT_PUBLIC_API_URL` to an old Railway URL.  
 Redeploy **frontend** after variable changes.
+
+`POST /api/waitlist/join` is handled on the **frontend** service when `SUPABASE_SERVICE_ROLE_KEY` is set there (recommended). Otherwise it proxies to the backend, which must have the same key.
 
 ---
 

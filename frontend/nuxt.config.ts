@@ -61,6 +61,10 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
   runtimeConfig: {
     apiProxyOrigin: apiOrigin,
+    supabaseServiceRoleKey:
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+      || process.env.SUPABASE_SERVICE_KEY
+      || '',
     public: {
       apiUrl: process.env.NUXT_PUBLIC_API_URL || '',
       // When false (default), browser calls same-origin /api (server proxies to API_URL).
