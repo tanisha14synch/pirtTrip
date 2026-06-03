@@ -1,4 +1,6 @@
 <script setup>
+const { partnerLandingUrl } = usePartnerSite()
+
 const CTA_BG = '/images/hero/hero-bg.png'
 
 const ctaPoints = [
@@ -41,7 +43,7 @@ const ctaPoints = [
               Register your business, get early access, and start connecting with travelers when we launch.
             </p>
             <NuxtLink
-              to="/business"
+              :to="partnerLandingUrl"
               class="mt-8 inline-flex h-[52px] min-w-[220px] items-center justify-center rounded-full bg-brand-gold px-10 font-plein text-[16px] font-bold text-white transition-opacity hover:opacity-90"
             >
               Become a Partner

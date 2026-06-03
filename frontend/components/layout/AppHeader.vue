@@ -1,4 +1,6 @@
 <script setup>
+const { partnerLandingUrl } = usePartnerSite()
+
 const store = useHomeStore()
 const { header, ui } = storeToRefs(store)
 
@@ -20,6 +22,8 @@ const navLinkClass =
 
 const isHashHref = (href) =>
   typeof href === 'string' && href.startsWith('#')
+
+const ctaHref = (cta) => (cta.id === 'partner' ? partnerLandingUrl.value : cta.href)
 
 const updateHeaderScroll = () => {
   const threshold = header.value.scrollThreshold ?? 24
@@ -123,7 +127,7 @@ watch(
           <template v-for="cta in header.ctas" :key="cta.id">
             <NuxtLink
               v-if="!isHashHref(cta.href)"
-              :to="cta.href"
+              :to="ctaHref(cta)"
               :class="ctaClass(cta.variant)"
               :style="headerButtonStyle"
             >
@@ -212,7 +216,7 @@ watch(
             <template v-for="cta in header.ctas" :key="cta.id">
               <NuxtLink
                 v-if="!isHashHref(cta.href)"
-                :to="cta.href"
+                :to="ctaHref(cta)"
                 :class="`${ctaClass(cta.variant)} w-full text-center`"
                 :style="headerButtonStyle"
                 @click="store.setMobileMenuOpen(false)"

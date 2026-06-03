@@ -1,3 +1,8 @@
 <script setup>
-await navigateTo('/business', { redirectCode: 301 })
+const { partnerLandingUrl } = usePartnerSite()
+
+await navigateTo(partnerLandingUrl.value, {
+  external: partnerLandingUrl.value.startsWith('http'),
+  redirectCode: 301,
+})
 </script>

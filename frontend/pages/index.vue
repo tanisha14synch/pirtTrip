@@ -1,20 +1,30 @@
 <script setup>
+const { isBusinessSite } = useSiteVariant()
+
 definePageMeta({
   layout: false,
 })
 
-useHead({
-  title: 'pirttrip — Find, Join & Experience Amazing Group Trips',
-  meta: [
-    {
-      name: 'description',
-      content:
-        'Coming soon: find exciting group trips, meet fellow travelers, and explore destinations with trusted organizers on pirttrip.',
-    },
-  ],
-})
+setPageLayout(isBusinessSite.value ? 'upcoming' : false)
+
+if (isBusinessSite.value) {
+  useBusinessLandingHead()
+}
+else {
+  useHead({
+    title: 'pirttrip — Find, Join & Experience Amazing Group Trips',
+    meta: [
+      {
+        name: 'description',
+        content:
+          'Coming soon: find exciting group trips, meet fellow travelers, and explore destinations with trusted organizers on pirttrip.',
+      },
+    ],
+  })
+}
 </script>
 
 <template>
-  <LandingLaunchHeroSection />
+  <PartnerBusinessLandingContent v-if="isBusinessSite" />
+  <LandingLaunchHeroSection v-else />
 </template>

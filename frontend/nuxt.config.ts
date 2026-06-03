@@ -20,18 +20,36 @@ function resolveApiOrigin(): string {
 const apiOrigin = resolveApiOrigin()
 const devApiTarget = `${apiOrigin || 'http://127.0.0.1:3001'}/api`
 
-const businessUrl = (process.env.NUXT_PUBLIC_BUSINESS_URL || '').trim().replace(/\/$/, '')
+import { DEFAULT_DEV_PARTNER_SITE_URL } from './utils/partner-site-url'
 
-const partnerRouteRules = businessUrl
-  ? {
-      '/business': { redirect: { to: businessUrl, statusCode: 301 } },
-      '/how-it-works': { redirect: { to: businessUrl, statusCode: 301 } },
-      '/become-a-partner': { redirect: { to: businessUrl, statusCode: 301 } },
-    }
-  : {
-      '/how-it-works': { redirect: { to: '/business', statusCode: 301 } },
-      '/become-a-partner': { redirect: { to: '/business', statusCode: 301 } },
-    }
+const siteVariant = process.env.NUXT_PUBLIC_SITE_VARIANT || 'main'
+const partnerSiteUrl = (process.env.NUXT_PUBLIC_PARTNER_SITE_URL || '').trim().replace(/\/$/, '')
+const effectivePartnerSiteUrl = partnerSiteUrl || (!isProd ? DEFAULT_DEV_PARTNER_SITE_URL : '')
+const defaultPartnerHosts = 'business.pirttrip.com,business.localhost'
+const partnerHosts = (process.env.NUXT_PUBLIC_PARTNER_HOSTS || defaultPartnerHosts)
+  .split(',')
+  .map(h => h.trim())
+  .filter(Boolean)
+
+const routeRules: Record<string, { redirect: { to: string, statusCode: number } } | { ssr: false }> = {
+  '/admin/**': { ssr: false },
+}
+
+if (siteVariant === 'business') {
+  routeRules['/business'] = { redirect: { to: '/', statusCode: 301 } }
+  routeRules['/become-a-partner'] = { redirect: { to: '/', statusCode: 301 } }
+  routeRules['/how-it-works'] = { redirect: { to: '/', statusCode: 301 } }
+}
+else if (effectivePartnerSiteUrl) {
+  const partnerRoot = `${effectivePartnerSiteUrl}/`
+  routeRules['/business'] = { redirect: { to: partnerRoot, statusCode: 301 } }
+  routeRules['/become-a-partner'] = { redirect: { to: partnerRoot, statusCode: 301 } }
+  routeRules['/how-it-works'] = { redirect: { to: partnerRoot, statusCode: 301 } }
+}
+else {
+  routeRules['/how-it-works'] = { redirect: { to: '/business', statusCode: 301 } }
+  routeRules['/become-a-partner'] = { redirect: { to: '/business', statusCode: 301 } }
+}
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -45,6 +63,9 @@ export default defineNuxtConfig({
       apiDirect: process.env.NUXT_PUBLIC_API_DIRECT === 'true',
       supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL || '',
       supabaseAnonKey: process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY || '',
+      siteVariant,
+      partnerHosts,
+      partnerSiteUrl: effectivePartnerSiteUrl,
     },
   },
   nitro: {
@@ -57,10 +78,7 @@ export default defineNuxtConfig({
       },
     },
   },
-  routeRules: {
-    ...partnerRouteRules,
-    '/admin/**': { ssr: false },
-  },
+  routeRules,
   css: ['~/assets/css/main.css'],
   app: {
     head: {

@@ -1,4 +1,6 @@
 <script setup>
+const { partnerLandingUrl } = usePartnerSite()
+
 const store = useLandingStore()
 const { header, ui } = storeToRefs(store)
 
@@ -74,7 +76,7 @@ watch(
             {{ header.travelerCta.label }}
           </NuxtLink>
           <NuxtLink
-            :to="header.partnerCta.href"
+            :to="partnerLandingUrl"
             :class="`${ctaClass} bg-brand-dark`"
           >
             {{ header.partnerCta.label }}
@@ -125,7 +127,7 @@ watch(
               {{ header.travelerCta.label }}
             </NuxtLink>
             <NuxtLink
-              :to="header.partnerCta.href"
+              :to="partnerLandingUrl"
               :class="`${ctaClass} w-full bg-brand-dark`"
               @click="store.setMobileMenuOpen(false)"
             >

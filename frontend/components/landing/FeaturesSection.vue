@@ -1,4 +1,6 @@
 <script setup>
+const { partnerLandingUrl } = usePartnerSite()
+
 const travelerFeatures = [
   'Search domestic and international group trips',
   'Filter by category, month, and trip type',
@@ -90,7 +92,7 @@ const featureCards = [
             </li>
           </ul>
           <NuxtLink
-            to="/business"
+            :to="partnerLandingUrl"
             class="mt-8 inline-flex h-[48px] items-center justify-center rounded-[9px] bg-brand-gold px-6 font-plein text-[15px] font-bold text-white transition-opacity hover:opacity-90"
           >
             Become a Partner

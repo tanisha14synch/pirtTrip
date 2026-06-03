@@ -1,6 +1,8 @@
 <script setup>
 import { FOOTER_LEGAL_LINKS, FOOTER_QUICK_LINKS } from '~/constants/legal-links'
 
+const { partnerLandingUrl } = usePartnerSite()
+
 const CTA_BG = '/images/hero/hero-bg.png'
 
 const quickLinks = FOOTER_QUICK_LINKS
@@ -47,7 +49,7 @@ const isExternalHref = (href) =>
           </h2>
 
           <NuxtLink
-            to="/business"
+            :to="partnerLandingUrl"
             class="mt-8 inline-flex h-[52px] min-w-[220px] items-center justify-center rounded-full bg-[#F76517] px-10 font-plein text-[16px] font-bold leading-[130%] tracking-[0] text-white transition-opacity hover:opacity-90"
           >
             Become a Partner

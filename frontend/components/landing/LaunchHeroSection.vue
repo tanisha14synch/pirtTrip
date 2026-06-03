@@ -1,4 +1,6 @@
 <script setup>
+const { partnerLandingUrl } = usePartnerSite()
+
 const HERO_BG = '/images/hero/hero-bg.png'
 
 const heroStyle = {
@@ -83,7 +85,7 @@ onUnmounted(() => {
 
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
           <NuxtLink
-            to="/business"
+            :to="partnerLandingUrl"
             class="inline-flex h-[44px] shrink-0 items-center justify-center rounded-[8px] bg-[#F3A81A] px-5 font-plein text-[15px] font-bold text-white transition-opacity hover:opacity-90 sm:h-[46px] sm:px-6"
           >
             Become a Partner
