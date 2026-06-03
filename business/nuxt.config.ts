@@ -12,7 +12,6 @@ function resolveApiOrigin(): string {
     || process.env.NUXT_PUBLIC_API_BASE_URL
     || ''
   if (fromEnv) return normalizeApiOrigin(fromEnv)
-  // Local dev default when .env.development is missing
   if (!isProd) return 'http://127.0.0.1:3001'
   return ''
 }
@@ -20,46 +19,31 @@ function resolveApiOrigin(): string {
 const apiOrigin = resolveApiOrigin()
 const devApiTarget = `${apiOrigin || 'http://127.0.0.1:3001'}/api`
 
-const businessUrl = (process.env.NUXT_PUBLIC_BUSINESS_URL || '').trim().replace(/\/$/, '')
-
-const partnerRouteRules = businessUrl
-  ? {
-      '/business': { redirect: { to: businessUrl, statusCode: 301 } },
-      '/how-it-works': { redirect: { to: businessUrl, statusCode: 301 } },
-      '/become-a-partner': { redirect: { to: businessUrl, statusCode: 301 } },
-    }
-  : {
-      '/how-it-works': { redirect: { to: '/business', statusCode: 301 } },
-      '/become-a-partner': { redirect: { to: '/business', statusCode: 301 } },
-    }
-
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
+  modules: ['@nuxtjs/tailwindcss'],
   runtimeConfig: {
     apiProxyOrigin: apiOrigin,
     public: {
       apiUrl: process.env.NUXT_PUBLIC_API_URL || '',
-      // When false (default), browser calls same-origin /api (server proxies to API_URL).
       apiDirect: process.env.NUXT_PUBLIC_API_DIRECT === 'true',
-      supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL || '',
-      supabaseAnonKey: process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY || '',
+      /** Main marketing site (legal pages, home logo link) */
+      mainSiteUrl: process.env.NUXT_PUBLIC_MAIN_SITE_URL || 'https://www.pirttrip.com',
     },
   },
   nitro: {
     devProxy: {
       '/api': {
-        // Nitro devProxy strips the matched prefix. Point to `/api` on backend
-        // so `/api/waitlist/send-otp` stays routed to backend API handlers.
         target: devApiTarget,
         changeOrigin: true,
       },
     },
   },
   routeRules: {
-    ...partnerRouteRules,
-    '/admin/**': { ssr: false },
+    '/become-a-partner': { redirect: { to: '/', statusCode: 301 } },
+    '/how-it-works': { redirect: { to: '/', statusCode: 301 } },
+    '/business': { redirect: { to: '/', statusCode: 301 } },
   },
   css: ['~/assets/css/main.css'],
   app: {

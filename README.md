@@ -4,7 +4,8 @@ Monorepo layout:
 
 | Folder | Role |
 |--------|------|
-| `frontend/` | Nuxt 3 UI (port **3000**) |
+| `frontend/` | Nuxt 3 marketing site (port **3000**) |
+| `business/` | Nuxt 3 partner / business page (port **3002**) — deploy separately on Railway |
 | `backend/` | Nitro API server (port **3001**) — all `/api/*` routes |
 | `backend/supabase/` | Database migrations |
 
@@ -36,7 +37,11 @@ cd frontend && npm run dev:backend
 
 ## Deploy (Railway)
 
-Two services: **backend** (`/api/health`) and **frontend** (`/`). See [docs/RAILWAY.md](docs/RAILWAY.md).
+Three services: **backend**, **frontend**, **business**. See [docs/RAILWAY.md](docs/RAILWAY.md) and [business/README.md](business/README.md).
+
+```bash
+npm run dev:business   # API :3001 + business app :3002
+```
 
 ## Database
 
