@@ -147,27 +147,52 @@ onUnmounted(() => {
       </header>
 
       <!-- Hero body -->
-      <div class="mt-10 grid grid-cols-1 items-start gap-10 lg:mt-14 lg:grid-cols-2 lg:gap-14 xl:grid-cols-[1.08fr_0.92fr]">
-        <article class="max-w-[580px] lg:pt-4">
-          <p class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-white">
-            Lets Grow Your Group Travel Business With pirttrip
-          </p>
-
-          <h1
-            class="mt-5 font-plein text-[34px] font-bold leading-[120%] tracking-[0] text-white sm:text-[42px] md:text-[48px] lg:text-[52px]"
+      <div class="relative mt-10 lg:mt-14">
+        <!-- Floating trip cards (Figma hero — middle + bottom) -->
+        <div
+          class="hero-floating-cards pointer-events-none absolute inset-0 z-[1] hidden overflow-visible lg:block"
+          aria-hidden="true"
+        >
+          <img
+            src="/images/hero/business-hero-card-middle.png"
+            alt=""
+            class="hero-floating-card hero-floating-card--middle"
+            loading="lazy"
+            draggable="false"
           >
-            Are you running a Travel Business ?
-          </h1>
-
-          <p
-            class="mt-6 max-w-[520px] font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-white/85"
+          <img
+            src="/images/hero/business-hero-card-bottom.png"
+            alt=""
+            class="hero-floating-card hero-floating-card--bottom"
+            loading="lazy"
+            draggable="false"
           >
-            pirttrip will be a one-stop discovery platform where travelers can explore all types of
-            group trips posted by travel businesses like yours.
-          </p>
-        </article>
+        </div>
 
-        <PartnerRegistrationForm />
+        <div
+          class="relative z-[2] grid grid-cols-1 items-start gap-10 lg:grid-cols-2 lg:gap-14 xl:grid-cols-[1.08fr_0.92fr]"
+        >
+          <article class="max-w-[580px] lg:pt-4">
+            <p class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-white">
+              Lets Grow Your Group Travel Business With pirttrip
+            </p>
+
+            <h1
+              class="mt-5 font-plein text-[34px] font-bold leading-[120%] tracking-[0] text-white sm:text-[42px] md:text-[48px] lg:text-[52px]"
+            >
+              Are you running a Travel Business ?
+            </h1>
+
+            <p
+              class="mt-6 max-w-[520px] font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-white/85"
+            >
+              pirttrip will be a one-stop discovery platform where travelers can explore all types of
+              group trips posted by travel businesses like yours.
+            </p>
+          </article>
+
+          <PartnerRegistrationForm />
+        </div>
       </div>
 
       <!-- Feature cards -->
@@ -189,10 +214,62 @@ onUnmounted(() => {
 <style scoped>
 .upcoming-hero {
   background-color: #000;
-  background-image: url('/images/upcoming-hero-bg.png');
+  background-image: url('/images/upcoming-hero-bg.svg');
   background-repeat: no-repeat;
   background-position: center top;
   background-size: cover;
 }
 
+.hero-floating-cards {
+  min-height: clamp(22rem, 52vh, 34rem);
+}
+
+.hero-floating-card {
+  position: absolute;
+  height: auto;
+  max-width: none;
+  border-radius: 1.25rem;
+  object-fit: contain;
+  filter: drop-shadow(0 1.5rem 2.75rem rgba(0, 0, 0, 0.45));
+}
+
+/* Middle card — right, tilted (Leh Ladakh) */
+.hero-floating-card--middle {
+  top: 2%;
+  right: -2%;
+  width: min(19.5rem, 42vw);
+  transform: rotate(-11deg);
+  transform-origin: center center;
+  z-index: 2;
+}
+
+/* Bottom card — lower left, tilted (Santorini / DriftTrip) */
+.hero-floating-card--bottom {
+  bottom: -6%;
+  left: 18%;
+  width: min(17.5rem, 38vw);
+  transform: rotate(9deg);
+  transform-origin: center center;
+  z-index: 1;
+}
+
+@media (min-width: 80rem) {
+  .hero-floating-card--middle {
+    top: 0;
+    right: 4%;
+    width: 20.5rem;
+  }
+
+  .hero-floating-card--bottom {
+    bottom: -4%;
+    left: 26%;
+    width: 18.5rem;
+  }
+}
+
+@media (max-width: 1023px) {
+  .hero-floating-cards {
+    display: none;
+  }
+}
 </style>
