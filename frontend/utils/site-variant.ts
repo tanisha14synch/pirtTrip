@@ -9,8 +9,8 @@ export function parsePartnerHosts(raw: string | string[] | undefined): string[] 
 }
 
 export function isPartnerHost(host: string, partnerHosts: string[]): boolean {
-  if (!partnerHosts.length) return false
   const h = host.toLowerCase().split(':')[0]
+  if (!h) return false
   return partnerHosts.some((ph) => h === ph || h.endsWith(`.${ph}`))
 }
 

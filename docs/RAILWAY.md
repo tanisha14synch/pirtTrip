@@ -102,6 +102,8 @@ The partner landing page lives in **`frontend/`** only (no separate `business/` 
 
 **Local test:** add `127.0.0.1 business.localhost` to `/etc/hosts`, run `npm run dev` in `frontend`, open `http://business.localhost:3000/`.
 
+**Cloudflare DNS (CNAME still yellow in Railway):** see [CLOUDFLARE_BUSINESS_SUBDOMAIN.md](./CLOUDFLARE_BUSINESS_SUBDOMAIN.md).
+
 ### Vercel (optional)
 
 Nuxt 3 works well on Vercel. Use Vercel for `frontend/` and Railway for `backend/` if you prefer edge hosting for static/SSR. Set `NUXT_PUBLIC_API_URL` in Vercel project settings to your Railway API URL.
