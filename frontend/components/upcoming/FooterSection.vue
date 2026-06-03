@@ -186,11 +186,7 @@ const ctaHighlights = [
         </div>
       </div>
 
-      <p
-        class="text-center font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/50"
-      >
-        Copyright © 2026 pirttrip. All Rights Reserved.
-      </p>
+      <LayoutFooterCopyright />
     </div>
   </footer>
 

@@ -55,7 +55,7 @@ const highlights = [
 
       <div class="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         <NuxtLink
-          to="/become-a-partner"
+          to="/business"
           class="inline-flex h-[52px] min-w-[200px] items-center justify-center rounded-[9px] bg-brand-gold px-8 font-plein text-[16px] font-bold leading-[140%] text-white transition-opacity hover:opacity-90"
         >
           Become a Partner

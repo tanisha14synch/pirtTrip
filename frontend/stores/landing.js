@@ -11,7 +11,7 @@ export const useLandingStore = defineStore('landing', {
       ],
       partnerCta: {
         label: 'Become a Partner',
-        href: '/become-a-partner',
+        href: '/business',
       },
       travelerCta: {
         label: 'Explore Trips',

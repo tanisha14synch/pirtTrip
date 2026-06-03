@@ -100,9 +100,7 @@ const isHashHref = (href) => typeof href === 'string' && href.startsWith('#')
         </div>
       </div>
 
-      <p class="text-center font-plein text-[16px] font-normal leading-[140%] text-black/50">
-        Copyright © 2026 pirttrip. All Rights Reserved.
-      </p>
+      <LayoutFooterCopyright />
     </div>
   </footer>
 </template>

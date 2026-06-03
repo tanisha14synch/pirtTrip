@@ -1,3 +1,3 @@
 <script setup>
-await navigateTo('/become-a-partner', { redirectCode: 301 })
+await navigateTo('/business', { redirectCode: 301 })
 </script>

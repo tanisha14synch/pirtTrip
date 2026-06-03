@@ -45,7 +45,8 @@ export default defineNuxtConfig({
     },
   },
   routeRules: {
-    '/how-it-works': { redirect: { to: '/become-a-partner', statusCode: 301 } },
+    '/how-it-works': { redirect: { to: '/business', statusCode: 301 } },
+    '/become-a-partner': { redirect: { to: '/business', statusCode: 301 } },
     '/admin/**': { ssr: false },
   },
   css: ['~/assets/css/main.css'],

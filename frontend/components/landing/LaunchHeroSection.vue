@@ -83,7 +83,7 @@ onUnmounted(() => {
 
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
           <NuxtLink
-            to="/become-a-partner"
+            to="/business"
             class="inline-flex h-[44px] shrink-0 items-center justify-center rounded-[8px] bg-[#F3A81A] px-5 font-plein text-[15px] font-bold text-white transition-opacity hover:opacity-90 sm:h-[46px] sm:px-6"
           >
             Become a Partner
@@ -158,11 +158,10 @@ onUnmounted(() => {
       </button>
     </div>
 
-    <p
-      class="absolute bottom-0 left-0 right-0 z-20 px-4 pb-5 text-center font-plein text-[14px] font-normal leading-[140%] tracking-[0] text-white/55 sm:pb-6 sm:text-[16px]"
-    >
-      Copyright © 2026 pirttrip. All Rights Reserved.
-    </p>
+    <LayoutFooterCopyright
+      variant="dark"
+      class="absolute bottom-0 left-0 right-0 z-20 px-4 pb-5 sm:pb-6"
+    />
 
     <LandingWaitlistModal v-model:open="waitlistOpen" />
   </section>

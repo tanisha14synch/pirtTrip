@@ -47,7 +47,7 @@ const isExternalHref = (href) =>
           </h2>
 
           <NuxtLink
-            to="/become-a-partner"
+            to="/business"
             class="mt-8 inline-flex h-[52px] min-w-[220px] items-center justify-center rounded-full bg-[#F76517] px-10 font-plein text-[16px] font-bold leading-[130%] tracking-[0] text-white transition-opacity hover:opacity-90"
           >
             Become a Partner
@@ -153,11 +153,7 @@ const isExternalHref = (href) =>
         </div>
       </div>
 
-      <p
-        class="text-center font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/50"
-      >
-        Copyright © 2026 pirttrip. All Rights Reserved.
-      </p>
+      <LayoutFooterCopyright />
     </div>
   </footer>
 </template>

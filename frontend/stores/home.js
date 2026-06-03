@@ -16,7 +16,7 @@ export const useHomeStore = defineStore('home', {
         {
           id: 'partner',
           label: 'Become a Partner',
-          href: '/become-a-partner',
+          href: '/business',
           variant: 'dark',
         },
         {

@@ -41,7 +41,7 @@ const ctaPoints = [
               Register your business, get early access, and start connecting with travelers when we launch.
             </p>
             <NuxtLink
-              to="/become-a-partner"
+              to="/business"
               class="mt-8 inline-flex h-[52px] min-w-[220px] items-center justify-center rounded-full bg-brand-gold px-10 font-plein text-[16px] font-bold text-white transition-opacity hover:opacity-90"
             >
               Become a Partner

@@ -101,9 +101,7 @@ const pageIcon = computed(() => getPageIcon(currentSlug.value))
         </ul>
       </nav>
 
-      <p class="mt-8 text-center font-plein text-[14px] text-white/45">
-        Copyright © 2026 pirttrip. All Rights Reserved.
-      </p>
+      <LayoutFooterCopyright variant="dark" class="mt-8" />
     </div>
   </div>
 </template>
