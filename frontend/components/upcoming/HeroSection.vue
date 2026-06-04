@@ -105,10 +105,10 @@ onUnmounted(() => {
       aria-hidden="true"
     >
 
-    <div class="relative z-10 mx-auto flex w-[94%] max-w-[1280px] flex-1 flex-col pb-10 md:pb-12">
+    <div class="hero-content relative z-10 mx-auto flex w-[94%] max-w-[1280px] flex-1 flex-col pb-8 md:pb-10 lg:pb-12">
       <!-- Launch header: logo | countdown | contact -->
       <header
-        class="flex flex-col gap-4 border-b border-white/5 pb-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6"
+        class="flex flex-col gap-3 border-b border-white/5 pb-3 sm:gap-4 sm:pb-4 md:gap-5 lg:flex-row lg:items-center lg:justify-between lg:gap-6 xl:gap-8"
       >
         <a
           v-if="homeIsExternal"
@@ -119,7 +119,7 @@ onUnmounted(() => {
           <img
             src="/images/logo.svg"
             alt="PirtTrip"
-            class="h-9 w-auto object-contain sm:h-10"
+            class="h-8 w-auto object-contain sm:h-9 md:h-10 lg:h-11 xl:h-12"
             width="584"
             height="192"
           >
@@ -133,7 +133,7 @@ onUnmounted(() => {
           <img
             src="/images/logo.svg"
             alt="PirtTrip"
-            class="h-8 w-auto object-contain sm:h-9"
+            class="h-8 w-auto object-contain sm:h-9 md:h-10 lg:h-11 xl:h-12"
             width="584"
             height="192"
           >
@@ -144,12 +144,12 @@ onUnmounted(() => {
         >
           <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
             <p
-              class="shrink-0 font-plein text-[13px] font-normal leading-[135%] tracking-[0] text-white sm:text-[14px]"
+              class="shrink-0 font-plein text-sm font-normal leading-snug text-white md:text-base lg:text-lg"
             >
               We are launching Soon!
             </p>
 
-            <div class="flex gap-1.5">
+            <div class="flex gap-1.5 sm:gap-2 md:gap-2.5">
               <div
                 v-for="unit in [
                   { label: 'DAYS', value: timeLeft.days },
@@ -158,13 +158,13 @@ onUnmounted(() => {
                   { label: 'SECS', value: timeLeft.seconds },
                 ]"
                 :key="unit.label"
-                class="flex min-w-[42px] flex-col items-center justify-center rounded-[5px] bg-white px-2 py-1.5 sm:min-w-[46px]"
+                class="hero-countdown-unit flex min-w-10 flex-col items-center justify-center rounded-md bg-white px-2 py-1.5 sm:min-w-11 md:min-w-12 md:px-2.5 md:py-2 lg:min-w-[3.25rem] xl:min-w-14"
               >
-                <span class="font-plein text-[15px] font-bold leading-none text-black sm:text-[16px]">
+                <span class="font-plein text-base font-bold leading-none text-black sm:text-lg md:text-xl lg:text-2xl">
                   {{ pad(unit.value) }}
                 </span>
                 <span
-                  class="mt-0.5 font-plein text-[8px] font-medium uppercase leading-none tracking-[0.02em] text-black/65 sm:text-[9px]"
+                  class="mt-0.5 font-plein text-[10px] font-medium uppercase leading-none tracking-wide text-black/65 sm:text-xs md:text-sm"
                 >
                   {{ unit.label }}
                 </span>
@@ -173,11 +173,11 @@ onUnmounted(() => {
           </div>
 
           <span
-            class="hidden h-9 w-px shrink-0 bg-white/35 sm:block"
+            class="hidden h-8 w-px shrink-0 bg-white/35 sm:block md:h-10 lg:h-12"
             aria-hidden="true"
           />
 
-          <div class="font-plein text-[13px] font-normal leading-[135%] tracking-[0] text-white sm:text-[14px]">
+          <div class="font-plein text-sm font-normal leading-snug text-white md:text-base lg:text-lg">
             <p>For any information, contact Business Support</p>
             <p class="mt-0.5">
               at:
@@ -196,45 +196,45 @@ onUnmounted(() => {
         </div>
       </header>
 
-      <div class="hero-main relative mt-6 flex flex-1 flex-col lg:mt-8">
+      <div class="hero-main relative mt-4 flex flex-1 flex-col sm:mt-5 md:mt-6 lg:mt-8">
         <!-- Hero body -->
-        <div class="hero-body-stage relative z-10">
+        <div class="hero-body-stage relative z-10 flex flex-1 flex-col justify-center">
         <div
           id="partner-registration"
-          class="grid scroll-mt-6 grid-cols-1 items-start gap-6 lg:grid-cols-2 lg:gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(520px,640px)] xl:gap-10"
+          class="grid scroll-mt-6 grid-cols-1 items-start gap-5 sm:gap-6 md:gap-7 lg:grid-cols-2 lg:gap-8 xl:gap-10 2xl:gap-12"
         >
-        <article class="max-w-[580px] lg:pt-1 xl:max-w-[500px]">
-            <p class="font-plein text-[14px] font-normal leading-[135%] tracking-[0] text-white">
+        <article class="max-w-xl lg:max-w-2xl">
+            <p class="font-plein text-sm font-normal leading-snug text-white md:text-base lg:text-lg xl:text-xl">
               Lets Grow Your Travel Business with
               <span class="text-brand-gold font-bold">PirtTrip</span>
             </p>
 
             <h1
-              class="mt-3 font-plein text-[28px] font-bold leading-[118%] tracking-[0] text-white sm:text-[34px] md:text-[38px] lg:text-[40px]"
+              class="mt-2 font-plein text-2xl font-bold leading-tight text-white sm:mt-3 sm:text-3xl md:text-4xl lg:text-5xl xl:text-[3.25rem] 2xl:text-6xl"
             >
              Running Your Travel Business All Alone?
             </h1>
 
             <p
-              class="mt-3 max-w-[480px] font-plein text-[14px] font-normal leading-[135%] tracking-[0] text-white/85"
+              class="mt-2 max-w-xl font-plein text-sm font-normal leading-snug text-white/85 sm:mt-3 md:text-base lg:text-lg xl:text-xl 2xl:max-w-2xl"
             >
             Let us contribute a small effort to help your
             business reach more travelers.
             </p>
           </article>
 
-        <PartnerRegistrationForm class="w-full lg:ml-auto" />
+        <PartnerRegistrationForm class="hero-form w-full lg:ml-auto lg:max-w-xl xl:max-w-2xl" />
         </div>
         </div>
 
       <!-- Feature cards -->
-      <div class="relative z-10 mt-5 flex flex-wrap justify-center gap-2 sm:gap-2 xl:mt-6 xl:flex-nowrap xl:gap-2.5 lg:mt-auto">
+      <div class="hero-feature-cards relative z-10 mt-4 flex flex-wrap justify-center gap-2 sm:mt-5 sm:gap-3 md:gap-4 lg:mt-auto lg:flex-nowrap lg:gap-5 xl:gap-6">
         <img
           v-for="card in featureCards"
           :key="card.id"
           :src="card.src"
           :alt="card.alt"
-          class="h-auto min-h-[76px] w-[calc(50%-4px)] max-w-[150px] shrink-0 rounded-[12px] object-contain sm:min-h-[84px] sm:max-w-[164px] xl:h-[100px] xl:w-[190px] xl:max-w-[190px] xl:min-h-0"
+          class="hero-vendor-card h-16 w-[calc(50%-4px)] max-w-[9rem] shrink-0 rounded-xl object-contain sm:h-20 sm:max-w-[10rem] md:h-24 md:max-w-[11rem] lg:h-28 lg:max-w-xs xl:h-32 xl:max-w-sm 2xl:h-36 2xl:max-w-md"
           loading="lazy"
           draggable="false"
         >
@@ -265,6 +265,36 @@ onUnmounted(() => {
   min-height: 0;
 }
 
+/* Scale typography & cards on tall viewports (extra space inside 100vh) */
+@media (min-height: 820px) and (min-width: 1024px) {
+  .hero-content {
+    padding-bottom: clamp(2rem, 4vh, 3.5rem);
+  }
+
+  .hero-countdown-unit {
+    min-width: clamp(3rem, 5vw, 4.5rem);
+    padding: clamp(0.5rem, 1vh, 0.75rem) clamp(0.5rem, 1.2vw, 0.875rem);
+  }
+
+  .hero-vendor-card {
+    height: clamp(6.5rem, 12vh, 10rem);
+    max-width: clamp(10rem, 14vw, 15rem);
+  }
+}
+
+@media (min-height: 960px) and (min-width: 1280px) {
+  .hero-vendor-card {
+    height: clamp(7.5rem, 14vh, 11.5rem);
+    max-width: clamp(11rem, 15vw, 17rem);
+  }
+}
+
+@media (min-height: 820px) and (min-width: 1024px) {
+  .hero-form {
+    max-width: clamp(28rem, 36vw, 40rem);
+  }
+}
+
 .hero-floating-card {
   position: absolute;
   width: auto;
@@ -288,7 +318,7 @@ onUnmounted(() => {
   display: block;
   margin: 0;
   padding: 0;
-  height: clamp(11rem, 20vh, 15rem);
+  height: clamp(9rem, 18vh, 14rem);
   width: auto;
   object-position: right center;
   transform: translateY(-50%);
@@ -299,13 +329,13 @@ onUnmounted(() => {
 /* Left — floating, bottom-left corner (image is pre-tilted) */
 .hero-floating-card--bottom {
   position: absolute;
-  bottom: 1.25rem;
+  bottom: clamp(0.75rem, 2vh, 1.5rem);
   left: 0;
   z-index: 2;
   display: block;
   margin: 0;
   padding: 0;
-  height: clamp(10rem, 17vh, 13rem);
+  height: clamp(8rem, 15vh, 12rem);
   width: auto;
   object-fit: contain;
   object-position: left bottom;
@@ -338,22 +368,42 @@ onUnmounted(() => {
 @media (min-width: 1024px) {
   .hero-floating-card--middle {
     top: 60%;
-    height: 20rem;
+    height: clamp(12rem, 22vh, 18rem);
   }
 
   .hero-floating-card--bottom {
-    height: 12.5rem;
+    height: clamp(10rem, 18vh, 15rem);
   }
 }
 
 @media (min-width: 1280px) {
   .hero-floating-card--middle {
     top: 62%;
-    height: 15.5rem;
+    height: clamp(14rem, 24vh, 20rem);
   }
 
   .hero-floating-card--bottom {
-    height: 13.5rem;
+    height: clamp(11rem, 20vh, 17rem);
+  }
+}
+
+@media (min-height: 820px) and (min-width: 1024px) {
+  .hero-floating-card--middle {
+    height: clamp(15rem, 26vh, 22rem);
+  }
+
+  .hero-floating-card--bottom {
+    height: clamp(12rem, 22vh, 18rem);
+  }
+}
+
+@media (min-height: 960px) and (min-width: 1280px) {
+  .hero-floating-card--middle {
+    height: clamp(17rem, 28vh, 24rem);
+  }
+
+  .hero-floating-card--bottom {
+    height: clamp(14rem, 24vh, 20rem);
   }
 }
 
