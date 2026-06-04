@@ -131,23 +131,23 @@ onUnmounted(() => {
           <img
             src="/images/logo.svg"
             alt="pirtTrip"
-            class="h-9 w-auto object-contain sm:h-10"
+            class="h-8 w-auto object-contain sm:h-9"
             width="584"
             height="192"
           >
         </NuxtLink>
 
         <div
-          class="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-6 lg:gap-8"
+          class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 lg:gap-5"
         >
-          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
             <p
-              class="shrink-0 font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-white"
+              class="shrink-0 font-plein text-[13px] font-normal leading-[135%] tracking-[0] text-white sm:text-[14px]"
             >
               We are launching Soon!
             </p>
 
-            <div class="flex gap-2">
+            <div class="flex gap-1.5">
               <div
                 v-for="unit in [
                   { label: 'DAYS', value: timeLeft.days },
@@ -156,13 +156,13 @@ onUnmounted(() => {
                   { label: 'SECS', value: timeLeft.seconds },
                 ]"
                 :key="unit.label"
-                class="flex min-w-[54px] flex-col items-center justify-center rounded-[6px] bg-white px-2.5 py-2 sm:min-w-[58px]"
+                class="flex min-w-[42px] flex-col items-center justify-center rounded-[5px] bg-white px-2 py-1.5 sm:min-w-[46px]"
               >
-                <span class="font-plein text-[20px] font-bold leading-none text-black sm:text-[22px]">
+                <span class="font-plein text-[15px] font-bold leading-none text-black sm:text-[16px]">
                   {{ pad(unit.value) }}
                 </span>
                 <span
-                  class="mt-1 font-plein text-[9px] font-medium uppercase leading-none tracking-[0.02em] text-black/65 sm:text-[10px]"
+                  class="mt-0.5 font-plein text-[8px] font-medium uppercase leading-none tracking-[0.02em] text-black/65 sm:text-[9px]"
                 >
                   {{ unit.label }}
                 </span>
@@ -171,11 +171,11 @@ onUnmounted(() => {
           </div>
 
           <span
-            class="hidden h-12 w-px shrink-0 bg-white/35 sm:block"
+            class="hidden h-9 w-px shrink-0 bg-white/35 sm:block"
             aria-hidden="true"
           />
 
-          <div class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-white">
+          <div class="font-plein text-[8px] font-normal leading-[135%] tracking-[0] text-white sm:text-[14px]">
             <p>For any information, contact Business Support</p>
             <p class="mt-0.5">
               at:
@@ -275,15 +275,15 @@ onUnmounted(() => {
   will-change: transform;
 }
 
-/* Right — flush to section right edge, vertically centered (image is pre-tilted) */
+/* Right — flush to section right edge (image is pre-tilted) */
 .hero-floating-card--middle {
-  top: 50%;
+  top: 58%;
   right: 0;
   z-index: 2;
   display: block;
   margin: 0;
   padding: 0;
-  height: clamp(18rem, 30vh, 24rem);
+  height: clamp(11rem, 20vh, 15rem);
   width: auto;
   object-position: right center;
   transform: translateY(-50%);
@@ -294,13 +294,13 @@ onUnmounted(() => {
 /* Left — floating, bottom-left corner (image is pre-tilted) */
 .hero-floating-card--bottom {
   position: absolute;
-  bottom: 0;
+  bottom: 1.25rem;
   left: 0;
   z-index: 2;
   display: block;
   margin: 0;
   padding: 0;
-  height: clamp(16rem, 26vh, 20rem);
+  height: clamp(10rem, 17vh, 13rem);
   width: auto;
   object-fit: contain;
   object-position: left bottom;
@@ -315,7 +315,7 @@ onUnmounted(() => {
   }
 
   50% {
-    transform: translateY(calc(-50% - 12px));
+    transform: translateY(calc(-50% - 8px));
   }
 }
 
@@ -326,27 +326,29 @@ onUnmounted(() => {
   }
 
   50% {
-    transform: translateY(-12px);
+    transform: translateY(-8px);
   }
 }
 
 @media (min-width: 1024px) {
   .hero-floating-card--middle {
-    height: 22rem;
+    top: 60%;
+    height: 16rem;
   }
 
   .hero-floating-card--bottom {
-    height: 19rem;
+    height: 12.5rem;
   }
 }
 
 @media (min-width: 1280px) {
   .hero-floating-card--middle {
-    height: 24rem;
+    top: 62%;
+    height: 15.5rem;
   }
 
   .hero-floating-card--bottom {
-    height: 20rem;
+    height: 13.5rem;
   }
 }
 
