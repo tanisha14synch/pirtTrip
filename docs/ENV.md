@@ -88,6 +88,8 @@ Otherwise requests proxy to the backend, which must have the same keys.
 
 **Partner registration 500 (missing `business_name`):** In Supabase SQL Editor, run `supabase/QUICK_FIX_partner_business_name.sql` on the production project. The API also falls back to storing the business name in `notes` until that migration is applied.
 
+**Node.js 20 + Supabase:** Backend and frontend server routes pass the `ws` package as Realtime `transport` (required before Node 22). Ensure `ws` is installed in production (`backend/package.json` / `frontend/package.json`).
+
 ---
 
 ## Quick verify

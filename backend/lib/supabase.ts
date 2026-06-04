@@ -1,5 +1,6 @@
 import { createClient, type SupabaseClient, type User } from '@supabase/supabase-js'
 import type { H3Event } from 'h3'
+import { serverSupabaseClientOptions } from './supabase-server-options'
 
 function resolveBackendSupabaseUrl(): string {
   const config = useRuntimeConfig()
@@ -37,12 +38,7 @@ export function getSupabaseAdmin(): SupabaseClient {
     })
   }
 
-  return createClient(url, serviceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  })
+  return createClient(url, serviceKey, serverSupabaseClientOptions())
 }
 
 export function getSupabaseAnon(): SupabaseClient {
@@ -55,12 +51,11 @@ export function getSupabaseAnon(): SupabaseClient {
     })
   }
 
-  return createClient(config.public.supabaseUrl, config.public.supabaseAnonKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  })
+  return createClient(
+    config.public.supabaseUrl,
+    config.public.supabaseAnonKey,
+    serverSupabaseClientOptions(),
+  )
 }
 
 export async function getUserFromEvent(event: H3Event): Promise<User | null> {

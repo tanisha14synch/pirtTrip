@@ -4,6 +4,7 @@ import {
   resolveSupabaseServiceKey,
   resolveSupabaseUrl,
 } from './supabase-config'
+import { serverSupabaseClientOptions } from './supabase-server-options'
 
 export function getSupabaseAdmin(): SupabaseClient {
   const url = resolveSupabaseUrl()
@@ -22,7 +23,5 @@ export function getSupabaseAdmin(): SupabaseClient {
     })
   }
 
-  return createClient(url, serviceKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  })
+  return createClient(url, serviceKey, serverSupabaseClientOptions())
 }
