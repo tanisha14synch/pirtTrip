@@ -1,5 +1,7 @@
 <script setup>
-const HERO_BG_SRC = '/images/upcoming-hero-bg.svg'
+import { BUSINESS_HERO_BG_SRC } from '~/constants/business-hero-assets'
+
+const HERO_BG_SRC = BUSINESS_HERO_BG_SRC
 
 const { homeHref, homeIsExternal } = useMainSite()
 
@@ -74,7 +76,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section class="upcoming-hero relative isolate overflow-hidden pt-5 md:pt-6">
+  <section class="upcoming-hero relative isolate flex min-h-screen min-h-[100svh] flex-col overflow-hidden pt-5 md:pt-6">
     <img
       :src="HERO_BG_SRC"
       alt=""
@@ -103,7 +105,7 @@ onUnmounted(() => {
       aria-hidden="true"
     >
 
-    <div class="relative z-10 mx-auto w-[94%] max-w-[1280px] pb-10 md:pb-12">
+    <div class="relative z-10 mx-auto flex w-[94%] max-w-[1280px] flex-1 flex-col pb-10 md:pb-12">
       <!-- Launch header: logo | countdown | contact -->
       <header
         class="flex flex-col gap-4 border-b border-white/5 pb-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6"
@@ -175,7 +177,7 @@ onUnmounted(() => {
             aria-hidden="true"
           />
 
-          <div class="font-plein text-[8px] font-normal leading-[135%] tracking-[0] text-white sm:text-[14px]">
+          <div class="font-plein text-[13px] font-normal leading-[135%] tracking-[0] text-white sm:text-[14px]">
             <p>For any information, contact Business Support</p>
             <p class="mt-0.5">
               at:
@@ -194,7 +196,7 @@ onUnmounted(() => {
         </div>
       </header>
 
-      <div class="hero-main relative mt-6 lg:mt-8">
+      <div class="hero-main relative mt-6 flex flex-1 flex-col lg:mt-8">
         <!-- Hero body -->
         <div class="hero-body-stage relative z-10">
         <div
@@ -226,7 +228,7 @@ onUnmounted(() => {
         </div>
 
       <!-- Feature cards -->
-      <div class="relative z-10 mt-5 flex flex-wrap justify-center gap-2 sm:gap-2 xl:mt-6 xl:flex-nowrap xl:gap-2.5">
+      <div class="relative z-10 mt-5 flex flex-wrap justify-center gap-2 sm:gap-2 xl:mt-6 xl:flex-nowrap xl:gap-2.5 lg:mt-auto">
         <img
           v-for="card in featureCards"
           :key="card.id"
@@ -245,6 +247,9 @@ onUnmounted(() => {
 <style scoped>
 .upcoming-hero {
   background-color: #000;
+  /* At least full viewport; grows naturally when content is taller */
+  min-height: 100vh;
+  min-height: 100svh;
 }
 
 .hero-bg-media {
@@ -333,7 +338,7 @@ onUnmounted(() => {
 @media (min-width: 1024px) {
   .hero-floating-card--middle {
     top: 60%;
-    height: 16rem;
+    height: 20rem;
   }
 
   .hero-floating-card--bottom {

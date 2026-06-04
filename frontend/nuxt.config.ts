@@ -35,8 +35,19 @@ const partnerHosts = (process.env.NUXT_PUBLIC_PARTNER_HOSTS || defaultPartnerHos
   .map(h => h.trim())
   .filter(Boolean)
 
-const routeRules: Record<string, { redirect: { to: string, statusCode: number } } | { ssr: false }> = {
+const routeRules: Record<
+  string,
+  | { redirect: { to: string, statusCode: number } }
+  | { ssr: false }
+  | { headers: Record<string, string> }
+> = {
   '/admin/**': { ssr: false },
+  // Hero bg: avoid long-lived CDN/browser cache after asset swaps (see BUSINESS_HERO_BG_VERSION)
+  '/images/upcoming-hero-bg.svg': {
+    headers: {
+      'Cache-Control': 'public, max-age=0, must-revalidate',
+    },
+  },
 }
 
 if (siteVariant === 'business') {
