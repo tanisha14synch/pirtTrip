@@ -103,10 +103,10 @@ onUnmounted(() => {
       aria-hidden="true"
     >
 
-    <div class="relative z-10 mx-auto w-[94%] max-w-[1280px] pb-16 md:pb-20">
+    <div class="relative z-10 mx-auto w-[94%] max-w-[1280px] pb-10 md:pb-12">
       <!-- Launch header: logo | countdown | contact -->
       <header
-        class="flex flex-col gap-6 border-b border-white/5 pb-6 lg:flex-row lg:items-center lg:justify-between lg:gap-8"
+        class="flex flex-col gap-4 border-b border-white/5 pb-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6"
       >
         <a
           v-if="homeIsExternal"
@@ -194,27 +194,27 @@ onUnmounted(() => {
         </div>
       </header>
 
-      <div class="hero-main relative mt-10 lg:mt-14">
+      <div class="hero-main relative mt-6 lg:mt-8">
         <!-- Hero body -->
         <div class="hero-body-stage relative z-10">
         <div
           id="partner-registration"
-          class="grid scroll-mt-6 grid-cols-1 items-start gap-10 lg:grid-cols-2 lg:gap-12 xl:grid-cols-[minmax(0,1fr)_minmax(560px,680px)] xl:gap-14"
+          class="grid scroll-mt-6 grid-cols-1 items-start gap-6 lg:grid-cols-2 lg:gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(520px,640px)] xl:gap-10"
         >
-        <article class="max-w-[580px] lg:pt-4 xl:max-w-[540px]">
-            <p class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-white">
+        <article class="max-w-[580px] lg:pt-1 xl:max-w-[500px]">
+            <p class="font-plein text-[14px] font-normal leading-[135%] tracking-[0] text-white">
               Lets Grow Your Travel Business with
               <span class="text-brand-gold font-bold">PirtTrip</span>
             </p>
 
             <h1
-              class="mt-5 font-plein text-[34px] font-bold leading-[120%] tracking-[0] text-white sm:text-[42px] md:text-[48px] lg:text-[52px]"
+              class="mt-3 font-plein text-[28px] font-bold leading-[118%] tracking-[0] text-white sm:text-[34px] md:text-[38px] lg:text-[40px]"
             >
              Running Your Travel Business All Alone?
             </h1>
 
             <p
-              class="mt-6 max-w-[520px] font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-white/85"
+              class="mt-3 max-w-[480px] font-plein text-[14px] font-normal leading-[135%] tracking-[0] text-white/85"
             >
             Let us contribute a small effort to help your
             business reach more travelers.
@@ -226,13 +226,13 @@ onUnmounted(() => {
         </div>
 
       <!-- Feature cards -->
-      <div class="relative z-10 mt-10 flex flex-wrap justify-center gap-2 sm:gap-2.5 xl:mt-12 xl:flex-nowrap xl:gap-3">
+      <div class="relative z-10 mt-5 flex flex-wrap justify-center gap-2 sm:gap-2 xl:mt-6 xl:flex-nowrap xl:gap-2.5">
         <img
           v-for="card in featureCards"
           :key="card.id"
           :src="card.src"
           :alt="card.alt"
-          class="h-auto min-h-[88px] w-[calc(50%-4px)] max-w-[168px] shrink-0 rounded-[14px] object-contain sm:min-h-[96px] sm:max-w-[182px] xl:h-[118px] xl:w-[218px] xl:max-w-[218px] xl:min-h-0"
+          class="h-auto min-h-[76px] w-[calc(50%-4px)] max-w-[150px] shrink-0 rounded-[12px] object-contain sm:min-h-[84px] sm:max-w-[164px] xl:h-[100px] xl:w-[190px] xl:max-w-[190px] xl:min-h-0"
           loading="lazy"
           draggable="false"
         >
@@ -245,7 +245,6 @@ onUnmounted(() => {
 <style scoped>
 .upcoming-hero {
   background-color: #000;
-  min-height: 100vh;
 }
 
 .hero-bg-media {
@@ -258,7 +257,7 @@ onUnmounted(() => {
 }
 
 .hero-body-stage {
-  min-height: clamp(18rem, 38vh, 26rem);
+  min-height: 0;
 }
 
 .hero-floating-card {
