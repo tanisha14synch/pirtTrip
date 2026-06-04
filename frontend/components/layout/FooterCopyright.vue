@@ -19,7 +19,7 @@ const pirttripHref = computed(() => `${mainSiteOrigin.value}/`)
       rel="noopener noreferrer"
       class="underline-offset-2 transition-colors hover:underline"
       :class="variant === 'dark' ? 'text-white/70 hover:text-white' : 'text-black/70 hover:text-black'"
-    >pirtTrip</a>.
+    >PirtTrip</a>.
     All rights reserved. A platform by
     <a
       href="https://www.martyrsservices.com"

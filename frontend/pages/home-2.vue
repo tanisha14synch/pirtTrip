@@ -4,12 +4,12 @@ definePageMeta({
 })
 
 useHead({
-  title: 'Home 2 — pirtTrip | Explore Group Trips',
+  title: 'Home 2 — PirtTrip | Explore Group Trips',
   meta: [
     {
       name: 'description',
       content:
-        'Search and compare group trips, packages, and deals. Discover your next adventure with pirtTrip.',
+        'Search and compare group trips, packages, and deals. Discover your next adventure with PirtTrip.',
     },
   ],
   link: [

@@ -49,6 +49,7 @@ export default defineEventHandler(async (event) => {
     .insert({
       first_name: parsed.data.firstName.trim(),
       last_name: parsed.data.lastName.trim(),
+      business_name: parsed.data.businessName.trim(),
       phone,
       email,
       otp_verified: true,

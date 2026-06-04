@@ -1,18 +1,18 @@
 Effective Date: 8th June, 2026
-Platform: pirtTrip.com
+Platform: PirtTrip.com
 Operated by: Martyrs Services, Bareilly, Uttar Pradesh, India
 
-Welcome to pirtTrip.com, a platform operated under Martyrs Services, Bareilly, Uttar Pradesh, India.
+Welcome to PirtTrip.com, a platform operated under Martyrs Services, Bareilly, Uttar Pradesh, India.
 By accessing or using this website, you acknowledge and agree to the following disclaimers.
 
 1. Platform Nature
-pirtTrip.com is a travel comparison, discovery and business connection platform that helps users explore trip options and connect with travel businesses.
-pirtTrip is not a travel agency, tour operator, transporter, hotel provider, airline, visa consultant or direct organizer of trips, unless expressly stated for a specific service in the future.
+PirtTrip.com is a travel comparison, discovery and business connection platform that helps users explore trip options and connect with travel businesses.
+PirtTrip is not a travel agency, tour operator, transporter, hotel provider, airline, visa consultant or direct organizer of trips, unless expressly stated for a specific service in the future.
 We primarily act as an intermediary platform for information display, inquiry routing and business discovery.
 
 2. No Direct Responsibility for Third-Party Travel Services
 All travel packages, itineraries, pricing, schedules, inclusions, exclusions, hotel details, transport arrangements, guides, permits, visas, insurance, safety measures, and service commitments displayed or promoted by travel partners are the sole responsibility of the respective travel business partner.
-pirtTrip does not independently guarantee:
+PirtTrip does not independently guarantee:
 • Package quality
 • Service standards
 • Hotel category claims
@@ -26,7 +26,7 @@ pirtTrip does not independently guarantee:
 Users are advised to independently verify all trip details before making any booking or payment.
 
 3. Partner Verification Disclaimer
-pirtTrip may conduct onboarding checks such as:
+PirtTrip may conduct onboarding checks such as:
 • Identity verification
 • Selfie/webcam verification
 • GST details review
@@ -46,21 +46,21 @@ Such information may change without notice due to:
 • Dynamic hotel pricing
 • Currency fluctuation
 • Human error
-pirtTrip does not guarantee that all information displayed is always current, complete or error-free.
+PirtTrip does not guarantee that all information displayed is always current, complete or error-free.
 
 5. Communication & Inquiry Routing
-pirtTrip may allow users to submit inquiries via:
+PirtTrip may allow users to submit inquiries via:
 • Email
 • Contact forms
 • WhatsApp redirects
 • External links
 • Direct call buttons
-Once you choose to contact a travel partner, subsequent communication may occur outside the pirtTrip platform. pirtTrip is not responsible for communications, representations, commitments, conduct or transactions occurring outside our platform environment.
+Once you choose to contact a travel partner, subsequent communication may occur outside the PirtTrip platform. PirtTrip is not responsible for communications, representations, commitments, conduct or transactions occurring outside our platform environment.
 
 6. Payments, Bookings, Cancellations & Refunds
-At present, pirtTrip generally does not directly process traveller booking payments for partner trips unless explicitly stated otherwise.
+At present, PirtTrip generally does not directly process traveller booking payments for partner trips unless explicitly stated otherwise.
 Any booking, advance payment, token amount, cancellation, refund, rescheduling or compensation matter is governed directly by the concerned travel partner’s policies.
-pirtTrip shall not be liable for:
+PirtTrip shall not be liable for:
 • Payment disputes
 • Refund delays
 • Non-refund decisions
@@ -71,12 +71,12 @@ pirtTrip shall not be liable for:
 Users should obtain written confirmation and receipts directly from the partner.
 
 7. Third-Party Content & Business Profiles
-Travel partners may have dedicated profile pages, business showcases, package listings, media, claims, branding content or promotional information hosted on or through pirtTrip.
+Travel partners may have dedicated profile pages, business showcases, package listings, media, claims, branding content or promotional information hosted on or through PirtTrip.
 Such content belongs to the respective partner and may contain opinions, descriptions, claims or marketing representations made by them.
-pirtTrip does not warrant the accuracy, legality, completeness, or reliability of third-party content.
+PirtTrip does not warrant the accuracy, legality, completeness, or reliability of third-party content.
 
 8. No Guarantee of Results
-pirtTrip does not guarantee that users will receive:
+PirtTrip does not guarantee that users will receive:
 • Lowest prices
 • Best packages
 • Confirmed bookings
@@ -100,7 +100,7 @@ Travel inherently involves risks including but not limited to:
 Users are responsible for assessing personal fitness, travel insurance needs, document readiness, and safety suitability before travel.
 
 10. International Trips by Indian Partners
-Some Indian travel partners may advertise international travel packages. pirtTrip does not guarantee visa approvals, foreign entry permissions, embassy timelines, overseas regulations, or foreign service delivery standards.
+Some Indian travel partners may advertise international travel packages. PirtTrip does not guarantee visa approvals, foreign entry permissions, embassy timelines, overseas regulations, or foreign service delivery standards.
 Travelers must independently verify passport, visa, insurance, currency, and destination compliance requirements.
 
 11. Technology & Availability Disclaimer
@@ -113,7 +113,7 @@ We strive to maintain uninterrupted platform access, but do not guarantee that t
 Features may change, pause or be removed without notice.
 
 12. Limitation of Liability
-To the maximum extent permitted by applicable law, pirtTrip, Martyrs Services, founders, employees, affiliates, and representatives shall not be liable for any direct, indirect, incidental, special or consequential loss arising from:
+To the maximum extent permitted by applicable law, PirtTrip, Martyrs Services, founders, employees, affiliates, and representatives shall not be liable for any direct, indirect, incidental, special or consequential loss arising from:
 • Use of the platform
 • Reliance on listings
 • Third-party acts or omissions
@@ -134,7 +134,7 @@ Users are strongly advised to:
 • Use personal judgment before purchase
 
 14. Future Service Expansion
-pirtTrip may introduce new services such as booking support, payment facilitation, ratings, reviews, chat systems or other features in the future. Separate terms may apply when such services are launched.
+PirtTrip may introduce new services such as booking support, payment facilitation, ratings, reviews, chat systems or other features in the future. Separate terms may apply when such services are launched.
 
 15. Updates to Disclaimer
 This Disclaimer may be revised periodically without prior notice. Continued use of the platform constitutes acceptance of the updated version.

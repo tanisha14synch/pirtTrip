@@ -15,6 +15,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const email = parsed.data.email?.trim().toLowerCase() || null
+  const businessName = parsed.data.businessName.trim()
   const notes = parsed.data.whatsappOptIn ? 'WhatsApp updates: opted in' : null
   const phone = normalizePhone(parsed.data.phone)
   const admin = getSupabaseAdmin()
@@ -37,6 +38,7 @@ export default defineEventHandler(async (event) => {
     .insert({
       first_name: parsed.data.firstName.trim(),
       last_name: parsed.data.lastName.trim(),
+      business_name: businessName,
       phone,
       email,
       notes,

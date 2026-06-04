@@ -64,7 +64,7 @@ const pages: LegalPageEntry[] = [
   },
   {
     slug: 'disclaimer',
-    document: parseLegalText(disclaimerText, 'Disclaimer for pirtTrip.com'),
+    document: parseLegalText(disclaimerText, 'Disclaimer for PirtTrip.com'),
   },
 ]
 

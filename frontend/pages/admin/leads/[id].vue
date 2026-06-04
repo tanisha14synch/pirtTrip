@@ -78,6 +78,7 @@ onMounted(load)
         {{ lead.first_name }} {{ lead.last_name }}
       </h1>
       <p class="mt-1 text-black/60">
+        <span v-if="lead.business_name">{{ lead.business_name }} · </span>
         {{ lead.phone }}
         <span v-if="lead.email"> · {{ lead.email }}</span>
       </p>

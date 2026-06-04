@@ -19,6 +19,7 @@ export function usePartnerRegistration() {
   const form = reactive({
     firstName: '',
     lastName: '',
+    businessName: '',
     phone: '',
     whatsappOptIn: false,
     agreePolicies1: false,
@@ -41,6 +42,7 @@ export function usePartnerRegistration() {
       const parsed = partnerRegistrationSchema.safeParse({
         firstName: form.firstName,
         lastName: form.lastName,
+        businessName: form.businessName,
         phone: form.phone.replace(/\D/g, '').slice(0, 10),
         whatsappOptIn: form.whatsappOptIn,
       })
@@ -206,6 +208,13 @@ export function usePartnerRegistration() {
 
   function reset() {
     step.value = 'form'
+    form.firstName = ''
+    form.lastName = ''
+    form.businessName = ''
+    form.phone = ''
+    form.whatsappOptIn = false
+    form.agreePolicies1 = false
+    form.agreePolicies2 = false
     otpDigits.value = ['', '', '', '', '', '']
     errorMessage.value = null
     successLead.value = null

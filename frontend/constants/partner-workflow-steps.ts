@@ -14,12 +14,12 @@ export const PARTNER_WORKFLOW_STEPS: WorkflowStep[] = [
     title: 'Step 1',
     parts: [
       { text: 'Travel businesses register on ', bold: false },
-      { text: 'pirtTrip', bold: true },
+      { text: 'PirtTrip', bold: true },
       { text: ' and ', bold: false },
       { text: 'create a professional business profile.', bold: true },
     ],
     iconSrc: '/images/how-we-work/step-01-illustration.png',
-    iconAlt: 'Travel businesses register on pirtTrip',
+    iconAlt: 'Travel businesses register on PirtTrip',
   },
   {
     number: '02',

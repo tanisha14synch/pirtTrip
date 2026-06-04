@@ -15,6 +15,11 @@ export const partnerRegistrationSchema = z.object({
     .string()
     .trim()
     .regex(/^\d{10}$/, 'Enter a valid 10-digit mobile number'),
+  businessName: z
+    .string()
+    .trim()
+    .min(1, 'Business name is required')
+    .max(120, 'Business name is too long'),
   email: z
     .string()
     .trim()

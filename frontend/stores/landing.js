@@ -4,7 +4,7 @@ export const useLandingStore = defineStore('landing', {
       logo: {
         image: '/images/logo.svg',
         href: '/',
-        alt: 'pirtTrip logo',
+        alt: 'PirtTrip logo',
       },
       navLinks: [
         { id: 'home', label: 'Home', href: '/' },

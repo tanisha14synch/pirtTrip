@@ -1,8 +1,8 @@
 Effective Date: 8th June, 2026
-Platform: pirtTrip.com
+Platform: PirtTrip.com
 Operated by: Martyrs Services, Bareilly, Uttar Pradesh, India
 
-This Cookie Policy explains how pirtTrip.com uses cookies, similar technologies and consent preferences when users visit our website or use platform features.
+This Cookie Policy explains how PirtTrip.com uses cookies, similar technologies and consent preferences when users visit our website or use platform features.
 
 1. What Are Cookies?
 Cookies are small text files placed on your browser or device that help websites function properly, remember preferences, improve security and understand usage patterns.
@@ -15,7 +15,7 @@ Similar technologies may include:
 • Preference storage tools
 
 2. Why We Use Cookies
-pirtTrip may use cookies or similar technologies for purposes such as:
+PirtTrip may use cookies or similar technologies for purposes such as:
 • Keeping users signed in
 • Maintaining secure sessions
 • Remembering preferences
@@ -59,7 +59,7 @@ If advertising features are enabled in the future, cookies may be used for:
 At present, certain analytics or advertising tools may not yet be active. However, this Policy is designed to support future features as the platform grows.
 
 5. Consent Management
-pirtTrip intends to provide a granular cookie consent banner, allowing users to choose among options such as:
+PirtTrip intends to provide a granular cookie consent banner, allowing users to choose among options such as:
 • Accept All
 • Reject Non-Essential
 • Customize Preferences
@@ -82,10 +82,10 @@ Examples:
 • Short-term cookies: days or weeks
 • Preference cookies: longer duration
 • Security cookies: as operationally necessary
-pirtTrip uses a mixed-by-type retention model.
+PirtTrip uses a mixed-by-type retention model.
 
 8. Login & Session Cookies
-Because pirtTrip offers user and partner accounts, cookies or tokens may be used to:
+Because PirtTrip offers user and partner accounts, cookies or tokens may be used to:
 • Keep you logged in
 • Secure sessions
 • Prevent unauthorized access
@@ -103,7 +103,7 @@ Such providers may use their own cookies or similar technologies subject to thei
 Third-party cookies should be allowed only from trusted operational vendors and only where reasonably necessary.
 
 10. Cloud Infrastructure Signals
-Even where pirtTrip does not actively run analytics tools, hosting or infrastructure providers may automatically process technical logs such as:
+Even where PirtTrip does not actively run analytics tools, hosting or infrastructure providers may automatically process technical logs such as:
 • IP address
 • Browser type
 • Device metadata
@@ -115,7 +115,7 @@ This is common for website delivery, security and reliability.
 Most browsers allow users to block, delete or manage cookies through settings. Doing so may affect functionality.
 
 12. Future Analytics / Ad Tools
-pirtTrip may later implement tools such as:
+PirtTrip may later implement tools such as:
 • Web analytics platforms
 • Heatmap / usability tools
 • Ad conversion tools

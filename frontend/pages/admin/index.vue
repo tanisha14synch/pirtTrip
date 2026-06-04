@@ -82,7 +82,7 @@ watch([page, statusFilter, sortOrder], loadLeads)
       <input
         v-model="search"
         type="search"
-        placeholder="Search name, phone, email…"
+        placeholder="Search name, business, phone…"
         class="h-10 min-w-[200px] flex-1 rounded-lg border border-black/15 px-3 text-sm outline-none focus:border-[#F3A81A]"
         @input="onSearchInput"
       >

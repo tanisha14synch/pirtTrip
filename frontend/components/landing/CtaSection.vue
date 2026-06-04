@@ -37,7 +37,7 @@ const ctaPoints = [
               id="cta-heading"
               class="mt-3 font-plein text-[28px] font-bold leading-[130%] text-white sm:text-[36px] md:text-[42px]"
             >
-              Join pirtTrip as a travel partner today
+              Join PirtTrip as a travel partner today
             </h2>
             <p class="mt-4 font-plein text-[16px] font-normal leading-[140%] text-white/85">
               Register your business, get early access, and start connecting with travelers when we launch.

@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
 
   if (search) {
     builder = builder.or(
-      `first_name.ilike.%${search}%,last_name.ilike.%${search}%,phone.ilike.%${search}%,email.ilike.%${search}%`,
+      `first_name.ilike.%${search}%,last_name.ilike.%${search}%,business_name.ilike.%${search}%,phone.ilike.%${search}%,email.ilike.%${search}%`,
     )
   }
 

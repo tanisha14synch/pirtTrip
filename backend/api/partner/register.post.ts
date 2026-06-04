@@ -44,6 +44,7 @@ export default defineEventHandler(async (event) => {
       auth_user_id: user.id,
       first_name: parsed.data.firstName.trim(),
       last_name: parsed.data.lastName.trim(),
+      business_name: parsed.data.businessName.trim(),
       phone,
       email: parsed.data.email?.trim() || null,
       otp_verified: true,

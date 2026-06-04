@@ -102,7 +102,7 @@ const rowTwo = [
     iconSrc: '/images/trust/trust-icon-11.png',
     iconAlt: 'Discovery platform not travel agency',
     parts: [
-      { text: 'pirtTrip acts as a ', bold: false },
+      { text: 'PirtTrip acts as a ', bold: false },
       { text: 'discovery platform', bold: true },
       { text: ' not a ', bold: false },
       { text: 'competing travel agency', bold: true },
@@ -115,18 +115,18 @@ const rowTwo = [
   <section class="relative overflow-hidden bg-[#f5f5f5] py-14 md:py-16">
     <div class="relative z-10 mx-auto w-[94%] max-w-[1280px]">
       <header class="text-center">
-        <p class="font-plein text-[24px] font-bold leading-[130%] tracking-[0] text-[#F76517] md:text-[26px]">
-          - Why Trust pirtTrip? -
+        <p class="font-plein text-[20px] font-bold leading-[130%] tracking-[0] text-[#F76517] md:text-[22px]">
+          - Why Trust PirtTrip? -
         </p>
 
         <h2
-          class="mt-3 font-plein text-[28px] font-bold leading-[130%] tracking-[0] text-black md:text-[30px]"
+          class="mt-2 font-plein text-[28px] font-bold leading-[130%] tracking-[0] text-black md:text-[30px]"
         >
           YOUR CUSTOMERs remain ALL YOURs
         </h2>
       </header>
 
-      <div class="mt-14 flex flex-col items-center gap-10">
+      <div class="mt-8 flex flex-col items-center gap-10 md:mt-9">
         <div class="flex max-w-full flex-wrap justify-center gap-x-3 gap-y-14">
           <UpcomingTrustBenefitCard
             v-for="benefit in rowOne"

@@ -65,10 +65,10 @@ const isExternalHref = (href) =>
       >
         <!-- Logo + description -->
         <div class="max-w-[340px] shrink-0">
-          <NuxtLink to="/" aria-label="pirtTrip home">
+          <NuxtLink to="/" aria-label="PirtTrip home">
             <img
               src="/images/logo-black.svg"
-              alt="pirtTrip"
+              alt="PirtTrip"
               class="h-10 w-auto object-contain"
               loading="lazy"
               draggable="false"

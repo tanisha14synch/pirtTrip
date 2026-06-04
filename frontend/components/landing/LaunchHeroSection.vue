@@ -76,7 +76,7 @@ onUnmounted(() => {
         <NuxtLink to="/" class="inline-flex shrink-0">
           <img
             src="/images/logo.svg"
-            alt="pirtTrip"
+            alt="PirtTrip"
             class="h-9 w-auto object-contain sm:h-10"
             width="584"
             height="192"

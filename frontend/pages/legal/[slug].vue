@@ -17,12 +17,12 @@ watchEffect(() => {
 const doc = computed(() => page.value!.document)
 
 useHead({
-  title: () => `${doc.value.title} — pirtTrip`,
+  title: () => `${doc.value.title} — PirtTrip`,
   meta: [
     {
       name: 'description',
       content: () =>
-        `${doc.value.title} for pirtTrip.com — operated by Martyrs Services, Bareilly, India.`,
+        `${doc.value.title} for PirtTrip.com — operated by Martyrs Services, Bareilly, India.`,
     },
   ],
 })

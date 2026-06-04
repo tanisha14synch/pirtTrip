@@ -88,7 +88,7 @@ function onOtpInput(index, event) {
               You&apos;re on the list!
             </h2>
             <p class="mt-3 font-plein text-[15px] leading-[140%] text-white/75">
-              We&apos;ll notify you at <span class="font-medium text-white">{{ email }}</span> when pirtTrip launches.
+              We&apos;ll notify you at <span class="font-medium text-white">{{ email }}</span> when PirtTrip launches.
             </p>
             <button
               type="button"

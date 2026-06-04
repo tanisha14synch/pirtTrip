@@ -65,7 +65,7 @@ function scrollToRegistration(event) {
               class="mt-3 font-plein text-[28px] font-bold leading-[130%] tracking-[0] text-white sm:text-[34px] md:text-[40px] lg:text-[44px]"
             >
               Lets Grow Your Travel Business with
-              <span class="text-[#F3A81A]">pirtTrip!</span>
+              <span class="text-[#F3A81A]">PirtTrip!</span>
             </h2>
 
             <p class="mt-4 font-plein text-[18px] font-bold leading-[140%] tracking-[0] text-white sm:text-[20px] md:text-[22px]">
@@ -113,11 +113,11 @@ function scrollToRegistration(event) {
           <a
             v-if="homeIsExternal"
             :href="homeHref"
-            aria-label="pirtTrip home"
+            aria-label="PirtTrip home"
           >
             <img
               src="/images/logo-black.svg"
-              alt="pirtTrip"
+              alt="PirtTrip"
               class="h-10 w-auto object-contain"
               loading="lazy"
               draggable="false"
@@ -126,11 +126,11 @@ function scrollToRegistration(event) {
           <NuxtLink
             v-else
             to="/"
-            aria-label="pirtTrip home"
+            aria-label="PirtTrip home"
           >
             <img
               src="/images/logo-black.svg"
-              alt="pirtTrip"
+              alt="PirtTrip"
               class="h-10 w-auto object-contain"
               loading="lazy"
               draggable="false"

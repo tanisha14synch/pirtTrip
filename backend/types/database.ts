@@ -7,6 +7,7 @@ export interface PartnerLead {
   first_name: string
   last_name: string
   phone: string
+  business_name: string | null
   email: string | null
   otp_verified: boolean
   source_page: string
@@ -49,6 +50,7 @@ export interface PartnerRegistrationPayload {
   firstName: string
   lastName: string
   phone: string
+  businessName: string
   email?: string
 }
 

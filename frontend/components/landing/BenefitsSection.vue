@@ -45,7 +45,7 @@ const benefits = [
           Everything you need to plan your next adventure
         </h2>
         <p class="mx-auto mt-4 max-w-[640px] font-plein text-[16px] font-normal leading-[140%] text-black/75">
-          pirtTrip brings travelers and travel businesses together on a transparent discovery platform.
+          PirtTrip brings travelers and travel businesses together on a transparent discovery platform.
         </p>
       </header>
 

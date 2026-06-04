@@ -116,13 +116,13 @@ onUnmounted(() => {
   >
     <div class="mx-auto w-[94%] max-w-[820px] lg:max-w-none lg:w-full">
       <header class="text-center lg:px-6 lg:pt-10 lg:pb-4">
-        <p class="font-plein text-[24px] font-bold leading-[130%] tracking-[0] text-[#F76517] md:text-[26px]">
+        <p class="font-plein text-[20px] font-bold leading-[130%] tracking-[0] text-[#F76517] md:text-[22px]">
           How We Work?
         </p>
 
         <h2
           id="how-we-work-heading"
-          class="mt-2 font-plein text-[28px] font-bold leading-[130%] tracking-[0] text-black md:text-[30px]"
+          class="mt-1.5 font-plein text-[28px] font-bold leading-[130%] tracking-[0] text-black md:text-[30px]"
         >
           Simple. Transparent. Business Friendly.
         </h2>

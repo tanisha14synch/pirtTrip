@@ -12,12 +12,12 @@ if (isBusinessSite.value) {
 }
 else {
   useHead({
-    title: 'pirtTrip — Find, Join & Experience Amazing Group Trips',
+    title: 'PirtTrip — Find, Join & Experience Amazing Group Trips',
     meta: [
       {
         name: 'description',
         content:
-          'Coming soon: find exciting group trips, meet fellow travelers, and explore destinations with trusted organizers on pirtTrip.',
+          'Coming soon: find exciting group trips, meet fellow travelers, and explore destinations with trusted organizers on PirtTrip.',
       },
     ],
   })

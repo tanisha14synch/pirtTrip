@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   if (status) builder = builder.eq('status', status)
   if (search) {
     builder = builder.or(
-      `first_name.ilike.%${search}%,last_name.ilike.%${search}%,phone.ilike.%${search}%,email.ilike.%${search}%`,
+      `first_name.ilike.%${search}%,last_name.ilike.%${search}%,business_name.ilike.%${search}%,phone.ilike.%${search}%,email.ilike.%${search}%`,
     )
   }
 
@@ -35,6 +35,7 @@ export default defineEventHandler(async (event) => {
     'id',
     'first_name',
     'last_name',
+    'business_name',
     'phone',
     'email',
     'otp_verified',

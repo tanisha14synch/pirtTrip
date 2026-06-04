@@ -31,23 +31,13 @@ function onPhoneInput(event) {
   form.phone = event.target.value.replace(/\D/g, '').slice(0, 10)
 }
 
-function toggleConnectsHelp() {
-  connectsHelpOpen.value = !connectsHelpOpen.value
+function showConnectsHelp() {
+  connectsHelpOpen.value = true
 }
 
-function onDocumentClick(event) {
-  if (!connectsHelpRef.value?.contains(event.target)) {
-    connectsHelpOpen.value = false
-  }
+function hideConnectsHelp() {
+  connectsHelpOpen.value = false
 }
-
-onMounted(() => {
-  document.addEventListener('click', onDocumentClick)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('click', onDocumentClick)
-})
 
 async function onSubmitDetails() {
   try {
@@ -89,7 +79,7 @@ function onOtpInput(index, event) {
 
     <template v-else>
       <h2 class="font-plein text-[22px] font-bold leading-[125%] tracking-[0] text-white md:text-[24px]">
-        New to pirtTrip business? Get Started
+        New to PirtTrip business? Get Started
       </h2>
 
       <p class="mt-2 font-plein text-[13px] font-normal leading-[135%] tracking-[0] text-white/90">
@@ -98,29 +88,36 @@ function onOtpInput(index, event) {
         as a Welcome Benefit!
       </p>
 
-      <div
-        ref="connectsHelpRef"
-        class="relative mt-2 inline-flex items-center gap-1.5"
-      >
+      <div class="relative mt-2 inline-flex items-center gap-1.5">
         <span class="font-plein text-[13px] text-white/70">What are connects?</span>
-        <button
-          type="button"
-          class="flex h-5 w-5 items-center justify-center rounded-full border border-white/25 bg-white/10 font-plein text-[12px] font-bold leading-none text-white/80 transition-colors hover:border-[#F3A81A]/60 hover:text-[#F3A81A]"
-          aria-label="What are connects?"
-          :aria-expanded="connectsHelpOpen"
-          @click.stop="toggleConnectsHelp"
-        >
-          ?
-        </button>
-
         <div
-          v-if="connectsHelpOpen"
-          class="absolute left-0 top-full z-20 mt-2 w-[260px] rounded-[10px] border border-white/10 bg-[#1e1b18] p-3.5 shadow-[0_12px_32px_rgba(0,0,0,0.45)]"
-          role="tooltip"
+          ref="connectsHelpRef"
+          class="relative inline-flex"
+          @mouseenter="showConnectsHelp"
+          @mouseleave="hideConnectsHelp"
+          @focusin="showConnectsHelp"
+          @focusout="hideConnectsHelp"
         >
-          <p class="font-plein text-[13px] leading-[150%] text-white/85">
-            Connects are credits that let you receive verified traveler inquiries on pirtTrip. Use them to connect with customers interested in your trips and packages.
-          </p>
+          <button
+            type="button"
+            class="flex h-5 w-5 items-center justify-center rounded-full border border-white/25 bg-white/10 font-plein text-[12px] font-bold leading-none text-white/80 transition-colors hover:border-[#F3A81A]/60 hover:text-[#F3A81A]"
+            aria-describedby="connects-help-tooltip"
+            aria-label="What are connects?"
+            :aria-expanded="connectsHelpOpen"
+          >
+            ?
+          </button>
+
+          <div
+            v-show="connectsHelpOpen"
+            id="connects-help-tooltip"
+            class="absolute left-1/2 top-full z-20 mt-2 w-[260px] -translate-x-1/2 rounded-[10px] border border-white/10 bg-[#1e1b18] p-3.5 shadow-[0_12px_32px_rgba(0,0,0,0.45)] sm:left-0 sm:translate-x-0"
+            role="tooltip"
+          >
+            <p class="font-plein text-[13px] leading-[150%] text-white/85">
+              Connects are credits that let you receive verified traveler inquiries on PirtTrip. Use them to connect with customers interested in your trips and packages.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -155,6 +152,15 @@ function onOtpInput(index, event) {
             :class="inputClass"
           >
         </div>
+
+        <input
+          v-model="form.businessName"
+          type="text"
+          placeholder="Business Name"
+          required
+          autocomplete="organization"
+          :class="inputClass"
+        >
 
         <div class="flex h-[40px] overflow-hidden rounded-[8px] border border-[#3a3530] bg-[#1e1b18] focus-within:border-[#F3A81A]/70">
           <span class="flex shrink-0 items-center border-r border-[#3a3530] px-3 font-plein text-[14px] text-white/70">

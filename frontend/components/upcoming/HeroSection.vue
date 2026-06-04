@@ -112,11 +112,11 @@ onUnmounted(() => {
           v-if="homeIsExternal"
           :href="homeHref"
           class="inline-flex shrink-0"
-          aria-label="pirtTrip home"
+          aria-label="PirtTrip home"
         >
           <img
             src="/images/logo.svg"
-            alt="pirtTrip"
+            alt="PirtTrip"
             class="h-9 w-auto object-contain sm:h-10"
             width="584"
             height="192"
@@ -126,11 +126,11 @@ onUnmounted(() => {
           v-else
           to="/"
           class="inline-flex shrink-0"
-          aria-label="pirtTrip home"
+          aria-label="PirtTrip home"
         >
           <img
             src="/images/logo.svg"
-            alt="pirtTrip"
+            alt="PirtTrip"
             class="h-8 w-auto object-contain sm:h-9"
             width="584"
             height="192"

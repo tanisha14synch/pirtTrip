@@ -42,6 +42,7 @@ export default defineEventHandler(async (event) => {
     metadata: {
       firstName: parsed.data.firstName.trim(),
       lastName: parsed.data.lastName.trim(),
+      businessName: parsed.data.businessName.trim(),
       phone,
     },
   })
