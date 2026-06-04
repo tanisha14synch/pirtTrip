@@ -1,5 +1,18 @@
 <script setup>
+const HERO_BG_SRC = '/images/upcoming-hero-bg.svg'
+
 const { homeHref, homeIsExternal } = useMainSite()
+
+useHead({
+  link: [
+    {
+      rel: 'preload',
+      as: 'image',
+      href: HERO_BG_SRC,
+      type: 'image/svg+xml',
+    },
+  ],
+})
 
 const timeLeft = ref({
   days: 20,
@@ -61,7 +74,18 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section class="upcoming-hero relative overflow-hidden pt-5 md:pt-6">
+  <section class="upcoming-hero relative isolate overflow-hidden pt-5 md:pt-6">
+    <img
+      :src="HERO_BG_SRC"
+      alt=""
+      class="hero-bg-media pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-top"
+      fetchpriority="high"
+      loading="eager"
+      decoding="async"
+      draggable="false"
+      aria-hidden="true"
+    >
+
     <img
       src="/images/hero/business-hero-card-bottom.svg"
       alt=""
@@ -221,10 +245,12 @@ onUnmounted(() => {
 <style scoped>
 .upcoming-hero {
   background-color: #000;
-  background-image: url('/images/upcoming-hero-bg.svg');
-  background-repeat: no-repeat;
-  background-position: center top;
-  background-size: cover;
+  min-height: 100vh;
+}
+
+.hero-bg-media {
+  min-height: 100%;
+  min-width: 100%;
 }
 
 .hero-main {
@@ -254,7 +280,7 @@ onUnmounted(() => {
 .hero-floating-card--middle {
   top: 50%;
   right: 0;
-  z-index: 1;
+  z-index: 2;
   display: block;
   margin: 0;
   padding: 0;
@@ -271,7 +297,7 @@ onUnmounted(() => {
   position: absolute;
   bottom: 0;
   left: 0;
-  z-index: 1;
+  z-index: 2;
   display: block;
   margin: 0;
   padding: 0;
