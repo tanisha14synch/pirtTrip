@@ -2,7 +2,7 @@ export const useLandingStore = defineStore('landing', {
   state: () => ({
     header: {
       logo: {
-        image: '/images/logo.png',
+        image: '/images/logo.svg',
         href: '/',
         alt: 'pirtTrip logo',
       },
@@ -10,7 +10,7 @@ export const useLandingStore = defineStore('landing', {
         { id: 'home', label: 'Home', href: '/' },
       ],
       partnerCta: {
-        label: 'Become a Partner',
+        label: 'For Businesses',
         href: '/business',
       },
       travelerCta: {

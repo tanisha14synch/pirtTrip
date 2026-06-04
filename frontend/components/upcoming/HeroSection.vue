@@ -91,7 +91,7 @@ onUnmounted(() => {
           aria-label="pirtTrip home"
         >
           <img
-            src="/images/logo.png"
+            src="/images/logo.svg"
             alt="pirtTrip"
             class="h-9 w-auto object-contain sm:h-10"
             width="584"
@@ -105,7 +105,7 @@ onUnmounted(() => {
           aria-label="pirtTrip home"
         >
           <img
-            src="/images/logo.png"
+            src="/images/logo.svg"
             alt="pirtTrip"
             class="h-9 w-auto object-contain sm:h-10"
             width="584"

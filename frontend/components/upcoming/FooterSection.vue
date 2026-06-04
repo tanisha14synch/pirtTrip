@@ -116,7 +116,7 @@ function scrollToRegistration(event) {
             aria-label="pirtTrip home"
           >
             <img
-              src="/images/logo-black.png"
+              src="/images/logo-black.svg"
               alt="pirtTrip"
               class="h-10 w-auto object-contain"
               loading="lazy"
@@ -129,7 +129,7 @@ function scrollToRegistration(event) {
             aria-label="pirtTrip home"
           >
             <img
-              src="/images/logo-black.png"
+              src="/images/logo-black.svg"
               alt="pirtTrip"
               class="h-10 w-auto object-contain"
               loading="lazy"

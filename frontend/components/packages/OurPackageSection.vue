@@ -22,7 +22,7 @@ const baseCards = [
     rating: '4.5',
     title: 'Kerala Backwater Escape',
     brand: 'Roamora',
-    brandLogo: '/images/logo.png',
+    brandLogo: '/images/logo.svg',
     location: 'North-central, France',
     tags: ['Ladakh', 'Rishikesh'],
     itinerary: [
@@ -42,7 +42,7 @@ const baseCards = [
     rating: '4.5',
     title: 'Rajasthan Heritage Journey',
     brand: 'Tripverse',
-    brandLogo: '/images/logo.png',
+    brandLogo: '/images/logo.svg',
     location: 'North-central, France',
     tags: ['Ladakh', 'Rishikesh'],
     itinerary: [
@@ -62,7 +62,7 @@ const baseCards = [
     rating: '4.5',
     title: 'Spiti Valley Adventure',
     brand: 'Wanderly',
-    brandLogo: '/images/logo.png',
+    brandLogo: '/images/logo.svg',
     location: 'North-central, France',
     tags: ['Ladakh', 'Rishikesh'],
     itinerary: [

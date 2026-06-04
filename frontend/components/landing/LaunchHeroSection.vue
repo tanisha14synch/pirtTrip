@@ -75,7 +75,7 @@ onUnmounted(() => {
       <div class="mx-auto flex max-w-[1440px] flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <NuxtLink to="/" class="inline-flex shrink-0">
           <img
-            src="/images/logo.png"
+            src="/images/logo.svg"
             alt="pirtTrip"
             class="h-9 w-auto object-contain sm:h-10"
             width="584"
@@ -88,7 +88,7 @@ onUnmounted(() => {
             :to="partnerLandingUrl"
             class="inline-flex h-[44px] shrink-0 items-center justify-center rounded-[8px] bg-[#F3A81A] px-5 font-plein text-[15px] font-bold text-white transition-opacity hover:opacity-90 sm:h-[46px] sm:px-6"
           >
-            Become a Partner
+            For Businesses
           </NuxtLink>
 
           <span class="hidden h-10 w-px shrink-0 bg-white/35 sm:block" aria-hidden="true" />

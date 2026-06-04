@@ -3,7 +3,7 @@ export const useHomeStore = defineStore('home', {
     header: {
       logo: {
         text: 'pirtTrip',
-        image: '/images/logo.png',
+        image: '/images/logo.svg',
         href: '/',
         alt: 'pirtTrip logo',
       },
@@ -15,7 +15,7 @@ export const useHomeStore = defineStore('home', {
       ctas: [
         {
           id: 'partner',
-          label: 'Become a Partner',
+          label: 'For Businesses',
           href: '/business',
           variant: 'dark',
         },
@@ -364,7 +364,7 @@ export const useHomeStore = defineStore('home', {
             discountSuffix: 'Upto',
             title: 'Kashmir Paradise Tour',
             region: 'North-central, France',
-            logo: '/images/logo.png',
+            logo: '/images/logo.svg',
             image:
               'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80',
             badges: [
@@ -388,7 +388,7 @@ export const useHomeStore = defineStore('home', {
             discountSuffix: 'Upto',
             title: 'Kashmir Paradise Tour',
             region: 'North-central, France',
-            logo: '/images/logo.png',
+            logo: '/images/logo.svg',
             image:
               'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80',
             badges: [
@@ -412,7 +412,7 @@ export const useHomeStore = defineStore('home', {
             discountSuffix: 'Upto',
             title: 'Kashmir Paradise Tour',
             region: 'North-central, India',
-            logo: '/images/logo.png',
+            logo: '/images/logo.svg',
             image:
               'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1200&q=80',
             badges: [
@@ -436,7 +436,7 @@ export const useHomeStore = defineStore('home', {
             discountSuffix: 'Upto',
             title: 'Kashmir Paradise Tour',
             region: 'North-central, France',
-            logo: '/images/logo.png',
+            logo: '/images/logo.svg',
             image:
               'https://images.unsplash.com/photo-1441716844725-09cedc13a4e7?auto=format&fit=crop&w=1200&q=80',
             badges: [

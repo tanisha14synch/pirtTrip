@@ -60,7 +60,7 @@ const highlights = [
           :to="partnerLandingUrl"
           class="inline-flex h-[52px] min-w-[200px] items-center justify-center rounded-[9px] bg-brand-gold px-8 font-plein text-[16px] font-bold leading-[140%] text-white transition-opacity hover:opacity-90"
         >
-          Become a Partner
+          For Businesses
         </NuxtLink>
         <NuxtLink
           to="/home-2"

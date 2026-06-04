@@ -21,7 +21,7 @@ const isHashHref = (href) => typeof href === 'string' && href.startsWith('#')
         <div class="max-w-[340px] shrink-0">
           <NuxtLink to="/" aria-label="pirtTrip home">
             <img
-              src="/images/logo-black.png"
+              src="/images/logo-black.svg"
               alt="pirtTrip"
               class="h-10 w-auto object-contain"
               loading="lazy"

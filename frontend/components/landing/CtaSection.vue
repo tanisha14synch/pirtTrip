@@ -46,7 +46,7 @@ const ctaPoints = [
               :to="partnerLandingUrl"
               class="mt-8 inline-flex h-[52px] min-w-[220px] items-center justify-center rounded-full bg-brand-gold px-10 font-plein text-[16px] font-bold text-white transition-opacity hover:opacity-90"
             >
-              Become a Partner
+              For Businesses
             </NuxtLink>
           </div>
 
