@@ -102,7 +102,7 @@ const rowTwo = [
     iconSrc: '/images/trust/trust-icon-11.png',
     iconAlt: 'Discovery platform not travel agency',
     parts: [
-      { text: 'pirttrip acts as a ', bold: false },
+      { text: 'pirtTrip acts as a ', bold: false },
       { text: 'discovery platform', bold: true },
       { text: ' not a ', bold: false },
       { text: 'competing travel agency', bold: true },
@@ -115,12 +115,12 @@ const rowTwo = [
   <section class="relative overflow-hidden bg-[#f5f5f5] py-14 md:py-16">
     <div class="relative z-10 mx-auto w-[94%] max-w-[1280px]">
       <header class="text-center">
-        <p class="font-plein text-[16px] font-bold leading-[130%] tracking-[0] text-[#F76517]">
-          - Why Trust pirttrip? -
+        <p class="font-plein text-[24px] font-bold leading-[130%] tracking-[0] text-[#F76517] md:text-[26px]">
+          - Why Trust pirtTrip? -
         </p>
 
         <h2
-          class="mt-3 font-plein text-[20px] font-bold leading-[130%] tracking-[0] text-black"
+          class="mt-3 font-plein text-[28px] font-bold leading-[130%] tracking-[0] text-black md:text-[30px]"
         >
           YOUR CUSTOMERs remain ALL YOURs
         </h2>
@@ -149,7 +149,7 @@ const rowTwo = [
       </div>
 
       <p
-        class="relative z-10 mt-14 text-center font-poppins text-[18px] font-medium leading-[100%] tracking-[0] text-black"
+        class="relative z-10 mt-14 text-center font-poppins text-[20px] font-medium leading-[100%] tracking-[0] text-black"
       >
         Your CUSTOMERs. Your BRAND. Your BUSINESS.
       </p>

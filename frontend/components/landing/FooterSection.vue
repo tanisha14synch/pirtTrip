@@ -19,17 +19,17 @@ const isHashHref = (href) => typeof href === 'string' && href.startsWith('#')
         class="flex w-full flex-col items-start justify-between gap-10 py-12 md:min-h-[220px] md:py-16 lg:flex-row"
       >
         <div class="max-w-[340px] shrink-0">
-          <NuxtLink to="/" aria-label="Pirttrip home">
+          <NuxtLink to="/" aria-label="pirtTrip home">
             <img
               src="/images/logo-black.png"
-              alt="pirttrip"
+              alt="pirtTrip"
               class="h-10 w-auto object-contain"
               loading="lazy"
               draggable="false"
             >
           </NuxtLink>
           <p class="mt-6 max-w-[300px] font-plein text-[16px] font-normal leading-[140%] text-black/80">
-            Discover, compare, and book group trips — or partner with pirttrip to grow your travel business.
+            Discover, compare, and book group trips — or partner with pirtTrip to grow your travel business.
           </p>
         </div>
 

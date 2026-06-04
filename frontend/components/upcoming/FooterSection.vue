@@ -4,7 +4,6 @@ import { FOOTER_LEGAL_LINKS, FOOTER_QUICK_LINKS } from '~/constants/legal-links'
 const { homeHref, homeIsExternal } = useMainSite()
 
 const CTA_BG = '/images/hero/hero-bg.png'
-const waitlistOpen = ref(false)
 
 const quickLinks = FOOTER_QUICK_LINKS
 
@@ -15,10 +14,21 @@ const isExternalHref = (href) =>
   typeof href === 'string' && (href.startsWith('mailto:') || href.startsWith('http'))
 
 const ctaHighlights = [
-  'Compare experiences',
-  'Discover upcoming group trips',
-  'Explore destinations',
+  'Establish Your Professional Travel Presence',
+  'Showcase Tours & Travel Experiences',
+  'Promote Trip Links Across Your Network',
+  'Strengthen Your Brand & Increase Visibility',
 ]
+
+function scrollToRegistration(event) {
+  event?.preventDefault()
+  const el = document.getElementById('partner-registration')
+    || document.getElementById('get-started')
+  if (!el) return
+
+  const top = el.getBoundingClientRect().top + window.scrollY
+  window.scrollTo({ top, behavior: 'smooth' })
+}
 </script>
 
 <template>
@@ -54,20 +64,21 @@ const ctaHighlights = [
             <h2
               class="mt-3 font-plein text-[28px] font-bold leading-[130%] tracking-[0] text-white sm:text-[34px] md:text-[40px] lg:text-[44px]"
             >
-              Your Group Travel Business With PirTrip
+              Lets Grow Your Travel Business with
+              <span class="text-[#F3A81A]">pirtTrip!</span>
             </h2>
 
-            <p class="mt-4 font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-white/85">
-              Get notified during launch
+            <p class="mt-4 font-plein text-[18px] font-bold leading-[140%] tracking-[0] text-white sm:text-[20px] md:text-[22px]">
+              Register Today &amp; Get 20 CONNECT CREDITs for FREE.
             </p>
 
-            <button
-              type="button"
-              class="mt-7 inline-flex h-[50px] min-w-[220px] items-center justify-center rounded-full bg-white px-8 font-plein text-[16px] font-bold leading-[130%] tracking-[0] text-black transition-opacity hover:opacity-90"
-              @click="waitlistOpen = true"
+            <a
+              href="#get-started"
+              class="mt-7 inline-flex h-[50px] min-w-[220px] items-center justify-center rounded-full bg-white px-8 font-plein text-[16px] font-bold leading-[130%] tracking-[0] text-black no-underline transition-opacity hover:opacity-90"
+              @click="scrollToRegistration"
             >
-              Join Traveler Waitlist
-            </button>
+              Join as Business
+            </a>
           </div>
 
           <!-- Right -->
@@ -102,11 +113,11 @@ const ctaHighlights = [
           <a
             v-if="homeIsExternal"
             :href="homeHref"
-            aria-label="Pirttrip home"
+            aria-label="pirtTrip home"
           >
             <img
               src="/images/logo-black.png"
-              alt="pirttrip"
+              alt="pirtTrip"
               class="h-10 w-auto object-contain"
               loading="lazy"
               draggable="false"
@@ -115,11 +126,11 @@ const ctaHighlights = [
           <NuxtLink
             v-else
             to="/"
-            aria-label="Pirttrip home"
+            aria-label="pirtTrip home"
           >
             <img
               src="/images/logo-black.png"
-              alt="pirttrip"
+              alt="pirtTrip"
               class="h-10 w-auto object-contain"
               loading="lazy"
               draggable="false"
@@ -209,5 +220,4 @@ const ctaHighlights = [
     </div>
   </footer>
 
-  <LandingWaitlistModal v-model:open="waitlistOpen" />
 </template>

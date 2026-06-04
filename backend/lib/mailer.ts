@@ -8,7 +8,7 @@ type MailPayload = {
 export async function sendTransactionalEmail(payload: MailPayload): Promise<void> {
   const config = useRuntimeConfig()
   const resendKey = config.resendApiKey
-  const from = config.emailFrom || 'Pirttrip <onboarding@resend.dev>'
+  const from = config.emailFrom || 'pirtTrip <onboarding@resend.dev>'
   const isProd = process.env.NODE_ENV === 'production'
 
   if (resendKey) {
@@ -107,8 +107,8 @@ async function sendViaSupabaseAuth(payload: MailPayload) {
 }
 
 export function buildOtpEmailContent(code: string, purposeLabel: string) {
-  const subject = `${code} is your pirttrip verification code`
-  const text = `Your pirttrip verification code for ${purposeLabel} is: ${code}\n\nThis code expires in 10 minutes. If you did not request this, ignore this email.`
+  const subject = `${code} is your pirtTrip verification code`
+  const text = `Your pirtTrip verification code for ${purposeLabel} is: ${code}\n\nThis code expires in 10 minutes. If you did not request this, ignore this email.`
   const html = `
 <!DOCTYPE html>
 <html>
@@ -116,7 +116,7 @@ export function buildOtpEmailContent(code: string, purposeLabel: string) {
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;margin:40px auto;background:#1e1b18;border-radius:12px;border:1px solid #333;">
     <tr>
       <td style="padding:32px 28px;text-align:center;">
-        <p style="margin:0 0 8px;color:#F3A81A;font-size:14px;font-weight:bold;letter-spacing:0.05em;">PIRTTRIP</p>
+        <p style="margin:0 0 8px;color:#F3A81A;font-size:14px;font-weight:bold;letter-spacing:0.05em;">pirtTrip</p>
         <h1 style="margin:0 0 12px;color:#fff;font-size:22px;">Verify your email</h1>
         <p style="margin:0 0 24px;color:#aaa;font-size:15px;line-height:1.5;">Use this code to complete <strong style="color:#fff;">${purposeLabel}</strong>. It expires in <strong>10 minutes</strong>.</p>
         <div style="display:inline-block;padding:16px 28px;background:#000;border:2px solid #F3A81A;border-radius:10px;">

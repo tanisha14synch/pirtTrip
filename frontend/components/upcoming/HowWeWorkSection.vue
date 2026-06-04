@@ -1,71 +1,13 @@
 <script setup>
-const steps = {
-  s1: {
-    number: '01',
-    title: 'Step 1',
-    description:
-      'Travel Partner registers on PirTrip and creates a professional business profile.',
-    iconSrc: '/images/how-we-work/step-01-illustration.png',
-    iconAlt: 'Partner registers on PirTrip',
-  },
-  s2: {
-    number: '02',
-    title: 'Step 2',
-    description: 'Partner posts upcoming trips, itineraries & travel packages.',
-    iconSrc: '/images/how-we-work/step-02-illustration.png',
-    iconAlt: 'Partner posts trips',
-  },
-  s3: {
-    number: '03',
-    title: 'Step 3',
-    description:
-      'Travelers explore destinations, compare options, and discover suitable travel partners.',
-    iconSrc: '/images/how-we-work/step-03-illustration.png',
-    iconAlt: 'Travelers explore destinations',
-  },
-  s4: {
-    number: '04',
-    title: 'Step 4',
-    description:
-      'Interested travelers send inquiries or connect requests for specific trips or requirements.',
-    iconSrc: '/images/how-we-work/step-04-illustration.png',
-    iconAlt: 'Travelers send inquiries',
-  },
-  s5: {
-    number: '05',
-    title: 'Step 5',
-    description:
-      'Verified customer leads are matched and shared directly with the relevant travel partner only.',
-    iconSrc: '/images/how-we-work/step-05-illustration.png',
-    iconAlt: 'Verified leads matched',
-  },
-  s6: {
-    number: '06',
-    title: 'Step 6',
-    description:
-      'Travel Partner contacts the traveler directly to discuss trip planning, pricing and customization.',
-    iconSrc: '/images/how-we-work/step-06-illustration.png',
-    iconAlt: 'Partner contacts traveler',
-  },
-  s7: {
-    number: '07',
-    title: 'Step 7',
-    description:
-      'Traveler and Partner finalize bookings and trip details independently without platform interference.',
-    iconSrc: '/images/how-we-work/step-07-illustration.png',
-    iconAlt: 'Finalize bookings independently',
-  },
-  s8: {
-    number: '08',
-    title: 'Step 8',
-    description:
-      'Partner grows business visibility, receives more traveler connects and builds long-term customer relationships through the platform.',
-    iconSrc: '/images/how-we-work/step-08-illustration.png',
-    iconAlt: 'Grow visibility and relationships',
-  },
-}
+import { PARTNER_WORKFLOW_STEPS } from '~/constants/partner-workflow-steps'
 
-const stepsList = Object.values(steps)
+const stepKeys = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8']
+
+const steps = Object.fromEntries(
+  stepKeys.map((key, index) => [key, PARTNER_WORKFLOW_STEPS[index]]),
+)
+
+const stepsList = PARTNER_WORKFLOW_STEPS
 
 /** Positions aligned to map-bg.svg path (1300×697) */
 const STEP_BG_SRC = '/images/how-we-work/map-bg.svg'
@@ -174,13 +116,13 @@ onUnmounted(() => {
   >
     <div class="mx-auto w-[94%] max-w-[820px] lg:max-w-none lg:w-full">
       <header class="text-center lg:px-6 lg:pt-10 lg:pb-4">
-        <p class="font-plein text-[16px] font-bold leading-[130%] tracking-[0] text-[#F76517]">
+        <p class="font-plein text-[24px] font-bold leading-[130%] tracking-[0] text-[#F76517] md:text-[26px]">
           How We Work?
         </p>
 
         <h2
           id="how-we-work-heading"
-          class="mt-2 font-plein text-[20px] font-bold leading-[130%] tracking-[0] text-black"
+          class="mt-2 font-plein text-[28px] font-bold leading-[130%] tracking-[0] text-black md:text-[30px]"
         >
           Simple. Transparent. Business Friendly.
         </h2>

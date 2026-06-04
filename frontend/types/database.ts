@@ -50,6 +50,7 @@ export interface PartnerRegistrationPayload {
   lastName: string
   phone: string
   email?: string
+  whatsappOptIn?: boolean
 }
 
 export interface LeadsListQuery {

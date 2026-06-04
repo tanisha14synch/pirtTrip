@@ -18,22 +18,22 @@ const partnerFeatures = [
 const featureCards = [
   {
     id: 'join',
-    src: '/images/vendor-hero-card-1.png',
+    src: '/images/vendor-hero-card-1.svg',
     alt: 'Join as a travel business partner',
   },
   {
     id: 'trips',
-    src: '/images/vendor-hero-card-2.png',
+    src: '/images/vendor-hero-card-2.svg',
     alt: 'Publish trips and itineraries',
   },
   {
     id: 'links',
-    src: '/images/vendor-hero-card-3.png',
+    src: '/images/vendor-hero-card-3.svg',
     alt: 'Shareable trip links',
   },
   {
     id: 'brand',
-    src: '/images/vendor-hero-card-4.png',
+    src: '/images/vendor-hero-card-4.svg',
     alt: 'Branding and visibility for partners',
   },
 ]

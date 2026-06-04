@@ -1,12 +1,12 @@
 Effective Date: 8th June, 2026
-Platform: PirtTrip.com
+Platform: pirtTrip.com
 Operated by: Martyrs Services, Bareilly, Uttar Pradesh, India
 
-This Intellectual Property Policy explains ownership rights, permitted use, restrictions, and content-related rules applicable to PirtTrip.com and associated services.
-By accessing or using PirtTrip.com, you agree to comply with this Policy.
+This Intellectual Property Policy explains ownership rights, permitted use, restrictions, and content-related rules applicable to pirtTrip.com and associated services.
+By accessing or using pirtTrip.com, you agree to comply with this Policy.
 
 1. Ownership of Platform Intellectual Property
-Unless otherwise stated, PirtTrip.com and its associated intellectual property are owned, controlled or licensed by Martyrs Services.
+Unless otherwise stated, pirtTrip.com and its associated intellectual property are owned, controlled or licensed by Martyrs Services.
 This may include rights in:
 • Website design
 • Platform layout
@@ -25,8 +25,8 @@ This may include rights in:
 • Documentation
 All rights not expressly granted are reserved.
 
-2. PirtTrip Brand Assets
-The names PirtTrip, PirtTrip.com, related logos, taglines, visual identifiers, and goodwill associated with the platform may constitute proprietary business assets of Martyrs Services, whether or not formally registered as trademarks at present.
+2. pirtTrip Brand Assets
+The names pirtTrip, pirtTrip.com, related logos, taglines, visual identifiers, and goodwill associated with the platform may constitute proprietary business assets of Martyrs Services, whether or not formally registered as trademarks at present.
 Unauthorized use is prohibited.
 
 3. Limited User License
@@ -41,7 +41,7 @@ Without prior written permission, users may not:
 • Scrape data using bots or automation
 • Download databases in bulk
 • Reverse engineer protected systems where prohibited by law
-• Use PirtTrip branding to imply affiliation
+• Use pirtTrip branding to imply affiliation
 • Mirror content on another website
 • Resell platform content unlawfully
 • Remove ownership notices
@@ -57,7 +57,7 @@ Partners or users may submit content such as:
 • Testimonials
 • Promotional text
 • Documents
-You retain ownership of content you lawfully own, but by submitting content to PirtTrip, you grant PirtTrip a non-exclusive, worldwide, royalty-free license (to the extent permitted by law) to:
+You retain ownership of content you lawfully own, but by submitting content to pirtTrip, you grant pirtTrip a non-exclusive, worldwide, royalty-free license (to the extent permitted by law) to:
 • Host
 • Store
 • Reproduce
@@ -78,8 +78,8 @@ Anyone submitting content confirms that:
 The submitter bears responsibility for claims arising from their content.
 
 7. Vendor-Developed Website / External Developers
-PirtTrip may use external developers, agencies, freelancers, or vendors to build or maintain technology.
-Unless otherwise agreed in writing, deliverables specifically commissioned for PirtTrip are intended for use by Martyrs Services subject to the governing commercial contract.
+pirtTrip may use external developers, agencies, freelancers, or vendors to build or maintain technology.
+Unless otherwise agreed in writing, deliverables specifically commissioned for pirtTrip are intended for use by Martyrs Services subject to the governing commercial contract.
 Where third-party components, open-source tools, or licensed software are used, ownership remains subject to their respective licenses.
 
 8. Open Source / Third-Party Components
@@ -87,29 +87,29 @@ Some platform elements may incorporate third-party frameworks, plugins, APIs, st
 Such materials remain subject to their own license terms, and nothing in this Policy overrides those rights.
 
 9. Feedback & Suggestions
-If users or partners provide suggestions, feature ideas, feedback, or improvement proposals, PirtTrip may use such feedback without obligation of compensation, unless separately agreed in writing.
+If users or partners provide suggestions, feature ideas, feedback, or improvement proposals, pirtTrip may use such feedback without obligation of compensation, unless separately agreed in writing.
 
 10. Copyright Infringement Complaints
-If you believe content on PirtTrip infringes your copyright or other IP rights, please submit a complaint with:
+If you believe content on pirtTrip infringes your copyright or other IP rights, please submit a complaint with:
 • Your name and contact details
 • Description of the protected work
 • URL/location of alleged infringement
 • Basis of ownership/authority
 • Good-faith statement
 • Requested action
-PirtTrip may investigate and remove content where appropriate.
+pirtTrip may investigate and remove content where appropriate.
 
 11. Repeat Infringers
-PirtTrip may suspend or terminate accounts that repeatedly submit infringing, copied, or unauthorized content.
+pirtTrip may suspend or terminate accounts that repeatedly submit infringing, copied, or unauthorized content.
 
 12. Data Extraction & Competitive Misuse
 Using automated tools or manual extraction to harvest listings, leads, pricing data, or structured platform content for competing commercial purposes may be prohibited.
 
 13. No Implied Rights
-Nothing on the platform grants any implied license to use PirtTrip intellectual property beyond ordinary permitted platform use.
+Nothing on the platform grants any implied license to use pirtTrip intellectual property beyond ordinary permitted platform use.
 
 14. Reservation of Improvement Rights
-PirtTrip may update, redesign, replace, or remove any feature, content structure, or visual element without notice.
+pirtTrip may update, redesign, replace, or remove any feature, content structure, or visual element without notice.
 
 15. Survival After Account Closure
 Restrictions relating to copied materials, misuse, infringement, confidentiality, and ownership may survive account termination.

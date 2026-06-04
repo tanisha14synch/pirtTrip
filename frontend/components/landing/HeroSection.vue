@@ -38,7 +38,7 @@ const highlights = [
       </h1>
 
       <p class="mt-5 max-w-[600px] font-plein text-[18px] font-normal leading-[140%] tracking-[0] text-white/90 md:text-[20px]">
-        Discover, compare, and book unforgettable group adventures — or grow your travel business as a pirttrip partner.
+        Discover, compare, and book unforgettable group adventures — or grow your travel business as a pirtTrip partner.
       </p>
 
       <ul class="mt-8 flex max-w-[640px] flex-col gap-3">

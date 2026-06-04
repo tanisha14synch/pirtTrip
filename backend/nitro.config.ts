@@ -25,7 +25,7 @@ export default defineNitroConfig({
       || '',
     otpSecret: process.env.OTP_SECRET || '',
     resendApiKey: process.env.RESEND_API_KEY || '',
-    emailFrom: process.env.EMAIL_FROM || 'Pirttrip <onboarding@resend.dev>',
+    emailFrom: process.env.EMAIL_FROM || 'pirtTrip <onboarding@resend.dev>',
     smtpHost: process.env.SMTP_HOST || '',
     smtpPort: process.env.SMTP_PORT || '587',
     smtpUser: process.env.SMTP_USER || '',

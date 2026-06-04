@@ -14,9 +14,14 @@ export const partnerRegistrationSchema = z.object({
   phone: z
     .string()
     .trim()
-    .min(10, 'Phone number is required')
-    .max(20, 'Phone number is too long'),
-  email: z.string().trim().email('Enter a valid email address'),
+    .regex(/^\d{10}$/, 'Enter a valid 10-digit mobile number'),
+  email: z
+    .string()
+    .trim()
+    .email('Enter a valid email address')
+    .optional()
+    .or(z.literal('')),
+  whatsappOptIn: z.boolean().optional(),
 })
 
 export const otpSchema = z.object({

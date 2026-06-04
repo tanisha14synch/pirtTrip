@@ -20,7 +20,9 @@ export function usePartnerRegistration() {
     firstName: '',
     lastName: '',
     phone: '',
-    email: '',
+    whatsappOptIn: false,
+    agreePolicies1: false,
+    agreePolicies2: false,
   })
 
   const otpDigits = ref(['', '', '', '', '', ''])
@@ -32,11 +34,15 @@ export function usePartnerRegistration() {
     errorMessage.value = null
 
     try {
+      if (!form.agreePolicies1 || !form.agreePolicies2) {
+        throw new Error('Please accept the required policies to continue.')
+      }
+
       const parsed = partnerRegistrationSchema.safeParse({
         firstName: form.firstName,
         lastName: form.lastName,
-        phone: form.phone,
-        email: form.email,
+        phone: form.phone.replace(/\D/g, '').slice(0, 10),
+        whatsappOptIn: form.whatsappOptIn,
       })
 
       if (!parsed.success) {
@@ -51,7 +57,7 @@ export function usePartnerRegistration() {
         },
       )
 
-      normalizedEmail.value = parsed.data.email
+      normalizedEmail.value = parsed.data.email ?? ''
       successLead.value = result.lead
       step.value = 'success'
     } catch (err: unknown) {

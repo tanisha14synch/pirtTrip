@@ -2,10 +2,10 @@ export const useHomeStore = defineStore('home', {
   state: () => ({
     header: {
       logo: {
-        text: 'pirttrip',
+        text: 'pirtTrip',
         image: '/images/logo.png',
         href: '/',
-        alt: 'Pirttrip logo',
+        alt: 'pirtTrip logo',
       },
       navLinks: [
         { id: 'home', label: 'Home', href: '/' },

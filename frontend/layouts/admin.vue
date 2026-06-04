@@ -12,7 +12,7 @@ async function handleSignOut() {
     <header class="border-b border-black/10 bg-white">
       <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <NuxtLink to="/admin" class="font-plein text-xl font-bold lowercase">
-          pirttrip <span class="text-sm font-normal text-black/50">admin</span>
+          pirtTrip <span class="text-sm font-normal text-black/50">admin</span>
         </NuxtLink>
 
         <div class="flex items-center gap-4">

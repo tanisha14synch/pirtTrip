@@ -14,7 +14,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const email = parsed.data.email.trim().toLowerCase()
+  const email = parsed.data.email?.trim().toLowerCase() || null
+  const notes = parsed.data.whatsappOptIn ? 'WhatsApp updates: opted in' : null
   const phone = normalizePhone(parsed.data.phone)
   const admin = getSupabaseAdmin()
 
@@ -38,6 +39,7 @@ export default defineEventHandler(async (event) => {
       last_name: parsed.data.lastName.trim(),
       phone,
       email,
+      notes,
       otp_verified: false,
       source_page: 'become-a-partner',
       status: 'NEW',

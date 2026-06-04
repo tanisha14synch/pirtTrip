@@ -10,7 +10,11 @@ const props = defineProps({
   },
   description: {
     type: String,
-    required: true,
+    default: '',
+  },
+  parts: {
+    type: Array,
+    default: () => [],
   },
   iconSrc: {
     type: String,
@@ -56,7 +60,13 @@ const isCompactFlow = computed(() => props.variant === 'flow-compact')
       </p>
 
       <p class="mt-2 font-poppins text-[12px] font-normal leading-[140%] text-[#2D2D2D]">
-        {{ description }}
+        <template v-if="parts.length">
+          <template v-for="(part, index) in parts" :key="index">
+            <span v-if="part.bold" class="font-semibold">{{ part.text }}</span>
+            <template v-else>{{ part.text }}</template>
+          </template>
+        </template>
+        <template v-else>{{ description }}</template>
       </p>
     </div>
   </article>
@@ -98,7 +108,13 @@ const isCompactFlow = computed(() => props.variant === 'flow-compact')
         onDarkBg ? 'text-white/75' : 'text-[#2D2D2D]',
       ]"
     >
-      {{ description }}
+      <template v-if="parts.length">
+        <template v-for="(part, index) in parts" :key="index">
+          <span v-if="part.bold" class="font-semibold">{{ part.text }}</span>
+          <template v-else>{{ part.text }}</template>
+        </template>
+      </template>
+      <template v-else>{{ description }}</template>
     </p>
   </article>
 </template>
