@@ -4,6 +4,7 @@ import { FOOTER_LEGAL_LINKS, FOOTER_QUICK_LINKS } from '~/constants/legal-links'
 const { homeHref, homeIsExternal } = useMainSite()
 
 const CTA_BG = '/images/hero/hero-bg.png'
+const FOOTER_LOGO_SRC = '/images/logo-black.svg'
 
 const quickLinks = FOOTER_QUICK_LINKS
 
@@ -19,6 +20,13 @@ const ctaHighlights = [
   'Promote Trip Links Across Your Network',
   'Strengthen Your Brand & Increase Visibility',
 ]
+
+const CONTACT_EMAIL = 'contact@pirttrip.com'
+const CONTACT_PHONE_DISPLAY = '+91-9711104186'
+const CONTACT_PHONE_TEL = 'tel:+919711104186'
+
+const linkClass =
+  'font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/80 transition-colors hover:text-[#F76517]'
 
 function scrollToRegistration(event) {
   event?.preventDefault()
@@ -105,18 +113,20 @@ function scrollToRegistration(event) {
     </div>
 
     <!-- Footer links -->
-    <div class="mx-auto w-[94%] max-w-[1261px] pb-10">
+    <div class="mx-auto w-[94%] max-w-[1200px] pb-10">
       <div
-        class="flex w-full flex-col items-start justify-between gap-10 py-12 md:min-h-[269px] md:py-16 lg:flex-row lg:gap-0"
+        class="flex flex-col gap-10 border-t border-black/[0.06] py-12 lg:flex-row lg:items-start lg:gap-12 lg:py-14 xl:gap-16"
       >
-        <div class="max-w-[340px] shrink-0">
+        <!-- Brand -->
+        <div class="w-full shrink-0 lg:w-[300px] xl:w-[320px]">
           <a
             v-if="homeIsExternal"
             :href="homeHref"
+            class="inline-flex shrink-0"
             aria-label="PirtTrip home"
           >
             <img
-              src="/images/logo-black.svg"
+              :src="FOOTER_LOGO_SRC"
               alt="PirtTrip"
               class="h-10 w-auto object-contain"
               loading="lazy"
@@ -126,10 +136,11 @@ function scrollToRegistration(event) {
           <NuxtLink
             v-else
             to="/"
+            class="inline-flex shrink-0"
             aria-label="PirtTrip home"
           >
             <img
-              src="/images/logo-black.svg"
+              :src="FOOTER_LOGO_SRC"
               alt="PirtTrip"
               class="h-10 w-auto object-contain"
               loading="lazy"
@@ -138,33 +149,34 @@ function scrollToRegistration(event) {
           </NuxtLink>
 
           <p
-            class="mt-6 max-w-[300px] font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/80"
+            class="mt-5 font-plein text-[15px] font-normal leading-[145%] tracking-[0] text-black/75"
           >
-            Find your perfect getaway from our curated list of top destinations.
+            Grow your travel business with verified leads and tools built for travel partners on PirtTrip.
           </p>
         </div>
 
+        <!-- Link columns — equal width, left-aligned -->
         <div
-          class="flex w-full max-w-[547px] flex-col gap-10 sm:flex-row sm:flex-wrap sm:gap-[50px] lg:w-[547px] lg:shrink-0 lg:flex-nowrap"
+          class="grid min-w-0 flex-1 grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-x-6 md:gap-x-10 lg:gap-x-12"
         >
-          <div class="shrink-0">
-            <h3 class="font-plein text-[18px] font-bold leading-[130%] tracking-[0] text-black">
+          <div class="min-w-0 text-left">
+            <h3 class="font-plein text-[17px] font-bold leading-[130%] text-black">
               Quick Links
             </h3>
 
-            <ul class="mt-5 space-y-[10px]">
+            <ul class="mt-4 space-y-2.5">
               <li v-for="link in quickLinks" :key="link.id">
                 <NuxtLink
                   v-if="!isHashHref(link.href) && !isExternalHref(link.href)"
                   :to="link.href"
-                  class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/80 transition-colors hover:text-black"
+                  :class="linkClass"
                 >
                   {{ link.label }}
                 </NuxtLink>
                 <a
                   v-else
                   :href="link.href"
-                  class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/80 transition-colors hover:text-black"
+                  :class="linkClass"
                 >
                   {{ link.label }}
                 </a>
@@ -172,16 +184,16 @@ function scrollToRegistration(event) {
             </ul>
           </div>
 
-          <div class="shrink-0">
-            <h3 class="font-plein text-[18px] font-bold leading-[130%] tracking-[0] text-black">
+          <div class="min-w-0 text-left">
+            <h3 class="font-plein text-[17px] font-bold leading-[130%] text-black">
               Legal
             </h3>
 
-            <ul class="mt-5 max-w-[220px] space-y-[10px]">
+            <ul class="mt-4 space-y-2.5">
               <li v-for="link in legalLinks" :key="link.id">
                 <NuxtLink
                   :to="link.href"
-                  class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/80 transition-colors hover:text-black"
+                  :class="linkClass"
                 >
                   {{ link.label }}
                 </NuxtLink>
@@ -189,26 +201,26 @@ function scrollToRegistration(event) {
             </ul>
           </div>
 
-          <div class="shrink-0">
-            <h3 class="font-plein text-[18px] font-bold leading-[130%] tracking-[0] text-black">
+          <div class="min-w-0 text-left">
+            <h3 class="font-plein text-[17px] font-bold leading-[130%] text-black">
               Contact us
             </h3>
 
-            <ul class="mt-5 space-y-[10px]">
+            <ul class="mt-4 space-y-2.5">
               <li>
                 <a
-                  href="mailto:contact@pirttrip.com"
-                  class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/80 transition-colors hover:text-black"
+                  :href="`mailto:${CONTACT_EMAIL}`"
+                  :class="linkClass"
                 >
-                  contact@pirttrip.com
+                  {{ CONTACT_EMAIL }}
                 </a>
               </li>
               <li>
                 <a
-                  href="tel:+919711104186"
-                  class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-black/80 transition-colors hover:text-black"
+                  :href="CONTACT_PHONE_TEL"
+                  :class="linkClass"
                 >
-                  +91-9711104186
+                  {{ CONTACT_PHONE_DISPLAY }}
                 </a>
               </li>
             </ul>
@@ -216,7 +228,9 @@ function scrollToRegistration(event) {
         </div>
       </div>
 
-      <LayoutFooterCopyright />
+      <div class="border-t border-black/[0.06] pt-8">
+        <LayoutFooterCopyright />
+      </div>
     </div>
   </footer>
 
