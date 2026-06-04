@@ -112,15 +112,15 @@ const rowTwo = [
 </script>
 
 <template>
-  <section class="relative overflow-hidden bg-[#f5f5f5] py-14 md:py-16">
+  <section class="relative overflow-hidden bg-[#f5f5f5] py-10 md:py-16">
     <div class="relative z-10 mx-auto w-[94%] max-w-[1280px]">
       <header class="text-center">
-        <p class="font-plein text-[20px] font-bold leading-[130%] tracking-[0] text-[#F76517] md:text-[22px]">
+        <p class="font-plein text-[14px] font-bold leading-[130%] tracking-[0] text-[#F76517] sm:text-[18px] md:text-[22px]">
           - Why Trust PirtTrip? -
         </p>
 
         <h2
-          class="mt-2 font-plein text-[28px] font-bold leading-[130%] tracking-[0] text-black md:text-[30px]"
+          class="mx-auto mt-1.5 max-w-[18em] font-plein text-[20px] font-bold leading-[125%] tracking-[0] text-black sm:mt-2 sm:max-w-none sm:text-[24px] md:text-[30px]"
         >
           YOUR CUSTOMERs remain ALL YOURs
         </h2>
@@ -149,7 +149,7 @@ const rowTwo = [
       </div>
 
       <p
-        class="relative z-10 mt-14 text-center font-poppins text-[20px] font-medium leading-[100%] tracking-[0] text-black"
+        class="relative z-10 mt-10 text-center font-poppins text-[14px] font-medium leading-[130%] tracking-[0] text-black sm:mt-14 sm:text-[17px] md:text-[20px] md:leading-[100%]"
       >
         Your CUSTOMERs. Your BRAND. Your BUSINESS.
       </p>

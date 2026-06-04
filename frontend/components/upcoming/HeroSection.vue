@@ -48,6 +48,13 @@ const featureCards = [
 
 let timerId
 
+const countdownUnits = computed(() => [
+  { label: 'DAYS', value: timeLeft.value.days },
+  { label: 'HRS', value: timeLeft.value.hours },
+  { label: 'MINS', value: timeLeft.value.minutes },
+  { label: 'SECS', value: timeLeft.value.seconds },
+])
+
 const pad = (value) => String(value).padStart(2, '0')
 
 const tickCountdown = () => {
@@ -106,92 +113,160 @@ onUnmounted(() => {
     >
 
     <div class="hero-inner relative z-10 mx-auto flex w-[94%] max-w-[1280px] flex-1 flex-col pb-8 md:pb-10">
-      <!-- Launch header: logo | countdown | contact -->
-      <header
-        class="flex flex-col gap-4 border-b border-white/5 pb-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6"
-      >
-        <a
-          v-if="homeIsExternal"
-          :href="homeHref"
-          class="inline-flex shrink-0"
-          aria-label="PirtTrip home"
-        >
-          <img
-            src="/images/logo.svg"
-            alt="PirtTrip"
-            class="h-9 w-auto object-contain sm:h-10"
-            width="584"
-            height="192"
-          >
-        </a>
-        <NuxtLink
-          v-else
-          to="/"
-          class="inline-flex shrink-0"
-          aria-label="PirtTrip home"
-        >
-          <img
-            src="/images/logo.svg"
-            alt="PirtTrip"
-            class="h-8 w-auto object-contain sm:h-9"
-            width="584"
-            height="192"
-          >
-        </NuxtLink>
-
-        <div
-          class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 lg:gap-5"
-        >
-          <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-            <p
-              class="shrink-0 font-plein text-[13px] font-normal leading-[135%] tracking-[0] text-white sm:text-[14px]"
+      <!-- Launch header -->
+      <header class="border-b border-white/5 pb-4 lg:pb-4">
+        <!-- Mobile (Figma) -->
+        <div class="lg:hidden">
+          <div class="flex items-start justify-between gap-2">
+            <a
+              v-if="homeIsExternal"
+              :href="homeHref"
+              class="inline-flex shrink-0"
+              aria-label="PirtTrip home"
             >
+              <img
+                src="/images/logo.svg"
+                alt="PirtTrip"
+                class="h-9 w-auto object-contain"
+                width="584"
+                height="192"
+              >
+            </a>
+            <NuxtLink
+              v-else
+              to="/"
+              class="inline-flex shrink-0"
+              aria-label="PirtTrip home"
+            >
+              <img
+                src="/images/logo.svg"
+                alt="PirtTrip"
+                class="h-9 w-auto object-contain"
+                width="584"
+                height="192"
+              >
+            </NuxtLink>
+
+            <div
+              class="min-w-0 max-w-[58%] text-right font-plein text-[10px] font-normal leading-[135%] tracking-[0] text-white sm:max-w-[65%] sm:text-[11px]"
+            >
+              <p>For any information, contact Business Support</p>
+              <p class="mt-0.5">
+                at:
+                <a
+                  href="mailto:contact@pirttrip.com"
+                  class="text-white hover:underline"
+                >contact@pirttrip.com</a>
+              </p>
+              <p class="mt-0.5">
+                Or Call at:
+                <a href="tel:+919711104186" class="text-white hover:underline">
+                  +91-9711104186
+                </a>
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-4 flex flex-col items-center text-center">
+            <p class="font-plein text-[15px] font-bold leading-[135%] tracking-[0] text-white">
               We are launching Soon!
             </p>
 
-            <div class="flex gap-1.5">
+            <div class="mt-3 grid w-full max-w-[252px] grid-cols-4 gap-1.5">
               <div
-                v-for="unit in [
-                  { label: 'DAYS', value: timeLeft.days },
-                  { label: 'HRS', value: timeLeft.hours },
-                  { label: 'MINS', value: timeLeft.minutes },
-                  { label: 'SECS', value: timeLeft.seconds },
-                ]"
+                v-for="unit in countdownUnits"
                 :key="unit.label"
-                class="flex min-w-[42px] flex-col items-center justify-center rounded-[5px] bg-white px-2 py-1.5 sm:min-w-[46px]"
+                class="hero-countdown-cell flex aspect-square flex-col items-center justify-center rounded-[6px] bg-white"
               >
-                <span class="font-plein text-[15px] font-bold leading-none text-black sm:text-[16px]">
+                <span class="font-plein text-[14px] font-bold leading-none text-black">
                   {{ pad(unit.value) }}
                 </span>
                 <span
-                  class="mt-0.5 font-plein text-[8px] font-medium uppercase leading-none tracking-[0.02em] text-black/65 sm:text-[9px]"
+                  class="mt-0.5 font-plein text-[7px] font-medium uppercase leading-none tracking-[0.02em] text-black/65"
                 >
                   {{ unit.label }}
                 </span>
               </div>
             </div>
           </div>
+        </div>
 
-          <span
-            class="hidden h-9 w-px shrink-0 bg-white/35 sm:block"
-            aria-hidden="true"
-          />
+        <!-- Desktop -->
+        <div class="hidden lg:flex lg:flex-row lg:items-center lg:justify-between lg:gap-6">
+          <a
+            v-if="homeIsExternal"
+            :href="homeHref"
+            class="inline-flex shrink-0"
+            aria-label="PirtTrip home"
+          >
+            <img
+              src="/images/logo.svg"
+              alt="PirtTrip"
+              class="h-10 w-auto object-contain"
+              width="584"
+              height="192"
+            >
+          </a>
+          <NuxtLink
+            v-else
+            to="/"
+            class="inline-flex shrink-0"
+            aria-label="PirtTrip home"
+          >
+            <img
+              src="/images/logo.svg"
+              alt="PirtTrip"
+              class="h-9 w-auto object-contain"
+              width="584"
+              height="192"
+            >
+          </NuxtLink>
 
-          <div class="font-plein text-[13px] font-normal leading-[135%] tracking-[0] text-white sm:text-[14px]">
-            <p>For any information, contact Business Support</p>
-            <p class="mt-0.5">
-              at:
-              <a
-                href="mailto:contact@pirttrip.com"
-                class="font-normal text-white hover:underline"
-              >contact@pirttrip.com</a>
-            </p>
-            <p class="mt-0.5">
-              Or Call at:
-              <a href="tel:+919711104186" class="font-normal text-white hover:underline">
-                +91-9711104186
-              </a>
-            </p>
+          <div class="flex items-center gap-5">
+            <div class="flex items-center gap-3">
+              <p class="shrink-0 font-plein text-[14px] font-normal leading-[135%] tracking-[0] text-white">
+                We are launching Soon!
+              </p>
+
+              <div class="flex gap-1.5">
+                <div
+                  v-for="unit in countdownUnits"
+                  :key="unit.label"
+                  class="flex min-w-[46px] flex-col items-center justify-center rounded-[5px] bg-white px-2 py-1.5"
+                >
+                  <span class="font-plein text-[16px] font-bold leading-none text-black">
+                    {{ pad(unit.value) }}
+                  </span>
+                  <span
+                    class="mt-0.5 font-plein text-[9px] font-medium uppercase leading-none tracking-[0.02em] text-black/65"
+                  >
+                    {{ unit.label }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <span
+              class="h-9 w-px shrink-0 bg-white/35"
+              aria-hidden="true"
+            />
+
+            <div class="font-plein text-[14px] font-normal leading-[135%] tracking-[0] text-white">
+              <p>For any information, contact Business Support</p>
+              <p class="mt-0.5">
+                at:
+                <a
+                  href="mailto:contact@pirttrip.com"
+                  class="font-normal text-white hover:underline"
+                >contact@pirttrip.com</a>
+              </p>
+              <p class="mt-0.5">
+                Or Call at:
+                <a href="tel:+919711104186" class="font-normal text-white hover:underline">
+                  +91-9711104186
+                </a>
+              </p>
+            </div>
           </div>
         </div>
       </header>
@@ -203,7 +278,7 @@ onUnmounted(() => {
           id="partner-registration"
           class="grid scroll-mt-6 grid-cols-1 items-start gap-6 lg:grid-cols-2 lg:gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(520px,640px)] xl:gap-10"
         >
-        <article class="max-w-[580px] lg:pt-1 xl:max-w-[500px]">
+        <article class="mx-auto max-w-[580px] text-center lg:mx-0 lg:pt-1 lg:text-left xl:max-w-[500px]">
             <p class="font-plein text-[14px] font-normal leading-[135%] tracking-[0] text-white">
               Lets Grow Your Travel Business with
               <span class="text-brand-gold font-bold">PirtTrip</span>
@@ -212,14 +287,14 @@ onUnmounted(() => {
             <h1
               class="mt-3 font-plein text-[28px] font-bold leading-[118%] tracking-[0] text-white sm:text-[34px] md:text-[38px] lg:text-[40px]"
             >
-             Running Your Travel Business All Alone?
+              Running Your Travel Business All Alone?
             </h1>
 
             <p
-              class="mt-3 max-w-[480px] font-plein text-[14px] font-normal leading-[135%] tracking-[0] text-white/85"
+              class="mx-auto mt-3 max-w-[480px] font-plein text-[14px] font-normal leading-[135%] tracking-[0] text-white/85 lg:mx-0"
             >
-            Let us contribute a small effort to help your
-            business reach more travelers.
+              Let us contribute a small effort to help your
+              business reach more travelers.
             </p>
           </article>
 

@@ -22,26 +22,15 @@ const iconError = ref(false)
     <div class="relative w-full">
       <div
         class="trust-benefit-card__icon-box absolute left-1/2 top-0 z-10 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center"
-        aria-hidden="true"
-      >
-        <img
-          v-if="!iconError"
-          :src="iconSrc"
-          :alt="iconAlt"
-          class="trust-benefit-card__icon h-[69.14px] w-[74.86px] object-contain"
-          loading="lazy"
-          draggable="false"
-          @error="iconError = true"
-        >
-        <span
-          v-else
-          class="h-[69.14px] w-[74.86px] rounded-[6px] bg-[#E2980B]/10"
-        />
+        aria-hidden="true">
+        <img v-if="!iconError" :src="iconSrc" :alt="iconAlt"
+          class="trust-benefit-card__icon h-12 w-12 sm:h-16 sm:w-16 object-contain" loading="lazy" draggable="false"
+          @error="iconError = true" />
+        <span v-else class="h-[69.14px] w-[74.86px] rounded-[6px] bg-[#E2980B]/10" />
       </div>
 
       <div
-        class="flex min-h-[140px] w-full flex-col items-center justify-center rounded-[14px] bg-white px-3 pb-4 pt-[54px] text-center shadow-[0_4px_20px_rgba(0,0,0,0.06)]"
-      >
+        class="flex min-h-[140px] w-full flex-col items-center justify-center rounded-[14px] bg-white px-3 pb-4 pt-[54px] text-center shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
         <p class="font-poppins text-[12px] font-normal leading-[100%] tracking-[0] text-[#2D2D2D]">
           <template v-for="(part, index) in parts" :key="index">
             <span v-if="part.bold" class="font-semibold">{{ part.text }}</span>

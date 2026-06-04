@@ -21,6 +21,12 @@ const ctaHighlights = [
   'Strengthen Your Brand & Increase Visibility',
 ]
 
+const mobileCtaFeatures = [
+  'Compare experiences',
+  'Discover upcoming group trips',
+  'Explore destinations',
+]
+
 const CONTACT_EMAIL = 'contact@pirttrip.com'
 const CONTACT_PHONE_DISPLAY = '+91-9711104186'
 const CONTACT_PHONE_TEL = 'tel:+919711104186'
@@ -44,7 +50,7 @@ function scrollToRegistration(event) {
     <!-- Vendor CTA — Figma Frame 696:4084 -->
     <div class="mx-auto w-[94%] max-w-[1280px] pb-14 pt-10 md:pb-16 md:pt-12">
       <div
-        class="relative mx-auto h-[280px] w-full max-w-[1261px] overflow-hidden rounded-tl-[56px] rounded-tr-[10px] rounded-br-[10px] rounded-bl-[10px] sm:h-[360px] md:h-[456px] md:rounded-tl-[100px]"
+        class="relative mx-auto min-h-[360px] w-full max-w-[1261px] overflow-hidden rounded-tl-[72px] rounded-tr-[10px] rounded-br-[10px] rounded-bl-[10px] sm:min-h-[380px] md:h-[456px] md:rounded-tl-[100px]"
       >
         <img
           :src="CTA_BG"
@@ -60,10 +66,50 @@ function scrollToRegistration(event) {
           aria-hidden="true"
         />
 
+        <!-- Mobile (Figma) -->
         <div
-          class="relative z-10 flex h-full flex-col justify-center gap-10 px-6 py-10 sm:px-10 md:flex-row md:items-center md:gap-12 md:px-14 lg:px-16"
+          class="relative z-10 flex min-h-[360px] flex-col md:hidden"
         >
-          <!-- Left -->
+          <div class="flex flex-1 flex-col items-center justify-center px-5 py-8 text-center">
+            <p class="font-plein text-[14px] font-bold leading-[130%] tracking-[0] text-[#F76517]">
+              Welcome
+            </p>
+
+            <h2
+              class="mt-2 font-plein text-[22px] font-bold leading-[125%] tracking-[0] text-white"
+            >
+              Your Group Travel Business
+              <br>
+              With PirTrip
+            </h2>
+
+            <a
+              href="#get-started"
+              class="mt-5 inline-flex h-[48px] w-full max-w-[300px] items-center justify-center rounded-full bg-white px-6 font-plein text-[15px] font-bold leading-[130%] tracking-[0] text-black no-underline transition-opacity hover:opacity-90"
+              @click="scrollToRegistration"
+            >
+              Join Traveler Waitlist
+            </a>
+          </div>
+
+          <div
+            class="flex items-stretch border-t border-white/10 px-2 py-4"
+          >
+            <p
+              v-for="(feature, index) in mobileCtaFeatures"
+              :key="feature"
+              class="flex flex-1 items-center justify-center px-1 text-center font-plein text-[10px] font-normal leading-[130%] tracking-[0] text-white"
+              :class="index > 0 ? 'border-l border-[#F76517]' : ''"
+            >
+              {{ feature }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Desktop -->
+        <div
+          class="relative z-10 hidden h-full flex-col justify-center gap-10 px-6 py-10 sm:px-10 md:flex md:flex-row md:items-center md:gap-12 md:px-14 lg:px-16"
+        >
           <div class="max-w-[620px] text-left">
             <p class="font-plein text-[16px] font-bold leading-[130%] tracking-[0] text-[#F76517] md:text-[18px]">
               Let's Grow
@@ -89,7 +135,6 @@ function scrollToRegistration(event) {
             </a>
           </div>
 
-          <!-- Right -->
           <div
             class="flex items-stretch gap-6 md:ml-auto md:min-w-[240px] md:gap-8 lg:min-w-[280px]"
           >

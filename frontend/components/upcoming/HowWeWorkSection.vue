@@ -114,15 +114,15 @@ onUnmounted(() => {
     class="bg-white py-8 lg:py-0"
     aria-labelledby="how-we-work-heading"
   >
-    <div class="mx-auto w-[94%] max-w-[820px] lg:max-w-none lg:w-full">
+    <div class="mx-auto w-[92%] max-w-[820px] sm:w-[94%] lg:max-w-none lg:w-full">
       <header class="text-center lg:px-6 lg:pt-10 lg:pb-4">
-        <p class="font-plein text-[20px] font-bold leading-[130%] tracking-[0] text-[#F76517] md:text-[22px]">
+        <p class="font-plein text-[14px] font-bold leading-[130%] tracking-[0] text-[#F76517] sm:text-[18px] md:text-[22px]">
           How We Work?
         </p>
 
         <h2
           id="how-we-work-heading"
-          class="mt-1.5 font-plein text-[28px] font-bold leading-[130%] tracking-[0] text-black md:text-[30px]"
+          class="mx-auto mt-1.5 max-w-[18em] font-plein text-[20px] font-bold leading-[125%] tracking-[0] text-black sm:max-w-none sm:text-[24px] md:text-[30px]"
         >
           Simple. Transparent. Business Friendly.
         </h2>
@@ -202,8 +202,11 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- Mobile -->
-      <ol class="mt-8 flex flex-col gap-4 lg:hidden">
+      <!-- Mobile — vertical timeline -->
+      <ol
+        class="how-we-work-mobile-timeline relative mt-6 flex flex-col pb-2 lg:hidden"
+        aria-label="How we work steps"
+      >
         <li
           v-for="(step, index) in stepsList"
           :key="step.number"
@@ -214,7 +217,8 @@ onUnmounted(() => {
         >
           <UpcomingHowWeWorkStep
             v-bind="step"
-            variant="card"
+            variant="timeline"
+            :is-last="index === stepsList.length - 1"
           />
         </li>
       </ol>
@@ -224,6 +228,26 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+/* Center line on timeline column (col1 + gap-x-2.5 + half of 24px rail) */
+.how-we-work-mobile-timeline::before {
+  content: '';
+  position: absolute;
+  left: calc(96px + 0.625rem + 12px);
+  top: 1.25rem;
+  bottom: 1.25rem;
+  width: 1px;
+  transform: translateX(-50%);
+  background-color: #d9d9d9;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@media (min-width: 640px) {
+  .how-we-work-mobile-timeline::before {
+    left: calc(104px + 0.75rem + 14px);
+  }
+}
+
 .how-we-work-bg {
   opacity: 0;
   transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1);
