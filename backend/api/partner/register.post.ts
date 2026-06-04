@@ -1,5 +1,6 @@
 import { partnerRegistrationSchema } from '~/lib/validation'
 import { normalizePhone } from '~/lib/phone'
+import { insertPartnerLead } from '~/lib/partner-lead-insert'
 
 export default defineEventHandler(async (event) => {
   const user = await requireAuth(event)
@@ -38,26 +39,22 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { data: lead, error: leadError } = await admin
-    .from('partner_leads')
-    .insert({
-      auth_user_id: user.id,
-      first_name: parsed.data.firstName.trim(),
-      last_name: parsed.data.lastName.trim(),
-      business_name: parsed.data.businessName.trim(),
-      phone,
-      email: parsed.data.email?.trim() || null,
-      otp_verified: true,
-      source_page: 'become-a-partner',
-      status: 'NEW',
-    })
-    .select()
-    .single()
+  const { data: lead, error: leadError } = await insertPartnerLead(admin, {
+    firstName: parsed.data.firstName,
+    lastName: parsed.data.lastName,
+    businessName: parsed.data.businessName,
+    phone,
+    email: parsed.data.email?.trim() || null,
+    otpVerified: true,
+    authUserId: user.id,
+  })
 
-  if (leadError) {
+  if (leadError || !lead) {
+    const msg = leadError?.message ?? 'Failed to save registration'
     throw createError({
       statusCode: 500,
-      statusMessage: leadError.message,
+      statusMessage: msg,
+      message: msg,
     })
   }
 

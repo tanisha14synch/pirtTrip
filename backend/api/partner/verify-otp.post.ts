@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { verifyEmailOtp } from '~/lib/email-otp-service'
 import { partnerRegistrationSchema } from '~/lib/validation'
 import { normalizePhone } from '~/lib/phone'
+import { insertPartnerLead } from '~/lib/partner-lead-insert'
 
 const bodySchema = partnerRegistrationSchema.extend({
   code: z.string().regex(/^\d{6}$/, 'Enter the 6-digit code from your email'),
@@ -44,23 +45,22 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { data: lead, error: leadError } = await admin
-    .from('partner_leads')
-    .insert({
-      first_name: parsed.data.firstName.trim(),
-      last_name: parsed.data.lastName.trim(),
-      business_name: parsed.data.businessName.trim(),
-      phone,
-      email,
-      otp_verified: true,
-      source_page: 'become-a-partner',
-      status: 'NEW',
-    })
-    .select()
-    .single()
+  const { data: lead, error: leadError } = await insertPartnerLead(admin, {
+    firstName: parsed.data.firstName,
+    lastName: parsed.data.lastName,
+    businessName: parsed.data.businessName,
+    phone,
+    email,
+    otpVerified: true,
+  })
 
-  if (leadError) {
-    throw createError({ statusCode: 500, statusMessage: leadError.message })
+  if (leadError || !lead) {
+    const msg = leadError?.message ?? 'Failed to save registration'
+    throw createError({
+      statusCode: 500,
+      statusMessage: msg,
+      message: msg,
+    })
   }
 
   await admin.from('otp_logs').insert({

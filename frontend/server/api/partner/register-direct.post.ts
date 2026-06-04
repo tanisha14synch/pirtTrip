@@ -2,6 +2,8 @@ import { partnerRegistrationSchema } from '~/utils/validation'
 import { normalizePhone } from '~/utils/phone'
 import { proxyApiToBackend, shouldHandleWithLocalSupabase } from '../../utils/api-proxy'
 import { getSupabaseAdmin } from '../../utils/supabase-admin'
+import { insertPartnerLead } from '../../utils/partner-lead-insert'
+import { logPartnerRegistrationSideEffects } from '../../utils/partner-registration-logs'
 
 export default defineEventHandler(async (event) => {
   if (!shouldHandleWithLocalSupabase()) {
@@ -30,8 +32,6 @@ export default defineEventHandler(async (event) => {
   }
 
   const email = parsed.data.email?.trim().toLowerCase() || null
-  const businessName = parsed.data.businessName.trim()
-  const notes = parsed.data.whatsappOptIn ? 'WhatsApp updates: opted in' : null
   const admin = getSupabaseAdmin()
 
   const { data: existing } = await admin
@@ -47,42 +47,28 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { data: lead, error: leadError } = await admin
-    .from('partner_leads')
-    .insert({
-      first_name: parsed.data.firstName.trim(),
-      last_name: parsed.data.lastName.trim(),
-      business_name: businessName,
-      phone,
-      email,
-      notes,
-      otp_verified: false,
-      source_page: 'become-a-partner',
-      status: 'NEW',
-    })
-    .select()
-    .single()
+  const { data: lead, error: leadError } = await insertPartnerLead(admin, {
+    firstName: parsed.data.firstName,
+    lastName: parsed.data.lastName,
+    businessName: parsed.data.businessName,
+    phone,
+    email,
+    whatsappOptIn: parsed.data.whatsappOptIn,
+  })
 
-  if (leadError) {
-    const msg = leadError.message.includes('partner_leads')
-      ? 'Partner table missing: run supabase/migrations/20250601000001_initial_schema.sql in Supabase SQL Editor.'
-      : leadError.message
-    throw createError({ statusCode: 500, statusMessage: msg })
+  if (leadError || !lead) {
+    const msg = leadError?.message ?? 'Failed to save registration'
+    const hint = msg.toLowerCase().includes('business_name')
+      ? ' Run supabase/QUICK_FIX_partner_business_name.sql in Supabase SQL Editor.'
+      : ''
+    throw createError({
+      statusCode: 500,
+      statusMessage: `${msg}${hint}`,
+      message: `${msg}${hint}`,
+    })
   }
 
-  await admin.from('otp_logs').insert({
-    phone,
-    verified_at: null,
-    is_verified: false,
-  }).catch(() => {})
-
-  await admin.from('lead_activity_logs').insert({
-    lead_id: lead.id,
-    action: 'LEAD_CREATED',
-    old_value: null,
-    new_value: 'NEW',
-    admin_id: null,
-  }).catch(() => {})
+  await logPartnerRegistrationSideEffects(admin, lead.id, phone)
 
   return { success: true, lead }
 })

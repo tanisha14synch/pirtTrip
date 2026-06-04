@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS public.partner_leads (
   auth_user_id UUID REFERENCES auth.users (id) ON DELETE SET NULL,
   first_name TEXT NOT NULL,
   last_name TEXT NOT NULL,
+  business_name TEXT,
   phone TEXT NOT NULL,
   email TEXT,
   otp_verified BOOLEAN NOT NULL DEFAULT FALSE,
