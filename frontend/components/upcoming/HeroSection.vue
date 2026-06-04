@@ -105,10 +105,10 @@ onUnmounted(() => {
       aria-hidden="true"
     >
 
-    <div class="hero-content relative z-10 mx-auto flex w-[94%] max-w-[1280px] flex-1 flex-col pb-8 md:pb-10 lg:pb-12">
+    <div class="hero-inner relative z-10 mx-auto flex w-[94%] max-w-[1280px] flex-1 flex-col pb-8 md:pb-10">
       <!-- Launch header: logo | countdown | contact -->
       <header
-        class="flex flex-col gap-3 border-b border-white/5 pb-3 sm:gap-4 sm:pb-4 md:gap-5 lg:flex-row lg:items-center lg:justify-between lg:gap-6 xl:gap-8"
+        class="flex flex-col gap-4 border-b border-white/5 pb-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6"
       >
         <a
           v-if="homeIsExternal"
@@ -119,7 +119,7 @@ onUnmounted(() => {
           <img
             src="/images/logo.svg"
             alt="PirtTrip"
-            class="h-8 w-auto object-contain sm:h-9 md:h-10 lg:h-11 xl:h-12"
+            class="h-9 w-auto object-contain sm:h-10"
             width="584"
             height="192"
           >
@@ -133,7 +133,7 @@ onUnmounted(() => {
           <img
             src="/images/logo.svg"
             alt="PirtTrip"
-            class="h-8 w-auto object-contain sm:h-9 md:h-10 lg:h-11 xl:h-12"
+            class="h-8 w-auto object-contain sm:h-9"
             width="584"
             height="192"
           >
@@ -144,12 +144,12 @@ onUnmounted(() => {
         >
           <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
             <p
-              class="shrink-0 font-plein text-sm font-normal leading-snug text-white md:text-base lg:text-lg"
+              class="shrink-0 font-plein text-[13px] font-normal leading-[135%] tracking-[0] text-white sm:text-[14px]"
             >
               We are launching Soon!
             </p>
 
-            <div class="flex gap-1.5 sm:gap-2 md:gap-2.5">
+            <div class="flex gap-1.5">
               <div
                 v-for="unit in [
                   { label: 'DAYS', value: timeLeft.days },
@@ -158,13 +158,13 @@ onUnmounted(() => {
                   { label: 'SECS', value: timeLeft.seconds },
                 ]"
                 :key="unit.label"
-                class="hero-countdown-unit flex min-w-10 flex-col items-center justify-center rounded-md bg-white px-2 py-1.5 sm:min-w-11 md:min-w-12 md:px-2.5 md:py-2 lg:min-w-[3.25rem] xl:min-w-14"
+                class="flex min-w-[42px] flex-col items-center justify-center rounded-[5px] bg-white px-2 py-1.5 sm:min-w-[46px]"
               >
-                <span class="font-plein text-base font-bold leading-none text-black sm:text-lg md:text-xl lg:text-2xl">
+                <span class="font-plein text-[15px] font-bold leading-none text-black sm:text-[16px]">
                   {{ pad(unit.value) }}
                 </span>
                 <span
-                  class="mt-0.5 font-plein text-[10px] font-medium uppercase leading-none tracking-wide text-black/65 sm:text-xs md:text-sm"
+                  class="mt-0.5 font-plein text-[8px] font-medium uppercase leading-none tracking-[0.02em] text-black/65 sm:text-[9px]"
                 >
                   {{ unit.label }}
                 </span>
@@ -173,11 +173,11 @@ onUnmounted(() => {
           </div>
 
           <span
-            class="hidden h-8 w-px shrink-0 bg-white/35 sm:block md:h-10 lg:h-12"
+            class="hidden h-9 w-px shrink-0 bg-white/35 sm:block"
             aria-hidden="true"
           />
 
-          <div class="font-plein text-sm font-normal leading-snug text-white md:text-base lg:text-lg">
+          <div class="font-plein text-[13px] font-normal leading-[135%] tracking-[0] text-white sm:text-[14px]">
             <p>For any information, contact Business Support</p>
             <p class="mt-0.5">
               at:
@@ -196,45 +196,50 @@ onUnmounted(() => {
         </div>
       </header>
 
-      <div class="hero-main relative mt-4 flex flex-1 flex-col sm:mt-5 md:mt-6 lg:mt-8">
+      <div class="hero-main hero-main--fill relative min-h-0 flex-1">
         <!-- Hero body -->
-        <div class="hero-body-stage relative z-10 flex flex-1 flex-col justify-center">
+        <div class="hero-body-stage hero-body-stage--fill relative z-10">
         <div
           id="partner-registration"
-          class="grid scroll-mt-6 grid-cols-1 items-start gap-5 sm:gap-6 md:gap-7 lg:grid-cols-2 lg:gap-8 xl:gap-10 2xl:gap-12"
+          class="grid scroll-mt-6 grid-cols-1 items-start gap-6 lg:grid-cols-2 lg:gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(520px,640px)] xl:gap-10"
         >
-        <article class="max-w-xl lg:max-w-2xl">
-            <p class="font-plein text-sm font-normal leading-snug text-white md:text-base lg:text-lg xl:text-xl">
+        <article class="max-w-[580px] lg:pt-1 xl:max-w-[500px]">
+            <p class="font-plein text-[14px] font-normal leading-[135%] tracking-[0] text-white">
               Lets Grow Your Travel Business with
               <span class="text-brand-gold font-bold">PirtTrip</span>
             </p>
 
             <h1
-              class="mt-2 font-plein text-2xl font-bold leading-tight text-white sm:mt-3 sm:text-3xl md:text-4xl lg:text-5xl xl:text-[3.25rem] 2xl:text-6xl"
+              class="mt-3 font-plein text-[28px] font-bold leading-[118%] tracking-[0] text-white sm:text-[34px] md:text-[38px] lg:text-[40px]"
             >
              Running Your Travel Business All Alone?
             </h1>
 
             <p
-              class="mt-2 max-w-xl font-plein text-sm font-normal leading-snug text-white/85 sm:mt-3 md:text-base lg:text-lg xl:text-xl 2xl:max-w-2xl"
+              class="mt-3 max-w-[480px] font-plein text-[14px] font-normal leading-[135%] tracking-[0] text-white/85"
             >
             Let us contribute a small effort to help your
             business reach more travelers.
             </p>
           </article>
 
-        <PartnerRegistrationForm class="hero-form w-full lg:ml-auto lg:max-w-xl xl:max-w-2xl" />
+        <PartnerRegistrationForm class="w-full lg:ml-auto" />
         </div>
         </div>
 
+        <div
+          class="hero-spacer min-h-0 flex-1"
+          aria-hidden="true"
+        />
+
       <!-- Feature cards -->
-      <div class="hero-feature-cards relative z-10 mt-4 flex flex-wrap justify-center gap-2 sm:mt-5 sm:gap-3 md:gap-4 lg:mt-auto lg:flex-nowrap lg:gap-5 xl:gap-6">
+      <div class="hero-feature-cards relative z-10 flex shrink-0 flex-wrap justify-center gap-2.5 sm:gap-3 xl:flex-nowrap xl:gap-3.5 mt-10">
         <img
           v-for="card in featureCards"
           :key="card.id"
           :src="card.src"
           :alt="card.alt"
-          class="hero-vendor-card h-16 w-[calc(50%-4px)] max-w-[9rem] shrink-0 rounded-xl object-contain sm:h-20 sm:max-w-[10rem] md:h-24 md:max-w-[11rem] lg:h-28 lg:max-w-xs xl:h-32 xl:max-w-sm 2xl:h-36 2xl:max-w-md"
+          class="h-auto min-h-[84px] w-[calc(80%-6px)] max-w-[172px] shrink-0 rounded-[12px] object-contain sm:min-h-[92px] sm:max-w-[188px] md:max-w-[200px] xl:h-[112px] xl:w-[220px] xl:max-w-[250px] xl:min-h-0"
           loading="lazy"
           draggable="false"
         >
@@ -252,47 +257,37 @@ onUnmounted(() => {
   min-height: 100svh;
 }
 
+.hero-inner {
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
 .hero-bg-media {
   min-height: 100%;
   min-width: 100%;
 }
 
-.hero-main {
+/* Shorter than viewport: top margin pushes content down; spacer pins cards to the bottom */
+.hero-main--fill {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  margin-top: clamp(2rem, 10vh, 7rem);
   isolation: isolate;
 }
 
-.hero-body-stage {
+.hero-body-stage--fill {
+  flex: 0 0 auto;
+}
+
+.hero-spacer {
+  flex: 1 1 auto;
   min-height: 0;
 }
 
-/* Scale typography & cards on tall viewports (extra space inside 100vh) */
-@media (min-height: 820px) and (min-width: 1024px) {
-  .hero-content {
-    padding-bottom: clamp(2rem, 4vh, 3.5rem);
-  }
-
-  .hero-countdown-unit {
-    min-width: clamp(3rem, 5vw, 4.5rem);
-    padding: clamp(0.5rem, 1vh, 0.75rem) clamp(0.5rem, 1.2vw, 0.875rem);
-  }
-
-  .hero-vendor-card {
-    height: clamp(6.5rem, 12vh, 10rem);
-    max-width: clamp(10rem, 14vw, 15rem);
-  }
-}
-
-@media (min-height: 960px) and (min-width: 1280px) {
-  .hero-vendor-card {
-    height: clamp(7.5rem, 14vh, 11.5rem);
-    max-width: clamp(11rem, 15vw, 17rem);
-  }
-}
-
-@media (min-height: 820px) and (min-width: 1024px) {
-  .hero-form {
-    max-width: clamp(28rem, 36vw, 40rem);
-  }
+.hero-feature-cards {
+  flex: 0 0 auto;
 }
 
 .hero-floating-card {
@@ -318,7 +313,7 @@ onUnmounted(() => {
   display: block;
   margin: 0;
   padding: 0;
-  height: clamp(9rem, 18vh, 14rem);
+  height: clamp(11rem, 20vh, 15rem);
   width: auto;
   object-position: right center;
   transform: translateY(-50%);
@@ -329,13 +324,13 @@ onUnmounted(() => {
 /* Left — floating, bottom-left corner (image is pre-tilted) */
 .hero-floating-card--bottom {
   position: absolute;
-  bottom: clamp(0.75rem, 2vh, 1.5rem);
+  bottom: 1.25rem;
   left: 0;
   z-index: 2;
   display: block;
   margin: 0;
   padding: 0;
-  height: clamp(8rem, 15vh, 12rem);
+  height: clamp(10rem, 17vh, 13rem);
   width: auto;
   object-fit: contain;
   object-position: left bottom;
@@ -368,42 +363,22 @@ onUnmounted(() => {
 @media (min-width: 1024px) {
   .hero-floating-card--middle {
     top: 60%;
-    height: clamp(12rem, 22vh, 18rem);
+    height: 20rem;
   }
 
   .hero-floating-card--bottom {
-    height: clamp(10rem, 18vh, 15rem);
+    height: 12.5rem;
   }
 }
 
 @media (min-width: 1280px) {
   .hero-floating-card--middle {
     top: 62%;
-    height: clamp(14rem, 24vh, 20rem);
+    height: 15.5rem;
   }
 
   .hero-floating-card--bottom {
-    height: clamp(11rem, 20vh, 17rem);
-  }
-}
-
-@media (min-height: 820px) and (min-width: 1024px) {
-  .hero-floating-card--middle {
-    height: clamp(15rem, 26vh, 22rem);
-  }
-
-  .hero-floating-card--bottom {
-    height: clamp(12rem, 22vh, 18rem);
-  }
-}
-
-@media (min-height: 960px) and (min-width: 1280px) {
-  .hero-floating-card--middle {
-    height: clamp(17rem, 28vh, 24rem);
-  }
-
-  .hero-floating-card--bottom {
-    height: clamp(14rem, 24vh, 20rem);
+    height: 13.5rem;
   }
 }
 
