@@ -29,7 +29,10 @@ Browser → https://your-app.up.railway.app/          (Nuxt frontend)
    | `SUPABASE_URL` | Required |
    | `SUPABASE_ANON_KEY` | Required |
    | `SUPABASE_SERVICE_ROLE_KEY` | Required |
-   | `OTP_SECRET` | Required (32+ chars) |
+   | `OTP_SECRET` | Required (32+ chars); falls back to `SUPABASE_SERVICE_ROLE_KEY` if unset |
+   | `AQUASMS_API_KEY` | Partner registration SMS OTP |
+   | `AQUASMS_USERNAME` | `pirttrip` |
+   | `AQUASMS_SENDER_NAME` | `MARSTP` |
    | `RESEND_API_KEY` | Email OTP |
    | `EMAIL_FROM` | With Resend |
    | `HOST` | `0.0.0.0` (optional; Nitro respects it) |

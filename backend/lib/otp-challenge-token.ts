@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto'
 import type { OtpPurpose } from './otp'
 import { canResendOtp, hashOtpCode, OTP_LIMITS } from './otp'
 import { getSupabaseAdmin } from './supabase'
+import { getOtpSigningSecret } from './runtime-env'
 
 export type OtpChallengePayload = {
   id: string
@@ -11,8 +12,7 @@ export type OtpChallengePayload = {
 }
 
 function getSecret(): string {
-  const config = useRuntimeConfig()
-  const secret = config.otpSecret || config.supabaseServiceRoleKey
+  const secret = getOtpSigningSecret()
   if (!secret) {
     throw createError({
       statusCode: 500,

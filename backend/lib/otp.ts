@@ -1,4 +1,5 @@
 import { createHmac, randomInt, timingSafeEqual } from 'node:crypto'
+import { getOtpSigningSecret } from './runtime-env'
 
 const OTP_LENGTH = 6
 const OTP_TTL_MS = 10 * 60 * 1000 // 10 minutes
@@ -10,12 +11,13 @@ const MAX_VERIFY_ATTEMPTS = 5
 export type OtpPurpose = 'waitlist' | 'admin_login' | 'partner_registration'
 
 function getOtpSecret(): string {
-  const config = useRuntimeConfig()
-  const secret = config.otpSecret || config.supabaseServiceRoleKey
+  const secret = getOtpSigningSecret()
   if (!secret) {
     throw createError({
       statusCode: 500,
-      statusMessage: 'OTP secret is not configured',
+      statusMessage:
+        'OTP secret is not configured. Set OTP_SECRET (or SUPABASE_SERVICE_ROLE_KEY) on the Railway backend service.',
+      data: { code: 'OTP_SECRET_MISSING' },
     })
   }
   return secret
