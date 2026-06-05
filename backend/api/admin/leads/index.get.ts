@@ -1,4 +1,5 @@
 import type { LeadStatus } from '~/types/database'
+import { getSupabaseAdmin, requireAdminWith2fa } from '~/lib/supabase'
 
 export default defineEventHandler(async (event) => {
   await requireAdminWith2fa(event)

@@ -1,3 +1,9 @@
+import {
+  fetchAdminUserProfile,
+  isAdmin2faVerified,
+  requireAdmin,
+} from '~/lib/supabase'
+
 export default defineEventHandler(async (event) => {
   const user = await requireAdmin(event)
 
@@ -9,15 +15,9 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const admin = getSupabaseAdmin()
+  const data = await fetchAdminUserProfile(user)
 
-  const { data, error } = await admin
-    .from('admin_users')
-    .select('id, full_name, email, role, created_at')
-    .eq('id', user.id)
-    .single()
-
-  if (error || !data) {
+  if (!data) {
     throw createError({ statusCode: 403, statusMessage: 'Admin profile not found' })
   }
 

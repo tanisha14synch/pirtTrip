@@ -1,11 +1,10 @@
 import { z } from 'zod'
+import { phoneLocalDigits, sendAdminPhoneOtp } from '~/lib/admin-auth-phone'
 import { assertOtpSendRateLimit } from '~/lib/otp-ip-rate-limit'
-import { createAndSendOtp } from '~/lib/email-otp-service'
-import { getSupabaseAdmin } from '~/lib/supabase'
 import { zodErrorMessage } from '~/lib/validation'
 
 const bodySchema = z.object({
-  email: z.string().trim().email('Enter a valid admin email'),
+  phone: z.string().trim().min(10, 'Enter a valid 10-digit mobile number'),
   challengeToken: z.string().optional(),
 })
 
@@ -17,37 +16,22 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 400,
       statusMessage: zodErrorMessage(parsed.error),
-      data: { code: 'INVALID_EMAIL' },
+      data: { code: 'INVALID_PHONE' },
     })
   }
 
-  const email = parsed.data.email.toLowerCase()
-  assertOtpSendRateLimit(event, email)
+  const phoneKey = phoneLocalDigits(parsed.data.phone)
+  assertOtpSendRateLimit(event, `admin:${phoneKey}`)
 
-  const admin = getSupabaseAdmin()
-  const { data: adminUser } = await admin
-    .from('admin_users')
-    .select('id, email')
-    .eq('email', email)
-    .maybeSingle()
-
-  if (!adminUser) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'This email is not authorized for admin access.',
-      data: { code: 'ADMIN_NOT_AUTHORIZED' },
-    })
-  }
-
-  const result = await createAndSendOtp({
-    email,
-    purpose: 'admin_login',
+  const result = await sendAdminPhoneOtp({
+    phone: parsed.data.phone,
     challengeToken: parsed.data.challengeToken,
   })
 
   return {
     success: true,
-    email,
+    phone: result.phone,
+    phoneMasked: result.phoneMasked,
     challengeToken: result.challengeToken,
     expiresInSeconds: result.expiresInSeconds,
     resendCooldownSeconds: result.resendCooldownSeconds,

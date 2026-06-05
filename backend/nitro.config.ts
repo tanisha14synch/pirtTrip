@@ -32,8 +32,11 @@ export default defineNitroConfig({
     smtpUser: process.env.SMTP_USER || '',
     smtpPass: process.env.SMTP_PASS || '',
     public: {
-      supabaseUrl: '',
-      supabaseAnonKey: '',
+      supabaseUrl: process.env.SUPABASE_URL || process.env.NUXT_PUBLIC_SUPABASE_URL || '',
+      supabaseAnonKey:
+        process.env.SUPABASE_ANON_KEY
+        || process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY
+        || '',
     },
   },
   alias: {

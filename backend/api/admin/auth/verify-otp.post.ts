@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { logAdminAction, recordAdminSession } from '~/lib/admin-audit'
 import { verifyEmailOtp } from '~/lib/email-otp-service'
+import { getSupabaseAdmin, requireAdmin } from '~/lib/supabase'
 import { zodErrorMessage } from '~/lib/validation'
 
 const bodySchema = z.object({

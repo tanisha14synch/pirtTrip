@@ -1,5 +1,6 @@
 import { logAdminAction } from '~/lib/admin-audit'
 import { clearStalePartnerOtpSessions } from '~/lib/partner-registration-otp'
+import { getSupabaseAdmin, requireAdminWith2fa } from '~/lib/supabase'
 
 export default defineEventHandler(async (event) => {
   const adminUser = await requireAdminWith2fa(event)

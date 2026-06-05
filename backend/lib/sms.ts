@@ -15,6 +15,10 @@ export function buildPartnerOtpSmsMessage(code: string): string {
   return `Your login verification OTP For PirtTrip is ${code}. This code is valid for 5 minutes. MARTYRS SERVICES Website : business.pirttrip.com`
 }
 
+export function buildAdminLoginOtpSmsMessage(code: string): string {
+  return `Your login verification OTP For PirtTrip is ${code}. This code is valid for 10 minutes. MARTYRS SERVICES Website : business.pirttrip.com`
+}
+
 export function buildPartnerRegistrationThankYouMessage(): string {
   return 'Thank you for registering on PirtTrip Business! We are launching soon. For queries: contact@pirttrip.com by MARTYRS SERVICES'
 }

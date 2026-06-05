@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { createAndSendOtp } from '~/lib/email-otp-service'
+import { requireAdmin } from '~/lib/supabase'
 
 const bodySchema = z.object({
   challengeToken: z.string().optional(),

@@ -1,5 +1,6 @@
 import type { LeadStatus } from '~/types/database'
 import { logAdminAction } from '~/lib/admin-audit'
+import { getSupabaseAdmin, requireAdminWith2fa } from '~/lib/supabase'
 
 function escapeCsv(value: unknown): string {
   const str = value == null ? '' : String(value)

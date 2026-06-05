@@ -1,6 +1,7 @@
 import { partnerRegistrationSchema } from '~/lib/validation'
 import { normalizePhone } from '~/lib/phone'
 import { insertPartnerLead } from '~/lib/partner-lead-insert'
+import { getSupabaseAdmin, requireAuth } from '~/lib/supabase'
 
 export default defineEventHandler(async (event) => {
   const user = await requireAuth(event)

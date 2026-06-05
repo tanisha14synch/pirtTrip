@@ -1,4 +1,5 @@
 import { logAdminAction } from '~/lib/admin-audit'
+import { getSupabaseAdmin, requireAdminWith2fa } from '~/lib/supabase'
 import { leadUpdateSchema, zodErrorMessage } from '~/lib/validation'
 
 export default defineEventHandler(async (event) => {

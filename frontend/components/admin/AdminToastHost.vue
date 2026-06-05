@@ -1,11 +1,11 @@
 <script setup>
-const toast = useAdminToast()
+const { toasts } = useAdminToast()
 </script>
 
 <template>
   <div class="pointer-events-none fixed bottom-4 right-4 z-[100] flex w-full max-w-sm flex-col gap-2">
     <div
-      v-for="item in toast.toasts.value"
+      v-for="item in toasts"
       :key="item.id"
       class="pointer-events-auto rounded-lg border px-4 py-3 text-sm shadow-lg"
       :class="{
