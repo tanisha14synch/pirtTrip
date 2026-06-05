@@ -31,12 +31,6 @@ const ctaHighlights = [
   'Strengthen Your Brand & Increase Visibility',
 ]
 
-const mobileCtaFeatures = [
-  'Compare experiences',
-  'Discover upcoming group trips',
-  'Explore destinations',
-]
-
 const CONTACT_EMAIL = 'contact@pirttrip.com'
 const CONTACT_PHONE_DISPLAY = '+91-9711104186'
 const CONTACT_PHONE_TEL = 'tel:+919711104186'
@@ -76,8 +70,8 @@ function handleCtaClick(event) {
   scrollToRegistration(event)
 }
 
-const mobileCtaLabel = computed(() =>
-  props.ctaMode === 'waitlist' ? 'Join Traveler Waitlist' : 'Join Business',
+const ctaButtonLabel = computed(() =>
+  props.ctaMode === 'waitlist' ? 'Join Traveler Waitlist' : 'Join as Business',
 )
 </script>
 
@@ -102,88 +96,47 @@ const mobileCtaLabel = computed(() =>
           aria-hidden="true"
         />
 
-        <!-- Mobile (Figma) -->
         <div
-          class="relative z-10 flex min-h-[360px] flex-col md:hidden"
+          class="relative z-10 flex min-h-[360px] flex-col items-center justify-center gap-8 px-5 py-8 text-center sm:px-10 md:h-full md:flex-row md:items-center md:gap-12 md:px-14 md:text-left lg:px-16"
         >
-          <div class="flex flex-1 flex-col items-center justify-center px-5 py-8 text-center">
-            <p class="font-plein text-[14px] font-bold leading-[130%] tracking-[0] text-[#F76517]">
-              Welcome
-            </p>
-
-            <h2
-              class="mt-2 font-plein text-[22px] font-bold leading-[125%] tracking-[0] text-white"
-            >
-              Your Group Travel Business
-              <br>
-              With PirTrip
-            </h2>
-
-            <a
-              href="#get-started"
-              class="mt-5 inline-flex h-[48px] w-full max-w-[300px] items-center justify-center rounded-full bg-white px-6 font-plein text-[15px] font-bold leading-[130%] tracking-[0] text-black no-underline transition-opacity hover:opacity-90"
-              @click="handleCtaClick"
-            >
-              {{ mobileCtaLabel }}
-            </a>
-          </div>
-
-          <div
-            class="flex items-stretch border-t border-white/10 px-2 py-4"
-          >
-            <p
-              v-for="(feature, index) in mobileCtaFeatures"
-              :key="feature"
-              class="flex flex-1 items-center justify-center px-1 text-center font-plein text-[10px] font-normal leading-[130%] tracking-[0] text-white"
-              :class="index > 0 ? 'border-l border-[#F76517]' : ''"
-            >
-              {{ feature }}
-            </p>
-          </div>
-        </div>
-
-        <!-- Desktop -->
-        <div
-          class="relative z-10 hidden h-full flex-col justify-center gap-10 px-6 py-10 sm:px-10 md:flex md:flex-row md:items-center md:gap-12 md:px-14 lg:px-16"
-        >
-          <div class="max-w-[620px] text-left">
-            <p class="font-plein text-[16px] font-bold leading-[130%] tracking-[0] text-[#F76517] md:text-[18px]">
+          <div class="w-full max-w-[620px]">
+            <p class="font-plein text-[14px] font-bold leading-[130%] tracking-[0] text-[#F76517] sm:text-[16px] md:text-[18px]">
               Let's Grow
             </p>
 
             <h2
-              class="mt-3 font-plein text-[28px] font-bold leading-[130%] tracking-[0] text-white sm:text-[34px] md:text-[40px] lg:text-[44px]"
+              class="mt-2 font-plein text-[22px] font-bold leading-[130%] tracking-[0] text-white sm:mt-3 sm:text-[34px] md:text-[40px] lg:text-[44px]"
             >
               Lets Grow Your Travel Business with
               <span class="text-[#F3A81A]">PirtTrip!</span>
             </h2>
 
-            <p class="mt-4 font-plein text-[18px] font-bold leading-[140%] tracking-[0] text-white sm:text-[20px] md:text-[22px]">
+            <p class="mt-3 font-plein text-[15px] font-bold leading-[140%] tracking-[0] text-white sm:mt-4 sm:text-[20px] md:text-[22px]">
               Register Today &amp; Get 20 CONNECT CREDITs for FREE.
             </p>
 
             <a
               href="#get-started"
-              class="mt-7 inline-flex h-[50px] min-w-[220px] items-center justify-center rounded-full bg-white px-8 font-plein text-[16px] font-bold leading-[130%] tracking-[0] text-black no-underline transition-opacity hover:opacity-90"
+              class="mx-auto mt-5 inline-flex h-[48px] w-full max-w-[300px] items-center justify-center rounded-full bg-white px-6 font-plein text-[15px] font-bold leading-[130%] tracking-[0] text-black no-underline transition-opacity hover:opacity-90 sm:mt-7 sm:h-[50px] sm:w-auto sm:min-w-[220px] sm:px-8 sm:text-[16px] md:mx-0"
               @click="handleCtaClick"
             >
-              Join as Business
+              {{ ctaButtonLabel }}
             </a>
           </div>
 
           <div
-            class="flex items-stretch gap-6 md:ml-auto md:min-w-[240px] md:gap-8 lg:min-w-[280px]"
+            class="mx-auto flex w-fit items-stretch gap-4 sm:gap-6 md:ml-auto md:min-w-[240px] md:gap-8 lg:min-w-[280px]"
           >
             <div
               class="w-[3px] shrink-0 rounded-full bg-[#F76517]"
               aria-hidden="true"
             />
 
-            <ul class="flex flex-col justify-center gap-4 py-1">
+            <ul class="flex flex-col items-center justify-center gap-3 py-1 sm:gap-4 md:items-start">
               <li
                 v-for="item in ctaHighlights"
                 :key="item"
-                class="font-plein text-[16px] font-normal leading-[140%] tracking-[0] text-white md:text-[18px]"
+                class="font-plein text-[14px] font-normal leading-[140%] tracking-[0] text-white sm:text-[16px] md:text-[18px]"
               >
                 {{ item }}
               </li>
