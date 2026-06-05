@@ -27,7 +27,7 @@ const inputClass =
 const linkClass =
   'text-[#F3A81A] underline decoration-[#F3A81A]/40 underline-offset-2 hover:decoration-[#F3A81A]'
 
-const PHONE_ALLOWED_KEYS = new Set([
+const EDITING_KEYS = new Set([
   'Backspace',
   'Delete',
   'Tab',
@@ -42,7 +42,7 @@ function onPhoneInput(event) {
 }
 
 function onPhoneKeydown(event) {
-  if (PHONE_ALLOWED_KEYS.has(event.key)) return
+  if (EDITING_KEYS.has(event.key)) return
   if (event.ctrlKey || event.metaKey) return
 
   if (/^\d$/.test(event.key)) {
@@ -51,6 +51,17 @@ function onPhoneKeydown(event) {
   }
 
   event.preventDefault()
+}
+
+function onPhoneBeforeInput(event) {
+  if (event.inputType !== 'insertText' && event.inputType !== 'insertCompositionText') return
+
+  const data = event.data
+  if (!data) return
+
+  if (/\D/.test(data) || form.phone.length + data.length > 10) {
+    event.preventDefault()
+  }
 }
 
 function onPhonePaste(event) {
@@ -63,6 +74,37 @@ function onPhonePaste(event) {
 
 function onNameInput(event, key) {
   form[key] = event.target.value.replace(/\d/g, '').slice(0, 80)
+}
+
+function onNameKeydown(event, key) {
+  if (EDITING_KEYS.has(event.key)) return
+  if (event.ctrlKey || event.metaKey) return
+
+  if (/^\d$/.test(event.key)) {
+    event.preventDefault()
+    return
+  }
+
+  if (event.key.length === 1 && form[key].length >= 80) {
+    event.preventDefault()
+  }
+}
+
+function onNameBeforeInput(event) {
+  if (event.inputType !== 'insertText' && event.inputType !== 'insertCompositionText') return
+
+  const data = event.data
+  if (data && /\d/.test(data)) {
+    event.preventDefault()
+  }
+}
+
+function onNamePaste(event, key) {
+  event.preventDefault()
+  const pasted = event.clipboardData?.getData('text').replace(/\d/g, '') ?? ''
+  if (!pasted) return
+
+  form[key] = `${form[key]}${pasted}`.slice(0, 80)
 }
 
 function onBusinessNameInput(event) {
@@ -182,8 +224,12 @@ function onOtpInput(index, event) {
             placeholder="First Name"
             required
             autocomplete="given-name"
+            maxlength="80"
             :class="inputClass"
             @input="onNameInput($event, 'firstName')"
+            @keydown="onNameKeydown($event, 'firstName')"
+            @beforeinput="onNameBeforeInput"
+            @paste="onNamePaste($event, 'firstName')"
           >
           <input
             :value="form.lastName"
@@ -191,8 +237,12 @@ function onOtpInput(index, event) {
             placeholder="Last Name"
             required
             autocomplete="family-name"
+            maxlength="80"
             :class="inputClass"
             @input="onNameInput($event, 'lastName')"
+            @keydown="onNameKeydown($event, 'lastName')"
+            @beforeinput="onNameBeforeInput"
+            @paste="onNamePaste($event, 'lastName')"
           >
         </div>
 
@@ -202,6 +252,7 @@ function onOtpInput(index, event) {
           placeholder="Business Name"
           required
           autocomplete="organization"
+          maxlength="120"
           :class="inputClass"
           @input="onBusinessNameInput"
         >
@@ -222,6 +273,7 @@ function onOtpInput(index, event) {
             class="min-w-0 flex-1 bg-transparent px-3 font-plein text-[14px] font-normal leading-[140%] text-white placeholder:text-white/35 outline-none"
             @input="onPhoneInput"
             @keydown="onPhoneKeydown"
+            @beforeinput="onPhoneBeforeInput"
             @paste="onPhonePaste"
           >
         </div>
