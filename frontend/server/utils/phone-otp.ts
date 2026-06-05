@@ -1,8 +1,8 @@
 import { randomInt } from 'node:crypto'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
-const OTP_TTL_MS = 10 * 60 * 1000
-const RESEND_COOLDOWN_MS = 60 * 1000
+const OTP_TTL_MS = 5 * 60 * 1000
+const RESEND_COOLDOWN_MS = 5 * 60 * 1000
 const MAX_VERIFY_ATTEMPTS = 5
 
 export function maskPhoneForDisplay(e164: string): string {

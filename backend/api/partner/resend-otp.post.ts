@@ -34,9 +34,10 @@ export default defineEventHandler(async (event) => {
   try {
     assertOtpSendRateLimit(event, phone)
 
-    const result = await sendPartnerRegistrationOtp({
+    const result = await sendPartnerRegistrationOtp(event, {
       data: parsed.data,
       challengeToken: parsed.data.challengeToken,
+      isResend: true,
     })
 
     return {

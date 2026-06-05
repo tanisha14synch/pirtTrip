@@ -25,6 +25,7 @@ export function usePartnerRegistration() {
     resendWaitSeconds: otpResendWaitSeconds,
     otpSessionActive,
     expiryLabel: otpExpiryLabel,
+    resendWaitLabel: otpResendWaitLabel,
     canResend: otpCanResend,
     isExpired: otpIsExpired,
     applySendResponse,
@@ -86,14 +87,20 @@ export function usePartnerRegistration() {
         throw new Error(parsed.error.issues[0]?.message ?? 'Invalid form')
       }
 
-      const response = await $fetch<OtpSendResponse>(apiUrl('/api/partner/send-otp'), {
-        method: 'POST',
-        timeout: 30_000,
-        body: {
-          ...parsed.data,
-          challengeToken: challengeToken.value ?? undefined,
+      challengeToken.value = null
+
+      const response = await $fetch<OtpSendResponse & { success?: boolean }>(
+        apiUrl('/api/partner/send-otp'),
+        {
+          method: 'POST',
+          timeout: 30_000,
+          body: parsed.data,
         },
-      })
+      )
+
+      if (!response?.challengeToken) {
+        throw new Error('Unable to send OTP now. Please try again later.')
+      }
 
       applyOtpSendResponse(response, parsed.data.phone)
 
@@ -246,6 +253,7 @@ export function usePartnerRegistration() {
     otpResendWaitSeconds,
     otpSessionActive,
     otpExpiryLabel,
+    otpResendWaitLabel,
     otpCanResend,
     otpIsExpired,
     otpEnabled: OTP_ENABLED,

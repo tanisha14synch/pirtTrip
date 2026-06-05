@@ -1,7 +1,9 @@
 import type { OtpPurpose } from './otp'
 import {
   generateOtpCode,
+  getOtpLimits,
   getOtpTtlSeconds,
+  getResendCooldownSeconds,
   OTP_LIMITS,
   verifyOtpHash,
 } from './otp'
@@ -14,6 +16,7 @@ import {
   markChallengeAttempt,
   markChallengeVerified,
   parseChallengeToken,
+  deleteOtpChallenge,
   upsertOtpChallenge,
   validateResendForEmail,
 } from './otp-challenge-token'
@@ -113,8 +116,8 @@ export async function createAndSendOtp(options: {
     console.info(`[OTP] ${options.purpose} code for ${devTarget}: ${code}`)
     return {
       challengeToken,
-      expiresInSeconds: getOtpTtlSeconds(),
-      resendCooldownSeconds: Math.ceil(OTP_LIMITS.RESEND_COOLDOWN_MS / 1000),
+      expiresInSeconds: getOtpTtlSeconds(options.purpose),
+      resendCooldownSeconds: getResendCooldownSeconds(options.purpose),
       debugCode: code,
     }
   }
@@ -149,6 +152,7 @@ export async function createAndSendOtp(options: {
         message: (deliveryError as Error)?.message || 'unknown',
       })
     } else {
+      await deleteOtpChallenge(challenge.id).catch(() => {})
       otpLog('send.provider_failed', {
         purpose: options.purpose,
         channel: useSms ? 'sms' : 'email',
@@ -161,8 +165,8 @@ export async function createAndSendOtp(options: {
 
   return {
     challengeToken,
-    expiresInSeconds: getOtpTtlSeconds(),
-    resendCooldownSeconds: Math.ceil(OTP_LIMITS.RESEND_COOLDOWN_MS / 1000),
+    expiresInSeconds: getOtpTtlSeconds(options.purpose),
+    resendCooldownSeconds: getResendCooldownSeconds(options.purpose),
     ...(showDevCode ? { debugCode: code } : {}),
   }
 }

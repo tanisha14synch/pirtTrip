@@ -12,7 +12,7 @@ type AquaSmsConfig = {
 }
 
 export function buildPartnerOtpSmsMessage(code: string): string {
-  return `Your login verification OTP For PirtTrip is ${code}. This code is valid for 10 minutes. MARTYRS SERVICES Website : business.pirttrip.com`
+  return `Your login verification OTP For PirtTrip is ${code}. This code is valid for 5 minutes. MARTYRS SERVICES Website : business.pirttrip.com`
 }
 
 export function buildPartnerRegistrationThankYouMessage(): string {
@@ -54,22 +54,72 @@ function getAquaSmsConfig(config: ReturnType<typeof useRuntimeConfig>): AquaSmsC
   }
 }
 
+const AQUA_SMS_FAILURE_HINTS = [
+  'insufficient',
+  'error',
+  'fail',
+  'invalid',
+  'denied',
+  'rejected',
+  'unauthorized',
+  'not allowed',
+  'no credit',
+  'low balance',
+]
+
+function parseAquaSmsResponse(body: string): { ok: boolean; detail?: string } {
+  const trimmed = body.trim()
+  if (!trimmed) {
+    return { ok: true }
+  }
+
+  try {
+    const parsed = JSON.parse(trimmed) as unknown
+    const items = Array.isArray(parsed) ? parsed : [parsed]
+
+    for (const item of items) {
+      if (!item || typeof item !== 'object') continue
+
+      const record = item as Record<string, unknown>
+      const responseCode = String(record.responseCode ?? record.ResponseCode ?? '').trim()
+      if (!responseCode) continue
+
+      const lower = responseCode.toLowerCase()
+      const isFailure = AQUA_SMS_FAILURE_HINTS.some((hint) => lower.includes(hint))
+      if (isFailure) {
+        return { ok: false, detail: responseCode }
+      }
+
+      if (
+        lower.includes('success')
+        || lower.includes('submitted')
+        || lower.includes('sent')
+        || lower === 'ok'
+      ) {
+        return { ok: true, detail: responseCode }
+      }
+
+      // Unknown provider codes are treated as failure (do not open OTP screen).
+      return { ok: false, detail: responseCode }
+    }
+  } catch {
+    // Fall through to plain-text checks.
+  }
+
+  const normalized = trimmed.toLowerCase()
+  const isFailure = AQUA_SMS_FAILURE_HINTS.some((hint) => normalized.includes(hint))
+  return isFailure ? { ok: false, detail: trimmed.slice(0, 200) } : { ok: true }
+}
+
 function isAquaSmsSuccess(status: number, body: string): boolean {
   if (status < 200 || status >= 300) {
     return false
   }
+  return parseAquaSmsResponse(body).ok
+}
 
-  const normalized = body.trim().toLowerCase()
-  if (!normalized) {
-    return true
-  }
-
-  return !(
-    normalized.includes('error')
-    || normalized.includes('fail')
-    || normalized.includes('invalid')
-    || normalized.includes('denied')
-  )
+export function partnerOtpDeliveryErrorMessage(): string {
+  return 'Unable to send OTP now. Please try again later.'
 }
 
 function logSmsEvent(event: string, payload: Record<string, unknown>) {
@@ -105,20 +155,22 @@ async function sendViaAquaSms(aquaConfig: AquaSmsConfig, payload: SmsPayload) {
     const response = await fetch(url.toString(), { method: 'GET' })
     const body = await response.text()
 
-    if (!isAquaSmsSuccess(response.status, body)) {
+    const parsed = parseAquaSmsResponse(body)
+    if (!isAquaSmsSuccess(response.status, body) || !parsed.ok) {
       logSmsEvent('aquasms.failed', {
         status: response.status,
         numberHint: maskedNumber,
         response: body.slice(0, 300),
+        providerCode: parsed.detail,
         latencyMs: Date.now() - startedAt,
       })
       throw createError({
         statusCode: 502,
-        statusMessage: 'SMS delivery failed. Please try again shortly.',
+        statusMessage: partnerOtpDeliveryErrorMessage(),
         data: {
           code: 'OTP_SMS_DELIVERY_FAILED',
           provider: 'aquasms',
-          detail: body.slice(0, 200),
+          detail: parsed.detail || body.slice(0, 200),
         },
       })
     }
@@ -141,7 +193,7 @@ async function sendViaAquaSms(aquaConfig: AquaSmsConfig, payload: SmsPayload) {
 
     throw createError({
       statusCode: 502,
-      statusMessage: 'SMS delivery failed. Please try again shortly.',
+      statusMessage: partnerOtpDeliveryErrorMessage(),
       data: { code: 'OTP_SMS_DELIVERY_FAILED', provider: 'aquasms' },
     })
   }
@@ -159,7 +211,7 @@ export async function sendTransactionalSms(payload: SmsPayload): Promise<void> {
   if (!aquaConfig) {
     throw createError({
       statusCode: 500,
-      statusMessage: 'SMS provider is not configured',
+      statusMessage: partnerOtpDeliveryErrorMessage(),
       data: { code: 'OTP_SMS_PROVIDER_MISSING' },
     })
   }

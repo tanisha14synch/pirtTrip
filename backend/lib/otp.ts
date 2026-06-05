@@ -2,13 +2,33 @@ import { createHmac, randomInt, timingSafeEqual } from 'node:crypto'
 import { getOtpSigningSecret } from './runtime-env'
 
 const OTP_LENGTH = 6
-const OTP_TTL_MS = 10 * 60 * 1000 // 10 minutes
-const RESEND_COOLDOWN_MS = 60 * 1000 // 60 seconds
+const OTP_TTL_MS = 10 * 60 * 1000 // 10 minutes (default)
+const RESEND_COOLDOWN_MS = 60 * 1000 // 60 seconds (default)
+const PARTNER_OTP_TTL_MS = 5 * 60 * 1000 // 5 minutes
+const PARTNER_RESEND_COOLDOWN_MS = 5 * 60 * 1000 // 5 minutes
 const MAX_RESENDS_PER_WINDOW = 5
 const RESEND_WINDOW_MS = 15 * 60 * 1000
 const MAX_VERIFY_ATTEMPTS = 5
 
 export type OtpPurpose = 'waitlist' | 'admin_login' | 'partner_registration'
+
+export type OtpPurposeLimits = {
+  ttlMs: number
+  resendCooldownMs: number
+}
+
+const OTP_LIMITS_BY_PURPOSE: Record<OtpPurpose, OtpPurposeLimits> = {
+  waitlist: { ttlMs: OTP_TTL_MS, resendCooldownMs: RESEND_COOLDOWN_MS },
+  admin_login: { ttlMs: OTP_TTL_MS, resendCooldownMs: RESEND_COOLDOWN_MS },
+  partner_registration: {
+    ttlMs: PARTNER_OTP_TTL_MS,
+    resendCooldownMs: PARTNER_RESEND_COOLDOWN_MS,
+  },
+}
+
+export function getOtpLimits(purpose: OtpPurpose): OtpPurposeLimits {
+  return OTP_LIMITS_BY_PURPOSE[purpose]
+}
 
 function getOtpSecret(): string {
   const secret = getOtpSigningSecret()
@@ -47,26 +67,40 @@ export function verifyOtpHash(
   }
 }
 
-export function getOtpExpiryDate(): Date {
-  return new Date(Date.now() + OTP_TTL_MS)
+export function getOtpExpiryDate(purpose?: OtpPurpose): Date {
+  const ttlMs = purpose ? getOtpLimits(purpose).ttlMs : OTP_TTL_MS
+  return new Date(Date.now() + ttlMs)
 }
 
-export function getOtpTtlSeconds(): number {
-  return Math.floor(OTP_TTL_MS / 1000)
+export function getOtpTtlSeconds(purpose?: OtpPurpose): number {
+  const ttlMs = purpose ? getOtpLimits(purpose).ttlMs : OTP_TTL_MS
+  return Math.floor(ttlMs / 1000)
 }
 
-export function canResendOtp(lastSentAt: string, resendCount: number): {
+export function getResendCooldownSeconds(purpose: OtpPurpose): number {
+  return Math.ceil(getOtpLimits(purpose).resendCooldownMs / 1000)
+}
+
+export function canResendOtp(
+  lastSentAt: string,
+  resendCount: number,
+  resendCooldownMs: number = RESEND_COOLDOWN_MS,
+): {
   allowed: boolean
   waitSeconds: number
   reason?: string
 } {
   const lastSent = new Date(lastSentAt).getTime()
   const elapsed = Date.now() - lastSent
-  if (elapsed < RESEND_COOLDOWN_MS) {
+  if (elapsed < resendCooldownMs) {
+    const waitSeconds = Math.ceil((resendCooldownMs - elapsed) / 1000)
+    const waitMinutes = Math.ceil(waitSeconds / 60)
     return {
       allowed: false,
-      waitSeconds: Math.ceil((RESEND_COOLDOWN_MS - elapsed) / 1000),
-      reason: `Please wait ${Math.ceil((RESEND_COOLDOWN_MS - elapsed) / 1000)} seconds before resending`,
+      waitSeconds,
+      reason: resendCooldownMs >= 60_000
+        ? `Please wait ${waitMinutes} minute(s) before resending`
+        : `Please wait ${waitSeconds} seconds before resending`,
     }
   }
 

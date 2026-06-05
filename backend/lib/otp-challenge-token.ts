@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import type { OtpPurpose } from './otp'
-import { canResendOtp, hashOtpCode, OTP_LIMITS } from './otp'
+import { canResendOtp, getOtpLimits, hashOtpCode, OTP_LIMITS } from './otp'
 import { getSupabaseAdmin } from './supabase'
 import { getOtpSigningSecret } from './runtime-env'
 
@@ -137,7 +137,11 @@ export async function validateResendForEmail(options: {
     }
   }
 
-  const check = canResendOtp(challenge.last_sent_at, challenge.resend_count)
+  const check = canResendOtp(
+    challenge.last_sent_at,
+    challenge.resend_count,
+    getOtpLimits(options.purpose).resendCooldownMs,
+  )
   return {
     ...check,
     resendCount: challenge.resend_count,
@@ -155,7 +159,7 @@ export async function upsertOtpChallenge(options: {
 }): Promise<OtpChallengeRow> {
   const admin = getSupabaseAdmin()
   const email = options.email.trim().toLowerCase()
-  const expiresAt = new Date(Date.now() + OTP_LIMITS.OTP_TTL_MS).toISOString()
+  const expiresAt = new Date(Date.now() + getOtpLimits(options.purpose).ttlMs).toISOString()
   const lastSentAt = new Date().toISOString()
   const codeHash = hashOtpCode(options.code, email, options.purpose)
 
@@ -287,6 +291,11 @@ export async function markChallengeAttempt(challengeId: string) {
     })
   }
   return next
+}
+
+export async function deleteOtpChallenge(challengeId: string) {
+  const admin = getSupabaseAdmin()
+  await admin.from('email_otp_challenges').delete().eq('id', challengeId)
 }
 
 export async function markChallengeVerified(challengeId: string) {

@@ -1,41 +1,75 @@
 import { createAndSendOtp } from '~/lib/email-otp-service'
-import { partnerOtpChallengeEmail } from '~/lib/partner-otp'
+import { partnerOtpChallengeEmail, partnerOtpChallengeEmailVariants } from '~/lib/partner-otp'
 import {
   buildPartnerRegistrationThankYouMessage,
   hasSmsProvider,
   maskPhoneForDisplay,
   sendTransactionalSms,
 } from '~/lib/sms'
+import { resetOtpSendRateLimit } from '~/lib/otp-ip-rate-limit'
 import { normalizePhone } from '~/lib/phone'
 import { getSupabaseAdmin } from '~/lib/supabase'
+import type { H3Event } from 'h3'
 import type { z } from 'zod'
 import type { partnerRegistrationSchema } from '~/lib/validation'
 
 type PartnerRegistrationInput = z.infer<typeof partnerRegistrationSchema>
 
-function phoneLookupVariants(phone: string): string[] {
+export function phoneLookupVariants(phone: string): string[] {
   const digits = phone.replace(/\D/g, '')
   const local = digits.slice(-10)
-  return [...new Set([phone, `+91${local}`, local, `91${local}`].filter(Boolean))]
+  return [...new Set([
+    phone,
+    `+91${local}`,
+    local,
+    `91${local}`,
+    `+91 ${local.slice(0, 5)} ${local.slice(5)}`,
+  ].filter(Boolean))]
 }
 
-export async function assertPartnerPhoneAvailable(phone: string) {
+export async function findPartnerLeadByPhone(phone: string) {
   const admin = getSupabaseAdmin()
+  const local = phone.replace(/\D/g, '').slice(-10)
   const variants = phoneLookupVariants(phone)
 
-  const { data: existing, error } = await admin
+  const { data: exactMatches, error: exactError } = await admin
     .from('partner_leads')
-    .select('id')
+    .select('id, phone')
     .in('phone', variants)
-    .limit(1)
-    .maybeSingle()
+    .limit(5)
 
-  if (error) {
+  if (exactError) {
     throw createError({
       statusCode: 500,
       statusMessage: 'Failed to verify phone availability',
     })
   }
+
+  const exact = (exactMatches ?? []).find(
+    (row) => row.phone.replace(/\D/g, '').slice(-10) === local,
+  )
+  if (exact) return exact
+
+  const { data: fuzzyMatches, error: fuzzyError } = await admin
+    .from('partner_leads')
+    .select('id, phone')
+    .ilike('phone', `%${local}`)
+    .limit(10)
+
+  if (fuzzyError) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to verify phone availability',
+    })
+  }
+
+  return (fuzzyMatches ?? []).find(
+    (row) => row.phone.replace(/\D/g, '').slice(-10) === local,
+  ) ?? null
+}
+
+export async function assertPartnerPhoneAvailable(phone: string) {
+  const existing = await findPartnerLeadByPhone(phone)
 
   if (existing) {
     throw createError({
@@ -48,19 +82,37 @@ export async function assertPartnerPhoneAvailable(phone: string) {
 
 export async function clearStalePartnerOtpSessions(phone: string) {
   const admin = getSupabaseAdmin()
-  const challengeEmail = partnerOtpChallengeEmail(phone)
-  const variants = phoneLookupVariants(phone)
+  const local = phone.replace(/\D/g, '').slice(-10)
+  const challengeEmails = partnerOtpChallengeEmailVariants(phone)
+  const phoneVariants = phoneLookupVariants(phone)
 
-  await Promise.all([
+  const deletes: Promise<unknown>[] = []
+
+  for (const email of challengeEmails) {
+    deletes.push(
+      admin
+        .from('email_otp_challenges')
+        .delete()
+        .eq('email', email)
+        .eq('purpose', 'partner_registration'),
+    )
+  }
+
+  // Catch legacy rows where email used a different digit format.
+  deletes.push(
     admin
       .from('email_otp_challenges')
       .delete()
-      .eq('email', challengeEmail)
-      .eq('purpose', 'partner_registration'),
-    ...variants.map((variant) =>
-      admin.from('phone_otps').delete().eq('phone_number', variant),
-    ),
-  ])
+      .eq('purpose', 'partner_registration')
+      .ilike('email', `partner%${local}%challenge.pirttrip.local`),
+  )
+
+  for (const variant of phoneVariants) {
+    deletes.push(admin.from('phone_otps').delete().eq('phone_number', variant))
+    deletes.push(admin.from('otp_logs').delete().eq('phone', variant))
+  }
+
+  await Promise.all(deletes)
 }
 
 export async function logPartnerOtpSent(phone: string) {
@@ -164,26 +216,39 @@ async function deliverPartnerRegistrationOtp(options: {
   })
 }
 
-export async function sendPartnerRegistrationOtp(options: {
-  data: PartnerRegistrationInput
-  challengeToken?: string | null
-}) {
+export async function sendPartnerRegistrationOtp(
+  event: H3Event,
+  options: {
+    data: PartnerRegistrationInput
+    challengeToken?: string | null
+    isResend?: boolean
+  },
+) {
   const phone = normalizePhone(options.data.phone)
   await assertPartnerPhoneAvailable(phone)
 
-  if (!options.challengeToken) {
+  const isResend = Boolean(options.isResend && options.challengeToken)
+  let deliveryOptions = { ...options }
+
+  if (!isResend) {
     await clearStalePartnerOtpSessions(phone)
+    resetOtpSendRateLimit(event, phone)
+    deliveryOptions = { ...options, challengeToken: null, isResend: false }
   }
 
   let result
   try {
-    result = await deliverPartnerRegistrationOtp(options)
+    result = await deliverPartnerRegistrationOtp(deliveryOptions)
   } catch (error: unknown) {
     const err = error as { statusCode?: number; data?: { code?: string } }
-    if (err.statusCode === 429 && options.challengeToken) {
+    const retriable = err.statusCode === 429
+      || err.data?.code === 'OTP_RATE_LIMITED'
+
+    if (retriable) {
       await clearStalePartnerOtpSessions(phone)
+      resetOtpSendRateLimit(event, phone)
       result = await deliverPartnerRegistrationOtp({
-        ...options,
+        ...deliveryOptions,
         challengeToken: null,
       })
     } else {

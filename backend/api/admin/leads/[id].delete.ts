@@ -1,5 +1,5 @@
 import { logAdminAction } from '~/lib/admin-audit'
-import { partnerOtpChallengeEmail } from '~/lib/partner-otp'
+import { clearStalePartnerOtpSessions } from '~/lib/partner-registration-otp'
 
 export default defineEventHandler(async (event) => {
   const adminUser = await requireAdminWith2fa(event)
@@ -22,17 +22,8 @@ export default defineEventHandler(async (event) => {
   }
 
   const displayName = `${existing.first_name} ${existing.last_name}`.trim()
-  const challengeEmail = partnerOtpChallengeEmail(existing.phone)
-  const phoneDigits = existing.phone.replace(/\D/g, '')
 
-  // Remove related OTP / activity data before deleting the registration row.
-  await Promise.all([
-    admin.from('otp_logs').delete().eq('phone', existing.phone),
-    admin.from('email_otp_challenges').delete().eq('email', challengeEmail),
-    admin.from('phone_otps').delete().eq('phone_number', existing.phone),
-    admin.from('phone_otps').delete().eq('phone_number', phoneDigits),
-    admin.from('phone_otps').delete().eq('phone_number', `+91${phoneDigits.slice(-10)}`),
-  ])
+  await clearStalePartnerOtpSessions(existing.phone)
 
   const { error } = await admin.from('partner_leads').delete().eq('id', id)
 

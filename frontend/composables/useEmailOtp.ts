@@ -5,8 +5,8 @@ export type EmailOtpSendResponse = {
   debugCode?: string
 }
 
-const DEFAULT_OTP_TTL_SECONDS = 600
-const DEFAULT_RESEND_COOLDOWN_SECONDS = 60
+const DEFAULT_OTP_TTL_SECONDS = 300
+const DEFAULT_RESEND_COOLDOWN_SECONDS = 300
 
 export function useEmailOtp(options: { resendCooldownSeconds?: number } = {}) {
   const expiresInSeconds = ref(0)
@@ -79,7 +79,7 @@ export function useEmailOtp(options: { resendCooldownSeconds?: number } = {}) {
 
   function parseFetchError(err: unknown): string {
     const fetchError = err as {
-      data?: { statusMessage?: string; message?: string; waitSeconds?: number }
+      data?: { statusMessage?: string; message?: string; waitSeconds?: number; code?: string }
       statusMessage?: string
       message?: string
     }
@@ -87,6 +87,15 @@ export function useEmailOtp(options: { resendCooldownSeconds?: number } = {}) {
     const waitSeconds = fetchError?.data?.waitSeconds
     if (waitSeconds) {
       startResendCooldown(waitSeconds)
+    }
+
+    const code = fetchError?.data?.code
+    if (
+      code === 'OTP_SMS_DELIVERY_FAILED'
+      || code === 'OTP_SMS_PROVIDER_MISSING'
+      || code === 'OTP_SEND_FAILED'
+    ) {
+      return 'Unable to send OTP now. Please try again later.'
     }
 
     return (
@@ -98,11 +107,14 @@ export function useEmailOtp(options: { resendCooldownSeconds?: number } = {}) {
     )
   }
 
-  const expiryLabel = computed(() => {
-    const m = Math.floor(expiresInSeconds.value / 60)
-    const s = expiresInSeconds.value % 60
+  const expiryLabel = computed(() => formatCountdown(expiresInSeconds.value))
+  const resendWaitLabel = computed(() => formatCountdown(resendWaitSeconds.value))
+
+  function formatCountdown(totalSeconds: number) {
+    const m = Math.floor(totalSeconds / 60)
+    const s = totalSeconds % 60
     return `${m}:${String(s).padStart(2, '0')}`
-  })
+  }
 
   const canResend = computed(() => resendWaitSeconds.value === 0)
   const isExpired = computed(() => otpSessionActive.value && expiresInSeconds.value === 0)
@@ -115,6 +127,7 @@ export function useEmailOtp(options: { resendCooldownSeconds?: number } = {}) {
     resendCooldownSeconds,
     otpSessionActive,
     expiryLabel,
+    resendWaitLabel,
     canResend,
     isExpired,
     startExpiryCountdown,

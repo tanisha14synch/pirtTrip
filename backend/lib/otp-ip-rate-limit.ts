@@ -46,3 +46,10 @@ export function assertOtpSendRateLimit(event: H3Event, phone?: string) {
 
   bucket.count += 1
 }
+
+/** Clear in-memory OTP send throttle for a phone (e.g. after admin delete / fresh re-register). */
+export function resetOtpSendRateLimit(event: H3Event, phone?: string) {
+  const ip = getRequestIP(event, { xForwardedFor: true }) || 'unknown'
+  const suffix = phone?.replace(/\D/g, '').slice(-10) || 'unknown'
+  buckets.delete(`${ip}:${suffix}`)
+}

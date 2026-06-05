@@ -13,6 +13,7 @@ const {
   otpResendWaitSeconds,
   otpSessionActive,
   otpExpiryLabel,
+  otpResendWaitLabel,
   otpCanResend,
   otpIsExpired,
   sendOtp,
@@ -418,13 +419,13 @@ function onOtpInput(index, event) {
         <button
           type="button"
           class="w-full py-2 font-plein text-[14px] text-white/60 hover:text-white disabled:opacity-50"
-          :disabled="loading"
+          :disabled="loading || !otpCanResend"
           @click="resendOtp"
         >
           {{
             otpCanResend
               ? 'Resend OTP'
-              : `Resend OTP in ${otpResendWaitSeconds}s`
+              : `Resend OTP in ${otpResendWaitLabel}`
           }}
         </button>
 

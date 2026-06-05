@@ -4,9 +4,7 @@ import { sendPartnerRegistrationOtp } from '~/lib/partner-registration-otp'
 import { normalizePhone } from '~/lib/phone'
 import { partnerRegistrationSchema, zodErrorMessage } from '~/lib/validation'
 
-const bodySchema = partnerRegistrationSchema.extend({
-  challengeToken: z.string().optional(),
-})
+const bodySchema = partnerRegistrationSchema
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -34,9 +32,9 @@ export default defineEventHandler(async (event) => {
   try {
     assertOtpSendRateLimit(event, phone)
 
-    const result = await sendPartnerRegistrationOtp({
+    const result = await sendPartnerRegistrationOtp(event, {
       data: parsed.data,
-      challengeToken: parsed.data.challengeToken,
+      isResend: false,
     })
 
     return {
@@ -51,7 +49,7 @@ export default defineEventHandler(async (event) => {
     console.error('[partner/send-otp]', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Failed to send verification code. Please try again.',
+      statusMessage: 'Unable to send OTP now. Please try again later.',
       data: { code: 'OTP_SEND_FAILED' },
     })
   }
