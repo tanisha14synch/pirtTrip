@@ -184,7 +184,7 @@ watch(page, loadLeads)
                 {{ col.label }}
                 <span v-if="sortBy === col.key">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
               </th>
-              <th class="min-w-[24rem] px-4 py-3 font-semibold">
+              <th class="px-4 py-3 font-semibold">
                 Actions
               </th>
             </tr>
@@ -221,7 +221,7 @@ watch(page, loadLeads)
                 <span class="block text-xs">{{ relativeTime(lead.created_at) }}</span>
                 <span class="text-[11px] text-black/40">{{ formatDate(lead.created_at) }}</span>
               </td>
-              <td class="min-w-[24rem] whitespace-nowrap px-4 py-3">
+              <td class="whitespace-nowrap px-4 py-3">
                 <AdminBusinessActionButtons
                   :phone="lead.phone"
                   :name="ownerName(lead)"
