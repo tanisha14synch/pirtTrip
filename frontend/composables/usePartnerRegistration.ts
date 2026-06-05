@@ -3,18 +3,27 @@ import type { PartnerLead } from '~/types/database'
 
 export type RegistrationStep = 'form' | 'otp' | 'success'
 
-/** OTP disabled temporarily — set to true when email provider is ready. */
-const OTP_ENABLED = false
+const OTP_ENABLED = true
+
+type OtpSendResponse = {
+  success: boolean
+  challengeToken: string
+  expiresInSeconds: number
+  resendCooldownSeconds: number
+  phoneMasked: string
+  debugCode?: string
+}
 
 export function usePartnerRegistration() {
   const step = ref<RegistrationStep>('form')
   const loading = ref(false)
   const errorMessage = ref<string | null>(null)
   const successLead = ref<PartnerLead | null>(null)
-  const normalizedEmail = ref('')
 
   const otpFlow = useEmailOtp()
   const challengeToken = ref<string | null>(null)
+  const otpPhoneMasked = ref('')
+  const otpDebugMode = ref(false)
 
   const form = reactive({
     firstName: '',
@@ -28,9 +37,32 @@ export function usePartnerRegistration() {
 
   const otpDigits = ref(['', '', '', '', '', ''])
   const otpCode = computed(() => otpDigits.value.join(''))
+  const canVerifyOtp = computed(() => otpCode.value.length === 6 && !otpFlow.isExpired.value)
 
-  /** Direct partner registration (no OTP). */
-  async function registerDirect() {
+  function getFormPayload() {
+    return {
+      firstName: form.firstName,
+      lastName: form.lastName,
+      businessName: form.businessName,
+      phone: form.phone.replace(/\D/g, '').slice(0, 10),
+      whatsappOptIn: form.whatsappOptIn,
+    }
+  }
+
+  function applyOtpSendResponse(response: OtpSendResponse, phone: string) {
+    challengeToken.value = response.challengeToken
+    otpPhoneMasked.value = response.phoneMasked || `+91 ******${phone.slice(-4)}`
+    step.value = 'otp'
+    otpDigits.value = ['', '', '', '', '', '']
+    otpFlow.applySendResponse(response)
+    otpDebugMode.value = Boolean(response.debugCode)
+
+    if (response.debugCode) {
+      console.info('[partner OTP]', response.debugCode)
+    }
+  }
+
+  async function sendOtp() {
     loading.value = true
     errorMessage.value = null
 
@@ -39,77 +71,24 @@ export function usePartnerRegistration() {
         throw new Error('Please accept the required policies to continue.')
       }
 
-      const parsed = partnerRegistrationSchema.safeParse({
-        firstName: form.firstName,
-        lastName: form.lastName,
-        businessName: form.businessName,
-        phone: form.phone.replace(/\D/g, '').slice(0, 10),
-        whatsappOptIn: form.whatsappOptIn,
-      })
-
+      const parsed = partnerRegistrationSchema.safeParse(getFormPayload())
       if (!parsed.success) {
-        throw new Error(parsed.error.errors[0]?.message ?? 'Invalid form')
+        throw new Error(parsed.error.issues[0]?.message ?? 'Invalid form')
       }
 
-      const result = await $fetch<{ success: boolean; lead: PartnerLead }>(
-        apiUrl('/api/partner/register-direct'),
-        {
-          method: 'POST',
-          body: parsed.data,
-        },
-      )
-
-      normalizedEmail.value = parsed.data.email ?? ''
-      successLead.value = result.lead
-      step.value = 'success'
-    } catch (err: unknown) {
-      errorMessage.value = otpFlow.parseFetchError(err)
-    } finally {
-      loading.value = false
-    }
-  }
-
-  /* OTP flow — commented until email (Resend/SMTP) is configured
-  async function sendOtp() {
-    loading.value = true
-    errorMessage.value = null
-
-    try {
-      const parsed = partnerRegistrationSchema.safeParse({
-        firstName: form.firstName,
-        lastName: form.lastName,
-        phone: form.phone,
-        email: form.email,
-      })
-
-      if (!parsed.success) {
-        throw new Error(parsed.error.errors[0]?.message ?? 'Invalid form')
-      }
-
-      const response = await $fetch<{
-        success: boolean
-        email: string
-        challengeToken: string
-        expiresInSeconds: number
-        resendCooldownSeconds: number
-        debugCode?: string
-      }>(apiUrl('/api/partner/send-otp'), {
+      const response = await $fetch<OtpSendResponse>(apiUrl('/api/partner/send-otp'), {
         method: 'POST',
+        timeout: 30_000,
         body: {
           ...parsed.data,
           challengeToken: challengeToken.value ?? undefined,
         },
       })
 
-      challengeToken.value = response.challengeToken
-      normalizedEmail.value = response.email
-      step.value = 'otp'
-      otpDigits.value = ['', '', '', '', '', '']
-      otpFlow.applySendResponse(response)
+      applyOtpSendResponse(response, parsed.data.phone)
 
-      if (import.meta.dev && response.debugCode) {
-        console.info('[partner OTP debug]', response.debugCode)
-      }
+      await nextTick()
+      document.getElementById('partner-otp-0')?.focus()
     } catch (err: unknown) {
       errorMessage.value = otpFlow.parseFetchError(err)
     } finally {
@@ -118,38 +97,70 @@ export function usePartnerRegistration() {
   }
 
   async function resendOtp() {
-    if (!otpFlow.canResend.value) return
-    await sendOtp()
-  }
+    if (!otpFlow.canResend.value || loading.value) return
+    if (!challengeToken.value) {
+      errorMessage.value = 'Verification session expired. Submit the form again.'
+      return
+    }
 
-  async function verifyOtpAndRegister() {
     loading.value = true
     errorMessage.value = null
 
     try {
-      const code = otpCode.value.trim()
-      if (code.length < 6) {
-        throw new Error('Enter the 6-digit code from your email')
+      const parsed = partnerRegistrationSchema.safeParse(getFormPayload())
+      if (!parsed.success) {
+        throw new Error(parsed.error.issues[0]?.message ?? 'Invalid form')
       }
 
-      if (otpFlow.isExpired.value) {
-        throw new Error('Code expired. Tap “Resend code” to get a new one.')
-      }
+      const response = await $fetch<OtpSendResponse>(apiUrl('/api/partner/resend-otp'), {
+        method: 'POST',
+        timeout: 30_000,
+        body: {
+          ...parsed.data,
+          challengeToken: challengeToken.value,
+        },
+      })
 
+      applyOtpSendResponse(response, parsed.data.phone)
+
+      await nextTick()
+      document.getElementById('partner-otp-0')?.focus()
+    } catch (err: unknown) {
+      errorMessage.value = otpFlow.parseFetchError(err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function verifyOtpAndRegister() {
+    if (!canVerifyOtp.value) {
+      errorMessage.value = otpFlow.isExpired.value
+        ? 'Code expired. Tap “Resend OTP” to get a new one.'
+        : 'Enter the 6-digit verification code'
+      return
+    }
+
+    loading.value = true
+    errorMessage.value = null
+
+    try {
       if (!challengeToken.value) {
         throw new Error('Verification session expired. Request a new code.')
+      }
+
+      const parsed = partnerRegistrationSchema.safeParse(getFormPayload())
+      if (!parsed.success) {
+        throw new Error(parsed.error.issues[0]?.message ?? 'Invalid form')
       }
 
       const result = await $fetch<{ success: boolean; lead: PartnerLead }>(
         apiUrl('/api/partner/verify-otp'),
         {
           method: 'POST',
+          timeout: 30_000,
           body: {
-            firstName: form.firstName.trim(),
-            lastName: form.lastName.trim(),
-            phone: form.phone,
-            email: normalizedEmail.value || form.email.trim(),
-            code,
+            ...parsed.data,
+            code: otpCode.value,
             challengeToken: challengeToken.value,
           },
         },
@@ -157,27 +168,12 @@ export function usePartnerRegistration() {
 
       successLead.value = result.lead
       step.value = 'success'
+      otpFlow.clearTimers()
     } catch (err: unknown) {
       errorMessage.value = otpFlow.parseFetchError(err)
     } finally {
       loading.value = false
     }
-  }
-  */
-
-  async function sendOtp() {
-    if (OTP_ENABLED) {
-      return
-    }
-    await registerDirect()
-  }
-
-  async function resendOtp() {
-    if (!OTP_ENABLED) return
-  }
-
-  async function verifyOtpAndRegister() {
-    if (!OTP_ENABLED) return
   }
 
   function setOtpDigit(index: number, value: string) {
@@ -218,8 +214,9 @@ export function usePartnerRegistration() {
     otpDigits.value = ['', '', '', '', '', '']
     errorMessage.value = null
     successLead.value = null
-    normalizedEmail.value = ''
     challengeToken.value = null
+    otpPhoneMasked.value = ''
+    otpDebugMode.value = false
     otpFlow.clearTimers()
   }
 
@@ -228,14 +225,15 @@ export function usePartnerRegistration() {
     form,
     otpDigits,
     otpCode,
+    canVerifyOtp,
     loading,
     errorMessage,
     successLead,
-    normalizedEmail,
+    otpPhoneMasked,
+    otpDebugMode,
     otpFlow,
     otpEnabled: OTP_ENABLED,
     sendOtp,
-    registerDirect,
     resendOtp,
     verifyOtpAndRegister,
     setOtpDigit,

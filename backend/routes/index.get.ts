@@ -5,7 +5,11 @@ export default defineEventHandler(() => ({
   docs: {
     health: '/api/health',
     waitlist: '/api/waitlist/send-otp',
-    partner: '/api/partner/send-otp',
+    partner: {
+      sendOtp: '/api/partner/send-otp',
+      resendOtp: '/api/partner/resend-otp',
+      verifyOtp: '/api/partner/verify-otp',
+    },
     admin: '/api/admin/me',
   },
 }))

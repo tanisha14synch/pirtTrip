@@ -64,7 +64,7 @@ See [RAILWAY.md](./RAILWAY.md) for exact variables and health checks.
 ## 6. Verify production flows
 
 - Waitlist OTP: `/api/waitlist/send-otp` + `/api/waitlist/verify-otp`
-- Partner OTP: `/api/partner/send-otp` + `/api/partner/verify-otp`
+- Partner OTP: `/api/partner/send-otp` + `/api/partner/resend-otp` + `/api/partner/verify-otp` (SMS via AquaSMS; without `AQUASMS_API_KEY` the OTP is logged on the backend console)
 - Admin 2FA OTP: `/api/admin/auth/send-otp` + `/api/admin/auth/verify-otp`
 
 ## 7. Troubleshooting

@@ -6,9 +6,10 @@ const {
   loading,
   errorMessage,
   successLead,
-  normalizedEmail,
+  otpPhoneMasked,
+  otpDebugMode,
+  canVerifyOtp,
   otpFlow,
-  otpEnabled,
   sendOtp,
   resendOtp,
   verifyOtpAndRegister,
@@ -42,11 +43,12 @@ function onPhoneInput(event) {
 }
 
 function onPhoneKeydown(event) {
-  if (EDITING_KEYS.has(event.key)) return
+  const key = event.key ?? ''
+  if (EDITING_KEYS.has(key)) return
   if (event.ctrlKey || event.metaKey) return
 
-  if (/^\d$/.test(event.key)) {
-    if (form.phone.length >= 10) event.preventDefault()
+  if (/^\d$/.test(key)) {
+    if ((form.phone ?? '').length >= 10) event.preventDefault()
     return
   }
 
@@ -59,7 +61,7 @@ function onPhoneBeforeInput(event) {
   const data = event.data
   if (!data) return
 
-  if (/\D/.test(data) || form.phone.length + data.length > 10) {
+  if (/\D/.test(data) || (form.phone ?? '').length + data.length > 10) {
     event.preventDefault()
   }
 }
@@ -69,23 +71,25 @@ function onPhonePaste(event) {
   const pasted = event.clipboardData?.getData('text').replace(/\D/g, '') ?? ''
   if (!pasted) return
 
-  form.phone = `${form.phone}${pasted}`.replace(/\D/g, '').slice(0, 10)
+  form.phone = `${form.phone ?? ''}${pasted}`.replace(/\D/g, '').slice(0, 10)
 }
 
 function onNameInput(event, key) {
   form[key] = event.target.value.replace(/\d/g, '').slice(0, 80)
 }
 
-function onNameKeydown(event, key) {
-  if (EDITING_KEYS.has(event.key)) return
+function onNameKeydown(event, field) {
+  const key = event.key ?? ''
+  if (EDITING_KEYS.has(key)) return
   if (event.ctrlKey || event.metaKey) return
 
-  if (/^\d$/.test(event.key)) {
+  if (/^\d$/.test(key)) {
     event.preventDefault()
     return
   }
 
-  if (event.key.length === 1 && form[key].length >= 80) {
+  const current = String(form[field] ?? '')
+  if (key.length === 1 && current.length >= 80) {
     event.preventDefault()
   }
 }
@@ -99,12 +103,12 @@ function onNameBeforeInput(event) {
   }
 }
 
-function onNamePaste(event, key) {
+function onNamePaste(event, field) {
   event.preventDefault()
   const pasted = event.clipboardData?.getData('text').replace(/\d/g, '') ?? ''
   if (!pasted) return
 
-  form[key] = `${form[key]}${pasted}`.slice(0, 80)
+  form[field] = `${form[field] ?? ''}${pasted}`.slice(0, 80)
 }
 
 function onBusinessNameInput(event) {
@@ -332,7 +336,7 @@ function onOtpInput(index, event) {
           :disabled="loading"
           class="mt-0.5 flex h-[44px] w-full items-center justify-center gap-2 rounded-[8px] bg-[#F3A81A] font-plein text-[15px] font-bold leading-[140%] tracking-[0] text-white transition-opacity hover:opacity-90 disabled:opacity-60"
         >
-          {{ loading ? 'Submitting…' : 'Register Now' }}
+          {{ loading ? 'Sending OTP…' : 'Register Now' }}
           <svg
             v-if="!loading"
             class="h-4 w-4 shrink-0"
@@ -347,28 +351,36 @@ function onOtpInput(index, event) {
         </button>
       </form>
 
-      <!-- OTP step disabled until email provider is configured -->
       <form
-        v-else-if="otpEnabled && step === 'otp'"
+        v-else-if="step === 'otp'"
         class="mt-6 space-y-3"
         @submit.prevent="onSubmitOtp"
       >
+        <h2 class="font-plein text-[17px] font-bold leading-[125%] text-white md:text-[20px]">
+          Verify your registration
+        </h2>
         <p class="font-plein text-[14px] leading-[140%] text-white/80">
           Enter the 6-digit code sent to
-          <span class="font-medium text-white">{{ normalizedEmail }}</span>
+          <span class="font-medium text-white">{{ otpPhoneMasked }}</span>
+        </p>
+        <p
+          v-if="otpDebugMode"
+          class="font-plein text-[12px] leading-[140%] text-white/55"
+        >
+          SMS is not configured. Check the backend server console for the OTP code.
         </p>
 
         <p
           v-if="otpFlow.expiresInSeconds > 0"
           class="font-plein text-[13px] text-white/50"
         >
-          Code expires in {{ otpFlow.expiryLabel }}
+          OTP expires in {{ otpFlow.expiryLabel }}
         </p>
         <p
           v-else
           class="font-plein text-[13px] text-amber-200/90"
         >
-          Code expired. Resend to get a new one.
+          OTP expired. Resend to get a new one.
         </p>
 
         <div
@@ -392,10 +404,10 @@ function onOtpInput(index, event) {
 
         <button
           type="submit"
-          :disabled="loading"
+          :disabled="loading || !canVerifyOtp"
           class="mt-1 flex h-[50px] w-full items-center justify-center rounded-[8px] bg-[#F3A81A] font-plein text-[16px] font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
         >
-          {{ loading ? 'Verifying…' : 'Verify & Register' }}
+          {{ loading ? 'Verifying…' : 'Verify OTP' }}
         </button>
 
         <button
@@ -404,11 +416,7 @@ function onOtpInput(index, event) {
           :disabled="loading || !otpFlow.canResend"
           @click="resendOtp"
         >
-          {{
-            otpFlow.canResend
-              ? 'Resend code'
-              : `Resend in ${otpFlow.resendWaitSeconds}s`
-          }}
+          {{ otpFlow.canResend ? 'Resend OTP' : `Resend OTP in ${otpFlow.resendWaitSeconds}s` }}
         </button>
 
         <button

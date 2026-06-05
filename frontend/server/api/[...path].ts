@@ -1,25 +1,20 @@
-import { proxyRequest } from 'h3'
+import {
+  handlePartnerOtpResend,
+  handlePartnerOtpSend,
+  handlePartnerOtpVerify,
+  isPartnerOtpApiPath,
+} from '../utils/partner-otp-handlers'
+import { proxyApiToBackend, shouldHandlePartnerOtpLocally } from '../utils/api-proxy'
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
-  const isProd = process.env.NODE_ENV === 'production'
-  const origin = (
-    (config.apiProxyOrigin as string)
-    || process.env.API_URL
-    || process.env.NUXT_API_PROXY_ORIGIN
-    || (!isProd ? 'http://127.0.0.1:3001' : '')
-  )
-    .trim()
-    .replace(/\/$/, '')
-    .replace(/\/api$/, '')
+  const path = event.path
+  const method = event.method
 
-  if (!origin) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'API proxy is not configured. Set API_URL on frontend service.',
-    })
+  if (shouldHandlePartnerOtpLocally() && isPartnerOtpApiPath(path) && method === 'POST') {
+    if (path === '/api/partner/send-otp') return handlePartnerOtpSend(event)
+    if (path === '/api/partner/resend-otp') return handlePartnerOtpResend(event)
+    if (path === '/api/partner/verify-otp') return handlePartnerOtpVerify(event)
   }
 
-  const target = `${origin}${event.path}`
-  return proxyRequest(event, target)
+  return proxyApiToBackend(event)
 })

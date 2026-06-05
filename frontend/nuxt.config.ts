@@ -1,5 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { DEV_BACKEND_PORT, DEV_FRONTEND_PORT } from './constants/dev-ports'
+import {
+  DEFAULT_DEV_PARTNER_SITE_URL,
+  DEFAULT_PROD_PARTNER_SITE_URL,
+} from './utils/partner-site-url'
+
 const isProd = process.env.NODE_ENV === 'production'
+const devFrontendPort = Number(process.env.PORT || process.env.FRONTEND_PORT || DEV_FRONTEND_PORT)
+const devBackendPort = Number(process.env.BACKEND_PORT || DEV_BACKEND_PORT)
 
 function normalizeApiOrigin(raw: string): string {
   return raw.trim().replace(/\/$/, '').replace(/\/api$/, '')
@@ -13,17 +21,12 @@ function resolveApiOrigin(): string {
     || ''
   if (fromEnv) return normalizeApiOrigin(fromEnv)
   // Local dev default when .env.development is missing
-  if (!isProd) return 'http://127.0.0.1:3001'
+  if (!isProd) return `http://127.0.0.1:${devBackendPort}`
   return ''
 }
 
 const apiOrigin = resolveApiOrigin()
-const devApiTarget = `${apiOrigin || 'http://127.0.0.1:3001'}/api`
-
-import {
-  DEFAULT_DEV_PARTNER_SITE_URL,
-  DEFAULT_PROD_PARTNER_SITE_URL,
-} from './utils/partner-site-url'
+const devApiTarget = `${apiOrigin || `http://127.0.0.1:${devBackendPort}`}/api`
 
 const siteVariant = process.env.NUXT_PUBLIC_SITE_VARIANT || 'main'
 const partnerSiteUrl = (process.env.NUXT_PUBLIC_PARTNER_SITE_URL || '').trim().replace(/\/$/, '')
@@ -69,6 +72,15 @@ else {
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+  devServer: {
+    port: devFrontendPort,
+    host: 'localhost',
+  },
+  vite: {
+    server: {
+      strictPort: true,
+    },
+  },
   modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
   runtimeConfig: {
     apiProxyOrigin: apiOrigin,

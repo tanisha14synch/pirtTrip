@@ -6,6 +6,7 @@ import {
   verifyOtpHash,
 } from './otp'
 import { buildOtpEmailContent, sendTransactionalEmail } from './mailer'
+import { buildPartnerOtpSmsMessage, hasSmsProvider, sendTransactionalSms } from './sms'
 import {
   buildChallengePayload,
   createChallengeToken,
@@ -39,8 +40,16 @@ export async function createAndSendOtp(options: {
   purpose: OtpPurpose
   challengeToken?: string | null
   metadata?: Record<string, unknown>
+  deliveryEmail?: string
+  buildMailContent?: (code: string) => { subject: string; html: string; text: string }
+  smsDelivery?: {
+    phone: string
+    buildMessage?: (code: string) => string
+  }
 }) {
   const email = options.email.trim().toLowerCase()
+  const deliveryEmail = (options.deliveryEmail || email).trim().toLowerCase()
+  const useSms = Boolean(options.smsDelivery)
 
   const resendCheck = await validateResendForEmail({
     email,
@@ -72,23 +81,36 @@ export async function createAndSendOtp(options: {
     expiresAt: challenge.expires_at,
   })
   const challengeToken = createChallengeToken(payload)
-  const mail = buildOtpEmailContent(code, PURPOSE_LABELS[options.purpose])
+  const mail = options.buildMailContent
+    ? options.buildMailContent(code)
+    : buildOtpEmailContent(code, PURPOSE_LABELS[options.purpose])
+  const smsMessage = options.smsDelivery
+    ? (options.smsDelivery.buildMessage?.(code) ?? buildPartnerOtpSmsMessage(code))
+    : ''
 
   const config = useRuntimeConfig()
   const isDev = process.env.NODE_ENV !== 'production'
   const hasMailProvider =
     Boolean(config.resendApiKey) || Boolean(config.smtpHost && config.smtpUser && config.smtpPass)
-  const showDevCode = isDev && (process.env.OTP_DEBUG === 'true' || !config.resendApiKey)
+  const smsReady = useSms ? hasSmsProvider() : false
+  const smsConsoleFallback = useSms && !smsReady
+  const emailConsoleFallback = !useSms && isDev && (
+    process.env.OTP_DEBUG === 'true' || !hasMailProvider
+  )
+  const showDevCode = smsConsoleFallback || emailConsoleFallback
 
-  // In local/dev without a configured provider, don't fail OTP flow.
-  // Return debugCode so frontend can continue verification while infra is being set up.
-  if (!hasMailProvider && showDevCode) {
+  // Without AquaSMS credentials, log OTP to server console and continue verification.
+  if (showDevCode) {
     otpLog('send.dev_fallback', {
       purpose: options.purpose,
-      emailHint: `${email.slice(0, 2)}***`,
+      channel: useSms ? 'sms' : 'email',
+      targetHint: useSms
+        ? `${options.smsDelivery!.phone.slice(0, 4)}***`
+        : `${email.slice(0, 2)}***`,
       challengeId: challenge.id,
     })
-    console.info(`[OTP DEV] ${options.purpose} code for ${email}: ${code}`)
+    const devTarget = useSms ? options.smsDelivery!.phone : email
+    console.info(`[OTP] ${options.purpose} code for ${devTarget}: ${code}`)
     return {
       challengeToken,
       expiresInSeconds: getOtpTtlSeconds(),
@@ -99,30 +121,41 @@ export async function createAndSendOtp(options: {
 
   try {
     const startedAt = Date.now()
-    await sendTransactionalEmail({
-      to: email,
-      ...mail,
-    })
+    if (useSms) {
+      await sendTransactionalSms({
+        to: options.smsDelivery!.phone,
+        message: smsMessage,
+      })
+    } else {
+      await sendTransactionalEmail({
+        to: deliveryEmail,
+        ...mail,
+      })
+    }
     otpLog('send.success', {
       purpose: options.purpose,
+      channel: useSms ? 'sms' : 'email',
       challengeId: challenge.id,
       latencyMs: Date.now() - startedAt,
     })
-  } catch (mailError) {
-    if (showDevCode) {
-      console.warn(`[OTP] Email delivery failed for ${email}. Dev code: ${code}`)
+  } catch (deliveryError) {
+    if (smsConsoleFallback || emailConsoleFallback) {
+      const devTarget = useSms ? options.smsDelivery!.phone : email
+      console.warn(`[OTP] Delivery failed for ${devTarget}. Console code: ${code}`)
       otpLog('send.provider_failed_dev_mode', {
         purpose: options.purpose,
+        channel: useSms ? 'sms' : 'email',
         challengeId: challenge.id,
-        message: (mailError as Error)?.message || 'unknown',
+        message: (deliveryError as Error)?.message || 'unknown',
       })
     } else {
       otpLog('send.provider_failed', {
         purpose: options.purpose,
+        channel: useSms ? 'sms' : 'email',
         challengeId: challenge.id,
-        message: (mailError as Error)?.message || 'unknown',
+        message: (deliveryError as Error)?.message || 'unknown',
       })
-      throw mailError
+      throw deliveryError
     }
   }
 

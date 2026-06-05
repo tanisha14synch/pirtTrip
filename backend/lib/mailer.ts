@@ -106,6 +106,55 @@ async function sendViaSupabaseAuth(payload: MailPayload) {
   }
 }
 
+export function buildPartnerAdminOtpEmailContent(options: {
+  code: string
+  firstName: string
+  lastName: string
+  businessName: string
+  phone: string
+}) {
+  const subject = `Partner registration OTP: ${options.code}`
+  const registrant = `${options.firstName} ${options.lastName}`.trim()
+  const text = [
+    'A new partner registration is awaiting verification.',
+    '',
+    `Name: ${registrant}`,
+    `Business: ${options.businessName}`,
+    `Phone: +91-${options.phone}`,
+    '',
+    `Verification code: ${options.code}`,
+    '',
+    'Share this code with the registrant so they can complete signup. The code expires in 10 minutes.',
+  ].join('\n')
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#141210;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:40px auto;background:#1e1b18;border-radius:12px;border:1px solid #333;">
+    <tr>
+      <td style="padding:32px 28px;">
+        <p style="margin:0 0 8px;color:#F3A81A;font-size:14px;font-weight:bold;letter-spacing:0.05em;">PirtTrip Business</p>
+        <h1 style="margin:0 0 16px;color:#fff;font-size:22px;">Partner registration OTP</h1>
+        <p style="margin:0 0 16px;color:#aaa;font-size:15px;line-height:1.5;">A new business registration is awaiting verification.</p>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;color:#ddd;font-size:14px;line-height:1.6;">
+          <tr><td><strong style="color:#fff;">Name:</strong> ${registrant}</td></tr>
+          <tr><td><strong style="color:#fff;">Business:</strong> ${options.businessName}</td></tr>
+          <tr><td><strong style="color:#fff;">Phone:</strong> +91-${options.phone}</td></tr>
+        </table>
+        <div style="text-align:center;display:inline-block;padding:16px 28px;background:#000;border:2px solid #F3A81A;border-radius:10px;">
+          <span style="font-size:32px;font-weight:bold;letter-spacing:8px;color:#F3A81A;">${options.code}</span>
+        </div>
+        <p style="margin:24px 0 0;color:#666;font-size:13px;line-height:1.5;">Share this code with the registrant so they can complete signup. The code expires in 10 minutes.</p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`.trim()
+
+  return { subject, text, html }
+}
+
 export function buildOtpEmailContent(code: string, purposeLabel: string) {
   const subject = `${code} is your PirtTrip verification code`
   const text = `Your PirtTrip verification code for ${purposeLabel} is: ${code}\n\nThis code expires in 10 minutes. If you did not request this, ignore this email.`

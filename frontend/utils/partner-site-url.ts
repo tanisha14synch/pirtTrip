@@ -1,7 +1,9 @@
 import type { H3Event } from 'h3'
 import { getRequestHost, getRequestURL } from 'h3'
 
-export const DEFAULT_DEV_PARTNER_SITE_URL = 'http://business.localhost:3000'
+import { DEV_FRONTEND_PORT, DEV_PARTNER_URL } from '../constants/dev-ports'
+
+export const DEFAULT_DEV_PARTNER_SITE_URL = DEV_PARTNER_URL
 export const DEFAULT_PROD_PARTNER_SITE_URL = 'https://business.pirttrip.com'
 
 export function normalizePartnerSiteUrl(url: string | undefined): string {
@@ -29,7 +31,7 @@ export function resolvePartnerSiteUrlFromEvent(
   const host = getRequestHost(event, { xForwardedHost: true }).toLowerCase().split(':')[0]
   if (host === 'localhost' || host === '127.0.0.1') {
     const url = getRequestURL(event)
-    const port = url.port || '3000'
+    const port = url.port || String(DEV_FRONTEND_PORT)
     return `${url.protocol}//business.localhost:${port}`
   }
 

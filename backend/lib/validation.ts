@@ -1,16 +1,22 @@
 import { z } from 'zod'
 
+export function zodErrorMessage(error: z.ZodError, fallback = 'Invalid request'): string {
+  return error.issues[0]?.message ?? fallback
+}
+
 export const partnerRegistrationSchema = z.object({
   firstName: z
     .string()
     .trim()
     .min(1, 'First name is required')
-    .max(80, 'First name is too long'),
+    .max(80, 'First name is too long')
+    .refine((val) => !/\d/.test(val), 'First name cannot contain numbers'),
   lastName: z
     .string()
     .trim()
     .min(1, 'Last name is required')
-    .max(80, 'Last name is too long'),
+    .max(80, 'Last name is too long')
+    .refine((val) => !/\d/.test(val), 'Last name cannot contain numbers'),
   phone: z
     .string()
     .trim()
@@ -19,7 +25,8 @@ export const partnerRegistrationSchema = z.object({
     .string()
     .trim()
     .min(1, 'Business name is required')
-    .max(120, 'Business name is too long'),
+    .max(120, 'Business name is too long')
+    .refine((val) => /[a-zA-Z]/.test(val), 'Business name must contain at least one letter'),
   email: z
     .string()
     .trim()

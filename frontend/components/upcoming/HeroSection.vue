@@ -230,7 +230,7 @@ onUnmounted(() => {
               </div>
             </div>
 
-            <span
+            <!-- <span
               class="h-9 w-px shrink-0 bg-white/35"
               aria-hidden="true"
             />
@@ -250,7 +250,7 @@ onUnmounted(() => {
                   +91-9711104186
                 </a>
               </p>
-            </div>
+            </div> -->
           </div>
         </div>
       </header>
@@ -264,7 +264,8 @@ onUnmounted(() => {
         >
         <article class="mx-auto max-w-[580px] text-center lg:mx-0 lg:pt-1 lg:text-left xl:max-w-[500px]">
             <p class="font-plein text-[14px] font-normal leading-[135%] tracking-[0] text-white">
-              <span class="text-brand-gold font-bold">Register Today & Get 20 CONNECT CREDITs for FREE.</span>
+              Lets Grow Your Travel Business with
+              <span class="text-brand-gold font-bold">PirtTrip</span>
             </p>
 
             <h1

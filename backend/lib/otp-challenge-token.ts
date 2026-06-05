@@ -219,7 +219,7 @@ export function buildChallengePayload(options: {
 }): OtpChallengePayload {
   return {
     id: options.id,
-    email,
+    email: options.email,
     purpose: options.purpose,
     exp: new Date(options.expiresAt).getTime(),
   }

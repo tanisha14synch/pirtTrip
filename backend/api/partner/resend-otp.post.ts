@@ -5,7 +5,7 @@ import { normalizePhone } from '~/lib/phone'
 import { partnerRegistrationSchema, zodErrorMessage } from '~/lib/validation'
 
 const bodySchema = partnerRegistrationSchema.extend({
-  challengeToken: z.string().optional(),
+  challengeToken: z.string().min(1, 'Verification session expired. Submit the form again.'),
 })
 
 export default defineEventHandler(async (event) => {
@@ -15,8 +15,8 @@ export default defineEventHandler(async (event) => {
   if (!parsed.success) {
     throw createError({
       statusCode: 400,
-      statusMessage: zodErrorMessage(parsed.error, 'Invalid form'),
-      data: { code: 'INVALID_FORM' },
+      statusMessage: zodErrorMessage(parsed.error),
+      data: { code: 'INVALID_REQUEST' },
     })
   }
 
@@ -48,11 +48,10 @@ export default defineEventHandler(async (event) => {
       throw error
     }
 
-    console.error('[partner/send-otp]', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Failed to send verification code. Please try again.',
-      data: { code: 'OTP_SEND_FAILED' },
+      statusMessage: 'Failed to resend verification code. Please try again.',
+      data: { code: 'OTP_RESEND_FAILED' },
     })
   }
 })

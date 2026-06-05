@@ -1,11 +1,18 @@
 import { z } from 'zod'
 import { verifyEmailOtp } from '~/lib/email-otp-service'
-import { partnerRegistrationSchema } from '~/lib/validation'
+import {
+  assertPartnerPhoneAvailable,
+  markPartnerPhoneVerified,
+  sendPartnerRegistrationThankYouSms,
+} from '~/lib/partner-registration-otp'
+import { partnerOtpChallengeEmail } from '~/lib/partner-otp'
+import { partnerRegistrationSchema, zodErrorMessage } from '~/lib/validation'
 import { normalizePhone } from '~/lib/phone'
 import { insertPartnerLead } from '~/lib/partner-lead-insert'
+import { getSupabaseAdmin } from '~/lib/supabase'
 
 const bodySchema = partnerRegistrationSchema.extend({
-  code: z.string().regex(/^\d{6}$/, 'Enter the 6-digit code from your email'),
+  code: z.string().regex(/^\d{6}$/, 'Enter the 6-digit verification code'),
   challengeToken: z.string().min(1, 'Verification session expired. Request a new code.'),
 })
 
@@ -16,34 +23,37 @@ export default defineEventHandler(async (event) => {
   if (!parsed.success) {
     throw createError({
       statusCode: 400,
-      statusMessage: parsed.error.errors[0]?.message ?? 'Invalid request',
+      statusMessage: zodErrorMessage(parsed.error),
+      data: { code: 'INVALID_REQUEST' },
     })
   }
 
-  const email = parsed.data.email.trim().toLowerCase()
   const phone = normalizePhone(parsed.data.phone)
+  const challengeEmail = partnerOtpChallengeEmail(phone)
 
-  await verifyEmailOtp({
-    email,
-    purpose: 'partner_registration',
-    code: parsed.data.code,
-    challengeToken: parsed.data.challengeToken,
-  })
+  try {
+    await verifyEmailOtp({
+      email: challengeEmail,
+      purpose: 'partner_registration',
+      code: parsed.data.code,
+      challengeToken: parsed.data.challengeToken,
+    })
+  } catch (error: unknown) {
+    if (error && typeof error === 'object' && 'statusCode' in error) {
+      throw error
+    }
+
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Verification failed. Please check the code and try again.',
+      data: { code: 'OTP_VERIFY_FAILED' },
+    })
+  }
+
+  await assertPartnerPhoneAvailable(phone)
 
   const admin = getSupabaseAdmin()
-
-  const { data: existing } = await admin
-    .from('partner_leads')
-    .select('id')
-    .eq('phone', phone)
-    .maybeSingle()
-
-  if (existing) {
-    throw createError({
-      statusCode: 409,
-      statusMessage: 'This phone number is already registered',
-    })
-  }
+  const email = parsed.data.email?.trim().toLowerCase() || null
 
   const { data: lead, error: leadError } = await insertPartnerLead(admin, {
     firstName: parsed.data.firstName,
@@ -51,6 +61,7 @@ export default defineEventHandler(async (event) => {
     businessName: parsed.data.businessName,
     phone,
     email,
+    whatsappOptIn: parsed.data.whatsappOptIn,
     otpVerified: true,
   })
 
@@ -60,14 +71,12 @@ export default defineEventHandler(async (event) => {
       statusCode: 500,
       statusMessage: msg,
       message: msg,
+      data: { code: 'REGISTRATION_SAVE_FAILED' },
     })
   }
 
-  await admin.from('otp_logs').insert({
-    phone,
-    verified_at: new Date().toISOString(),
-    is_verified: true,
-  })
+  await markPartnerPhoneVerified(phone)
+  await sendPartnerRegistrationThankYouSms(phone)
 
   await admin.from('lead_activity_logs').insert({
     lead_id: lead.id,
