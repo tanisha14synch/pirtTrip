@@ -63,6 +63,7 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <div>
   <section class="relative flex min-h-screen flex-col overflow-hidden" aria-label="Coming soon">
     <div
       class="pointer-events-none absolute inset-0 z-0"
@@ -70,9 +71,9 @@ onUnmounted(() => {
       aria-hidden="true"
     />
 
-    <!-- Top bar (Figma) -->
+    <!-- Top bar: mobile = logo + For Businesses; desktop = logo + button + contact -->
     <header class="relative z-20 w-full px-4 pt-5 sm:px-8 sm:pt-6 lg:px-12">
-      <div class="mx-auto flex max-w-[1440px] flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div class="mx-auto flex max-w-[1440px] items-center justify-between gap-3 sm:gap-4">
         <NuxtLink to="/" class="inline-flex shrink-0">
           <img
             src="/images/logo.svg"
@@ -83,17 +84,17 @@ onUnmounted(() => {
           >
         </NuxtLink>
 
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
+        <div class="flex shrink-0 items-center gap-3 sm:gap-5">
           <NuxtLink
             :to="partnerLandingUrl"
-            class="inline-flex h-[44px] shrink-0 items-center justify-center rounded-[8px] bg-[#F3A81A] px-5 font-plein text-[15px] font-bold text-white transition-opacity hover:opacity-90 sm:h-[46px] sm:px-6"
+            class="inline-flex h-[36px] shrink-0 items-center justify-center rounded-[8px] bg-[#F3A81A] px-3.5 font-plein text-[12px] font-bold text-white transition-opacity hover:opacity-90 sm:h-[46px] sm:px-6 sm:text-[15px]"
           >
             For Businesses
           </NuxtLink>
 
           <span class="hidden h-10 w-px shrink-0 bg-white/35 sm:block" aria-hidden="true" />
 
-          <div class="font-plein text-[13px] font-normal leading-[140%] text-white sm:text-[14px]">
+          <div class="hidden font-plein text-[13px] font-normal leading-[140%] text-white sm:block sm:text-[14px]">
             <p>For any information, Contact</p>
             <p>
               Partner Support at:
@@ -162,9 +163,16 @@ onUnmounted(() => {
 
     <LayoutFooterCopyright
       variant="dark"
-      class="absolute bottom-0 left-0 right-0 z-20 px-4 pb-5 sm:pb-6"
+      class="absolute bottom-0 left-0 right-0 z-20 hidden px-4 pb-5 md:block sm:pb-6"
     />
 
     <LandingWaitlistModal v-model:open="waitlistOpen" />
   </section>
+
+  <UpcomingFooterSection
+    class="md:hidden"
+    cta-mode="waitlist"
+    @open-waitlist="waitlistOpen = true"
+  />
+  </div>
 </template>

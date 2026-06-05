@@ -94,7 +94,8 @@ const rowTwo = [
     iconSrc: '/images/trust/trust-icon-10.png',
     iconAlt: 'Transparent platform',
     parts: [
-      { text: 'Transparent and travel-business-friendly platform', bold: false },
+      { text: 'Transparent and travel-business-friendly', bold: true },
+      { text: ' platform', bold: false },
     ],
   },
   {

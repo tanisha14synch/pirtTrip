@@ -27,8 +27,46 @@ const inputClass =
 const linkClass =
   'text-[#F3A81A] underline decoration-[#F3A81A]/40 underline-offset-2 hover:decoration-[#F3A81A]'
 
+const PHONE_ALLOWED_KEYS = new Set([
+  'Backspace',
+  'Delete',
+  'Tab',
+  'ArrowLeft',
+  'ArrowRight',
+  'Home',
+  'End',
+])
+
 function onPhoneInput(event) {
   form.phone = event.target.value.replace(/\D/g, '').slice(0, 10)
+}
+
+function onPhoneKeydown(event) {
+  if (PHONE_ALLOWED_KEYS.has(event.key)) return
+  if (event.ctrlKey || event.metaKey) return
+
+  if (/^\d$/.test(event.key)) {
+    if (form.phone.length >= 10) event.preventDefault()
+    return
+  }
+
+  event.preventDefault()
+}
+
+function onPhonePaste(event) {
+  event.preventDefault()
+  const pasted = event.clipboardData?.getData('text').replace(/\D/g, '') ?? ''
+  if (!pasted) return
+
+  form.phone = `${form.phone}${pasted}`.replace(/\D/g, '').slice(0, 10)
+}
+
+function onNameInput(event, key) {
+  form[key] = event.target.value.replace(/\d/g, '').slice(0, 80)
+}
+
+function onBusinessNameInput(event) {
+  form.businessName = event.target.value.slice(0, 120)
 }
 
 function showConnectsHelp() {
@@ -59,14 +97,20 @@ function onOtpInput(index, event) {
 <template>
   <aside
     id="get-started"
-    class="w-full scroll-mt-6 rounded-[14px] border border-white/[0.08] bg-[#141210]/95 p-5 shadow-[0_24px_60px_rgba(0,0,0,0.45)]"
+    class="w-full scroll-mt-6 rounded-[14px] border border-white/[0.08] bg-[#141210]/95 p-4 shadow-[0_24px_60px_rgba(0,0,0,0.45)] md:p-5"
   >
     <template v-if="step === 'success'">
-      <h2 class="font-plein text-[30px] font-bold leading-[130%] text-white md:text-[34px]">
-        You&apos;re registered!
+      <h2 class="font-plein text-[22px] font-bold leading-[130%] text-white md:text-[26px]">
+        Thank you for registering on PirtTrip Business!
       </h2>
-      <p class="mt-3 font-plein text-[15px] leading-[140%] text-white/85">
-        Thank you{{ successLead ? `, ${successLead.first_name}` : '' }}. Our team will contact you shortly.
+      <p class="mt-3 font-plein text-[15px] leading-[150%] text-white/85">
+        We are launching soon and working hard to bring your business dashboard live.
+        We&apos;ll keep you updated once it is ready. For any queries, please contact
+        Business Support at:
+        <a
+          href="mailto:contact@pirttrip.com"
+          class="text-[#F3A81A] underline underline-offset-2 hover:text-[#f5b83d]"
+        >contact@pirttrip.com</a>
       </p>
       <button
         type="button"
@@ -78,8 +122,8 @@ function onOtpInput(index, event) {
     </template>
 
     <template v-else>
-      <h2 class="font-plein text-[22px] font-bold leading-[125%] tracking-[0] text-white md:text-[24px]">
-        New to PirtTrip business? Get Started
+      <h2 class="font-plein text-[17px] font-bold leading-[125%] tracking-[0] text-white md:text-[24px]">
+        New to PirtTrip business?<span class="hidden md:inline"> Get Started</span>
       </h2>
 
       <p class="mt-2 font-plein text-[13px] font-normal leading-[135%] tracking-[0] text-white/90">
@@ -88,36 +132,33 @@ function onOtpInput(index, event) {
         as a Welcome Benefit!
       </p>
 
-      <div class="relative mt-2 inline-flex items-center gap-1.5">
-        <span class="font-plein text-[13px] text-white/70">What are connects?</span>
-        <div
-          ref="connectsHelpRef"
-          class="relative inline-flex"
-          @mouseenter="showConnectsHelp"
-          @mouseleave="hideConnectsHelp"
-          @focusin="showConnectsHelp"
-          @focusout="hideConnectsHelp"
+      <div
+        ref="connectsHelpRef"
+        class="relative mt-2 inline-flex items-center"
+        @mouseenter="showConnectsHelp"
+        @mouseleave="hideConnectsHelp"
+      >
+        <span class="font-plein text-[13px] leading-[135%] text-white/70">What are connects</span>
+        <button
+          type="button"
+          class="connects-help-trigger -ml-px inline-flex h-[18px] w-[14px] shrink-0 items-center justify-center font-plein text-[15px] font-bold leading-none text-[#F3A81A] transition-colors hover:text-white"
+          aria-describedby="connects-help-tooltip"
+          aria-label="What are connects?"
+          :aria-expanded="connectsHelpOpen"
+          @click="connectsHelpOpen = !connectsHelpOpen"
         >
-          <button
-            type="button"
-            class="flex h-5 w-5 items-center justify-center rounded-full border border-white/25 bg-white/10 font-plein text-[12px] font-bold leading-none text-white/80 transition-colors hover:border-[#F3A81A]/60 hover:text-[#F3A81A]"
-            aria-describedby="connects-help-tooltip"
-            aria-label="What are connects?"
-            :aria-expanded="connectsHelpOpen"
-          >
-            ?
-          </button>
+          ?
+        </button>
 
-          <div
-            v-show="connectsHelpOpen"
-            id="connects-help-tooltip"
-            class="absolute left-1/2 top-full z-20 mt-2 w-[260px] -translate-x-1/2 rounded-[10px] border border-white/10 bg-[#1e1b18] p-3.5 shadow-[0_12px_32px_rgba(0,0,0,0.45)] sm:left-0 sm:translate-x-0"
-            role="tooltip"
-          >
-            <p class="font-plein text-[13px] leading-[150%] text-white/85">
-              Connects are credits that let you receive verified traveler inquiries on PirtTrip. Use them to connect with customers interested in your trips and packages.
-            </p>
-          </div>
+        <div
+          v-show="connectsHelpOpen"
+          id="connects-help-tooltip"
+          class="absolute left-0 top-[calc(100%+8px)] z-30 w-[min(260px,calc(100vw-2.5rem))] rounded-[10px] border border-white/10 bg-[#1e1b18] p-3.5 shadow-[0_12px_32px_rgba(0,0,0,0.45)]"
+          role="tooltip"
+        >
+          <p class="font-plein text-[13px] leading-[150%] text-white/85">
+            Connects are credits that let you receive verified traveler inquiries on PirtTrip. Use them to connect with customers interested in your trips and packages.
+          </p>
         </div>
       </div>
 
@@ -136,30 +177,33 @@ function onOtpInput(index, event) {
       >
         <div class="grid grid-cols-2 gap-2.5">
           <input
-            v-model="form.firstName"
+            :value="form.firstName"
             type="text"
             placeholder="First Name"
             required
             autocomplete="given-name"
             :class="inputClass"
+            @input="onNameInput($event, 'firstName')"
           >
           <input
-            v-model="form.lastName"
+            :value="form.lastName"
             type="text"
             placeholder="Last Name"
             required
             autocomplete="family-name"
             :class="inputClass"
+            @input="onNameInput($event, 'lastName')"
           >
         </div>
 
         <input
-          v-model="form.businessName"
+          :value="form.businessName"
           type="text"
           placeholder="Business Name"
           required
           autocomplete="organization"
           :class="inputClass"
+          @input="onBusinessNameInput"
         >
 
         <div class="flex h-[40px] overflow-hidden rounded-[8px] border border-[#3a3530] bg-[#1e1b18] focus-within:border-[#F3A81A]/70">
@@ -173,9 +217,12 @@ function onOtpInput(index, event) {
             required
             autocomplete="tel-national"
             inputmode="numeric"
+            pattern="[0-9]{10}"
             maxlength="10"
             class="min-w-0 flex-1 bg-transparent px-3 font-plein text-[14px] font-normal leading-[140%] text-white placeholder:text-white/35 outline-none"
             @input="onPhoneInput"
+            @keydown="onPhoneKeydown"
+            @paste="onPhonePaste"
           >
         </div>
 
@@ -324,3 +371,13 @@ function onOtpInput(index, event) {
     </template>
   </aside>
 </template>
+
+<style scoped>
+.connects-help-trigger {
+  color: #f3a81a;
+}
+
+.connects-help-trigger:hover {
+  color: #fff;
+}
+</style>

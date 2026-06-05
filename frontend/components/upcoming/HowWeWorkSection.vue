@@ -31,7 +31,9 @@ const desktopStepPlacements = [
 ]
 
 const BG_REVEAL_MS = 700
-const STEP_STAGGER_MS = 280
+const DESKTOP_STEP_STAGGER_MS = 280
+const MOBILE_STEP_STAGGER_MS = 160
+const MOBILE_STEPS_START_DELAY = 80
 
 const stageRef = ref(null)
 const hasStarted = ref(false)
@@ -54,12 +56,13 @@ function startSequence() {
   showBg.value = true
 
   const isDesktop = window.matchMedia('(min-width: 1024px)').matches
-  const stepsStartDelay = isDesktop ? BG_REVEAL_MS : 200
+  const stepsStartDelay = isDesktop ? BG_REVEAL_MS : MOBILE_STEPS_START_DELAY
+  const stepStagger = isDesktop ? DESKTOP_STEP_STAGGER_MS : MOBILE_STEP_STAGGER_MS
 
   desktopStepPlacements.forEach((_, index) => {
     const timer = setTimeout(() => {
       visibleStepCount.value = index + 1
-    }, stepsStartDelay + index * STEP_STAGGER_MS)
+    }, stepsStartDelay + index * stepStagger)
     stepTimers.push(timer)
   })
 }
@@ -88,6 +91,7 @@ onMounted(() => {
     showBg.value = true
   }
 
+  const isDesktop = window.matchMedia('(min-width: 1024px)').matches
   sectionObserver = new IntersectionObserver(
     (entries) => {
       if (entries[0]?.isIntersecting) {
@@ -96,7 +100,9 @@ onMounted(() => {
         sectionObserver = null
       }
     },
-    { threshold: 0.2, rootMargin: '0px 0px -60px 0px' },
+    isDesktop
+      ? { threshold: 0.2, rootMargin: '0px 0px -60px 0px' }
+      : { threshold: 0.12, rootMargin: '0px 0px 20px 0px' },
   )
 
   sectionObserver.observe(stageRef.value)
@@ -276,6 +282,15 @@ onUnmounted(() => {
   transition:
     opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (max-width: 1023px) {
+  .how-we-work-step {
+    transform: translateY(20px);
+    transition:
+      opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
 }
 
 .how-we-work-step--visible {

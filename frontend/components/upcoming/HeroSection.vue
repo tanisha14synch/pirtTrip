@@ -83,7 +83,10 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section class="upcoming-hero relative isolate flex min-h-screen min-h-[100svh] flex-col overflow-hidden pt-5 md:pt-6">
+  <section
+    id="upcoming-hero"
+    class="upcoming-hero relative isolate flex min-h-screen min-h-[100svh] flex-col overflow-hidden pt-4 md:pt-6"
+  >
     <img
       :src="HERO_BG_SRC"
       alt=""
@@ -114,10 +117,10 @@ onUnmounted(() => {
 
     <div class="hero-inner relative z-10 mx-auto flex w-[94%] max-w-[1280px] flex-1 flex-col pb-8 md:pb-10">
       <!-- Launch header -->
-      <header class="border-b border-white/5 pb-4 lg:pb-4">
-        <!-- Mobile (Figma) -->
+      <header class="border-b border-white/5 pb-3 lg:pb-4">
+        <!-- Mobile: logo + compact countdown; contact hidden -->
         <div class="lg:hidden">
-          <div class="flex items-start justify-between gap-2">
+          <div class="flex items-center justify-between gap-2">
             <a
               v-if="homeIsExternal"
               :href="homeHref"
@@ -127,7 +130,7 @@ onUnmounted(() => {
               <img
                 src="/images/logo.svg"
                 alt="PirtTrip"
-                class="h-9 w-auto object-contain"
+                class="h-8 w-auto object-contain"
                 width="584"
                 height="192"
               >
@@ -141,51 +144,32 @@ onUnmounted(() => {
               <img
                 src="/images/logo.svg"
                 alt="PirtTrip"
-                class="h-9 w-auto object-contain"
+                class="h-8 w-auto object-contain"
                 width="584"
                 height="192"
               >
             </NuxtLink>
 
-            <div
-              class="min-w-0 max-w-[58%] text-right font-plein text-[10px] font-normal leading-[135%] tracking-[0] text-white sm:max-w-[65%] sm:text-[11px]"
-            >
-              <p>For any information, contact Business Support</p>
-              <p class="mt-0.5">
-                at:
-                <a
-                  href="mailto:contact@pirttrip.com"
-                  class="text-white hover:underline"
-                >contact@pirttrip.com</a>
+            <div class="flex min-w-0 shrink-0 flex-col items-end gap-1">
+              <p class="font-plein text-[9px] font-bold leading-[130%] tracking-[0] text-white">
+                We are launching Soon!
               </p>
-              <p class="mt-0.5">
-                Or Call at:
-                <a href="tel:+919711104186" class="text-white hover:underline">
-                  +91-9711104186
-                </a>
-              </p>
-            </div>
-          </div>
 
-          <div class="mt-4 flex flex-col items-center text-center">
-            <p class="font-plein text-[15px] font-bold leading-[135%] tracking-[0] text-white">
-              We are launching Soon!
-            </p>
-
-            <div class="mt-3 grid w-full max-w-[252px] grid-cols-4 gap-1.5">
-              <div
-                v-for="unit in countdownUnits"
-                :key="unit.label"
-                class="hero-countdown-cell flex aspect-square flex-col items-center justify-center rounded-[6px] bg-white"
-              >
-                <span class="font-plein text-[14px] font-bold leading-none text-black">
-                  {{ pad(unit.value) }}
-                </span>
-                <span
-                  class="mt-0.5 font-plein text-[7px] font-medium uppercase leading-none tracking-[0.02em] text-black/65"
+              <div class="flex gap-1">
+                <div
+                  v-for="unit in countdownUnits"
+                  :key="unit.label"
+                  class="flex min-w-[30px] flex-col items-center justify-center rounded-[4px] bg-white px-1 py-1"
                 >
-                  {{ unit.label }}
-                </span>
+                  <span class="font-plein text-[10px] font-bold leading-none text-black">
+                    {{ pad(unit.value) }}
+                  </span>
+                  <span
+                    class="mt-0.5 font-plein text-[5px] font-medium uppercase leading-none tracking-[0.02em] text-black/65"
+                  >
+                    {{ unit.label }}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -330,6 +314,7 @@ onUnmounted(() => {
   /* At least full viewport; grows naturally when content is taller */
   min-height: 100vh;
   min-height: 100svh;
+  scroll-margin-top: 0;
 }
 
 .hero-inner {
@@ -348,8 +333,14 @@ onUnmounted(() => {
   flex: 1 1 auto;
   flex-direction: column;
   min-height: 0;
-  margin-top: clamp(2rem, 10vh, 7rem);
+  margin-top: clamp(0.75rem, 3vh, 1.5rem);
   isolation: isolate;
+}
+
+@media (min-width: 1024px) {
+  .hero-main--fill {
+    margin-top: clamp(1.5rem, 6vh, 5rem);
+  }
 }
 
 .hero-body-stage--fill {

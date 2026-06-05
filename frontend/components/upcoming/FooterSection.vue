@@ -1,6 +1,16 @@
 <script setup>
 import { FOOTER_LEGAL_LINKS, FOOTER_QUICK_LINKS } from '~/constants/legal-links'
 
+const props = defineProps({
+  ctaMode: {
+    type: String,
+    default: 'registration',
+    validator: (value) => ['registration', 'waitlist'].includes(value),
+  },
+})
+
+const emit = defineEmits(['open-waitlist'])
+
 const { homeHref, homeIsExternal } = useMainSite()
 
 const CTA_BG = '/images/hero/hero-bg.png'
@@ -36,13 +46,39 @@ const linkClass =
 
 function scrollToRegistration(event) {
   event?.preventDefault()
-  const el = document.getElementById('partner-registration')
-    || document.getElementById('get-started')
+  // If user taps CTA from the footer/hero, show the whole hero again.
+  // This ensures the fixed header is visible at the top.
+  const heroEl = document.getElementById('upcoming-hero')
+  if (heroEl) {
+    heroEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    return
+  }
+
+  // Priority: form header ("Get Started") so the user immediately sees context.
+  const el = document.getElementById('get-started')
+    || document.getElementById('partner-registration')
   if (!el) return
 
-  const top = el.getBoundingClientRect().top + window.scrollY
+  // If there's a fixed/static header, offset so the target isn't hidden.
+  // We measure the first <header> on the page so it matches the real logo/header height.
+  const headerEl = document.querySelector('header')
+  const headerOffset = headerEl?.getBoundingClientRect().height ?? 88
+  const top = el.getBoundingClientRect().top + window.scrollY - headerOffset
   window.scrollTo({ top, behavior: 'smooth' })
 }
+
+function handleCtaClick(event) {
+  event?.preventDefault()
+  if (props.ctaMode === 'waitlist') {
+    emit('open-waitlist')
+    return
+  }
+  scrollToRegistration(event)
+}
+
+const mobileCtaLabel = computed(() =>
+  props.ctaMode === 'waitlist' ? 'Join Traveler Waitlist' : 'Join Business',
+)
 </script>
 
 <template>
@@ -86,9 +122,9 @@ function scrollToRegistration(event) {
             <a
               href="#get-started"
               class="mt-5 inline-flex h-[48px] w-full max-w-[300px] items-center justify-center rounded-full bg-white px-6 font-plein text-[15px] font-bold leading-[130%] tracking-[0] text-black no-underline transition-opacity hover:opacity-90"
-              @click="scrollToRegistration"
+              @click="handleCtaClick"
             >
-              Join Traveler Waitlist
+              {{ mobileCtaLabel }}
             </a>
           </div>
 
@@ -129,7 +165,7 @@ function scrollToRegistration(event) {
             <a
               href="#get-started"
               class="mt-7 inline-flex h-[50px] min-w-[220px] items-center justify-center rounded-full bg-white px-8 font-plein text-[16px] font-bold leading-[130%] tracking-[0] text-black no-underline transition-opacity hover:opacity-90"
-              @click="scrollToRegistration"
+              @click="handleCtaClick"
             >
               Join as Business
             </a>
@@ -160,14 +196,14 @@ function scrollToRegistration(event) {
     <!-- Footer links -->
     <div class="mx-auto w-[94%] max-w-[1200px] pb-10">
       <div
-        class="flex flex-col gap-10 border-t border-black/[0.06] py-12 lg:flex-row lg:items-start lg:gap-12 lg:py-14 xl:gap-16"
+        class="flex flex-col items-center gap-10 border-t border-black/[0.06] py-12 text-center lg:flex-row lg:items-start lg:gap-12 lg:py-14 lg:text-left xl:gap-16"
       >
         <!-- Brand -->
         <div class="w-full shrink-0 lg:w-[300px] xl:w-[320px]">
           <a
             v-if="homeIsExternal"
             :href="homeHref"
-            class="inline-flex shrink-0"
+            class="mx-auto inline-flex shrink-0 lg:mx-0"
             aria-label="PirtTrip home"
           >
             <img
@@ -181,7 +217,7 @@ function scrollToRegistration(event) {
           <NuxtLink
             v-else
             to="/"
-            class="inline-flex shrink-0"
+            class="mx-auto inline-flex shrink-0 lg:mx-0"
             aria-label="PirtTrip home"
           >
             <img
@@ -200,11 +236,11 @@ function scrollToRegistration(event) {
           </p>
         </div>
 
-        <!-- Link columns — equal width, left-aligned -->
+        <!-- Link columns -->
         <div
-          class="grid min-w-0 flex-1 grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-x-6 md:gap-x-10 lg:gap-x-12"
+          class="grid min-w-0 w-full flex-1 grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-x-6 md:gap-x-10 lg:gap-x-12"
         >
-          <div class="min-w-0 text-left">
+          <div class="min-w-0 text-center lg:text-left">
             <h3 class="font-plein text-[17px] font-bold leading-[130%] text-black">
               Quick Links
             </h3>
@@ -229,7 +265,7 @@ function scrollToRegistration(event) {
             </ul>
           </div>
 
-          <div class="min-w-0 text-left">
+          <div class="min-w-0 text-center lg:text-left">
             <h3 class="font-plein text-[17px] font-bold leading-[130%] text-black">
               Legal
             </h3>
@@ -246,7 +282,7 @@ function scrollToRegistration(event) {
             </ul>
           </div>
 
-          <div class="min-w-0 text-left">
+          <div class="min-w-0 text-center lg:text-left">
             <h3 class="font-plein text-[17px] font-bold leading-[130%] text-black">
               Contact us
             </h3>
