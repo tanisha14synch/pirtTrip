@@ -9,7 +9,12 @@ const {
   otpPhoneMasked,
   otpDebugMode,
   canVerifyOtp,
-  otpFlow,
+  otpExpiresInSeconds,
+  otpResendWaitSeconds,
+  otpSessionActive,
+  otpExpiryLabel,
+  otpCanResend,
+  otpIsExpired,
   sendOtp,
   resendOtp,
   verifyOtpAndRegister,
@@ -371,13 +376,13 @@ function onOtpInput(index, event) {
         </p>
 
         <p
-          v-if="otpFlow.expiresInSeconds > 0"
+          v-if="otpSessionActive && otpExpiresInSeconds > 0"
           class="font-plein text-[13px] text-white/50"
         >
-          OTP expires in {{ otpFlow.expiryLabel }}
+          OTP expires in {{ otpExpiryLabel }}
         </p>
         <p
-          v-else
+          v-else-if="otpSessionActive && otpIsExpired"
           class="font-plein text-[13px] text-amber-200/90"
         >
           OTP expired. Resend to get a new one.
@@ -413,10 +418,14 @@ function onOtpInput(index, event) {
         <button
           type="button"
           class="w-full py-2 font-plein text-[14px] text-white/60 hover:text-white disabled:opacity-50"
-          :disabled="loading || !otpFlow.canResend"
+          :disabled="loading"
           @click="resendOtp"
         >
-          {{ otpFlow.canResend ? 'Resend OTP' : `Resend OTP in ${otpFlow.resendWaitSeconds}s` }}
+          {{
+            otpCanResend
+              ? 'Resend OTP'
+              : `Resend OTP in ${otpResendWaitSeconds}s`
+          }}
         </button>
 
         <button

@@ -1,4 +1,5 @@
 import type { LeadStatus } from '~/types/database'
+import { logAdminAction } from '~/lib/admin-audit'
 
 function escapeCsv(value: unknown): string {
   const str = value == null ? '' : String(value)
@@ -9,7 +10,7 @@ function escapeCsv(value: unknown): string {
 }
 
 export default defineEventHandler(async (event) => {
-  await requireAdminWith2fa(event)
+  const adminUser = await requireAdminWith2fa(event)
 
   const query = getQuery(event)
   const search = String(query.search ?? '').trim()
@@ -54,6 +55,13 @@ export default defineEventHandler(async (event) => {
 
   setHeader(event, 'Content-Type', 'text/csv; charset=utf-8')
   setHeader(event, 'Content-Disposition', 'attachment; filename="partner-leads.csv"')
+
+  await logAdminAction(event, {
+    adminId: adminUser.id,
+    action: 'VENDORS_EXPORTED',
+    resourceType: 'partner_leads',
+    metadata: { count: (data ?? []).length, search, status },
+  })
 
   return csv
 })

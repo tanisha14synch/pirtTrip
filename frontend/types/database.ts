@@ -1,4 +1,4 @@
-export type LeadStatus = 'NEW' | 'CONTACTED' | 'QUALIFIED' | 'ONBOARDED' | 'REJECTED'
+export type LeadStatus = 'NEW' | 'CONTACTED' | 'QUALIFIED' | 'ONBOARDED' | 'REJECTED' | 'SUSPENDED'
 export type AdminRole = 'SUPER_ADMIN' | 'ADMIN'
 
 export interface PartnerLead {
@@ -60,7 +60,10 @@ export interface LeadsListQuery {
   pageSize?: number
   search?: string
   status?: LeadStatus | ''
-  sortBy?: 'created_at' | 'updated_at' | 'first_name'
+  sortBy?: 'created_at' | 'updated_at' | 'first_name' | 'business_name' | 'phone' | 'status'
+  dateFrom?: string
+  dateTo?: string
+  otpVerified?: '' | 'true' | 'false'
   sortOrder?: 'asc' | 'desc'
 }
 

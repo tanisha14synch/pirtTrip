@@ -1,4 +1,5 @@
-import { leadUpdateSchema } from '~/lib/validation'
+import { logAdminAction } from '~/lib/admin-audit'
+import { leadUpdateSchema, zodErrorMessage } from '~/lib/validation'
 
 export default defineEventHandler(async (event) => {
   const adminUser = await requireAdminWith2fa(event)
@@ -14,7 +15,7 @@ export default defineEventHandler(async (event) => {
   if (!parsed.success) {
     throw createError({
       statusCode: 400,
-      statusMessage: parsed.error.errors[0]?.message ?? 'Invalid input',
+      statusMessage: zodErrorMessage(parsed.error, 'Invalid input'),
     })
   }
 
@@ -68,6 +69,14 @@ export default defineEventHandler(async (event) => {
       admin_id: adminUser.id,
     })
   }
+
+  await logAdminAction(event, {
+    adminId: adminUser.id,
+    action: 'VENDOR_UPDATED',
+    resourceType: 'partner_lead',
+    resourceId: id,
+    metadata: { updates },
+  })
 
   return { success: true, lead }
 })

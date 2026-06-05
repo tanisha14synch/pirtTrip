@@ -5,29 +5,45 @@ export type EmailOtpSendResponse = {
   debugCode?: string
 }
 
+const DEFAULT_OTP_TTL_SECONDS = 600
+const DEFAULT_RESEND_COOLDOWN_SECONDS = 60
+
 export function useEmailOtp(options: { resendCooldownSeconds?: number } = {}) {
   const expiresInSeconds = ref(0)
-  const resendCooldownSeconds = ref(options.resendCooldownSeconds ?? 60)
+  const resendCooldownSeconds = ref(options.resendCooldownSeconds ?? DEFAULT_RESEND_COOLDOWN_SECONDS)
   const resendWaitSeconds = ref(0)
+  const otpSessionActive = ref(false)
   let expiryTimer: ReturnType<typeof setInterval> | null = null
   let resendTimer: ReturnType<typeof setInterval> | null = null
 
-  function clearTimers() {
+  function clearExpiryTimer() {
     if (expiryTimer) clearInterval(expiryTimer)
-    if (resendTimer) clearInterval(resendTimer)
     expiryTimer = null
+  }
+
+  function clearResendTimer() {
+    if (resendTimer) clearInterval(resendTimer)
     resendTimer = null
   }
 
+  function clearTimers() {
+    clearExpiryTimer()
+    clearResendTimer()
+    otpSessionActive.value = false
+  }
+
   function startExpiryCountdown(seconds: number) {
-    clearTimers()
-    expiresInSeconds.value = seconds
+    clearExpiryTimer()
+    const ttl = Number.isFinite(seconds) && seconds > 0
+      ? Math.floor(seconds)
+      : DEFAULT_OTP_TTL_SECONDS
+    expiresInSeconds.value = ttl
+    otpSessionActive.value = true
 
     expiryTimer = setInterval(() => {
       if (expiresInSeconds.value <= 1) {
         expiresInSeconds.value = 0
-        if (expiryTimer) clearInterval(expiryTimer)
-        expiryTimer = null
+        clearExpiryTimer()
         return
       }
       expiresInSeconds.value -= 1
@@ -35,17 +51,18 @@ export function useEmailOtp(options: { resendCooldownSeconds?: number } = {}) {
   }
 
   function startResendCooldown(seconds: number) {
-    if (resendTimer) {
-      clearInterval(resendTimer)
-      resendTimer = null
-    }
-    resendWaitSeconds.value = seconds
+    clearResendTimer()
+    const cooldown = Number.isFinite(seconds) && seconds >= 0
+      ? Math.floor(seconds)
+      : DEFAULT_RESEND_COOLDOWN_SECONDS
+    resendWaitSeconds.value = cooldown
+
+    if (cooldown <= 0) return
 
     resendTimer = setInterval(() => {
       if (resendWaitSeconds.value <= 1) {
         resendWaitSeconds.value = 0
-        if (resendTimer) clearInterval(resendTimer)
-        resendTimer = null
+        clearResendTimer()
         return
       }
       resendWaitSeconds.value -= 1
@@ -88,7 +105,7 @@ export function useEmailOtp(options: { resendCooldownSeconds?: number } = {}) {
   })
 
   const canResend = computed(() => resendWaitSeconds.value === 0)
-  const isExpired = computed(() => expiresInSeconds.value === 0)
+  const isExpired = computed(() => otpSessionActive.value && expiresInSeconds.value === 0)
 
   onUnmounted(clearTimers)
 
@@ -96,6 +113,7 @@ export function useEmailOtp(options: { resendCooldownSeconds?: number } = {}) {
     expiresInSeconds,
     resendWaitSeconds,
     resendCooldownSeconds,
+    otpSessionActive,
     expiryLabel,
     canResend,
     isExpired,

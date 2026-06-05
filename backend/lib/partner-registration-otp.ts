@@ -13,13 +13,29 @@ import type { partnerRegistrationSchema } from '~/lib/validation'
 
 type PartnerRegistrationInput = z.infer<typeof partnerRegistrationSchema>
 
+function phoneLookupVariants(phone: string): string[] {
+  const digits = phone.replace(/\D/g, '')
+  const local = digits.slice(-10)
+  return [...new Set([phone, `+91${local}`, local, `91${local}`].filter(Boolean))]
+}
+
 export async function assertPartnerPhoneAvailable(phone: string) {
   const admin = getSupabaseAdmin()
-  const { data: existing } = await admin
+  const variants = phoneLookupVariants(phone)
+
+  const { data: existing, error } = await admin
     .from('partner_leads')
     .select('id')
-    .eq('phone', phone)
+    .in('phone', variants)
+    .limit(1)
     .maybeSingle()
+
+  if (error) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to verify phone availability',
+    })
+  }
 
   if (existing) {
     throw createError({
@@ -28,6 +44,23 @@ export async function assertPartnerPhoneAvailable(phone: string) {
       data: { code: 'PHONE_ALREADY_REGISTERED' },
     })
   }
+}
+
+export async function clearStalePartnerOtpSessions(phone: string) {
+  const admin = getSupabaseAdmin()
+  const challengeEmail = partnerOtpChallengeEmail(phone)
+  const variants = phoneLookupVariants(phone)
+
+  await Promise.all([
+    admin
+      .from('email_otp_challenges')
+      .delete()
+      .eq('email', challengeEmail)
+      .eq('purpose', 'partner_registration'),
+    ...variants.map((variant) =>
+      admin.from('phone_otps').delete().eq('phone_number', variant),
+    ),
+  ])
 }
 
 export async function logPartnerOtpSent(phone: string) {
@@ -104,19 +137,17 @@ export async function sendPartnerRegistrationThankYouSms(phone: string) {
   }
 }
 
-export async function sendPartnerRegistrationOtp(options: {
+async function deliverPartnerRegistrationOtp(options: {
   data: PartnerRegistrationInput
   challengeToken?: string | null
 }) {
   const phone = normalizePhone(options.data.phone)
-  await assertPartnerPhoneAvailable(phone)
-
   const challengeEmail = partnerOtpChallengeEmail(phone)
   const firstName = options.data.firstName.trim()
   const lastName = options.data.lastName.trim()
   const businessName = options.data.businessName.trim()
 
-  const result = await createAndSendOtp({
+  return createAndSendOtp({
     email: challengeEmail,
     purpose: 'partner_registration',
     challengeToken: options.challengeToken,
@@ -131,6 +162,34 @@ export async function sendPartnerRegistrationOtp(options: {
       phone,
     },
   })
+}
+
+export async function sendPartnerRegistrationOtp(options: {
+  data: PartnerRegistrationInput
+  challengeToken?: string | null
+}) {
+  const phone = normalizePhone(options.data.phone)
+  await assertPartnerPhoneAvailable(phone)
+
+  if (!options.challengeToken) {
+    await clearStalePartnerOtpSessions(phone)
+  }
+
+  let result
+  try {
+    result = await deliverPartnerRegistrationOtp(options)
+  } catch (error: unknown) {
+    const err = error as { statusCode?: number; data?: { code?: string } }
+    if (err.statusCode === 429 && options.challengeToken) {
+      await clearStalePartnerOtpSessions(phone)
+      result = await deliverPartnerRegistrationOtp({
+        ...options,
+        challengeToken: null,
+      })
+    } else {
+      throw error
+    }
+  }
 
   await logPartnerOtpSent(phone)
 

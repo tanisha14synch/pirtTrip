@@ -1,4 +1,4 @@
-export type LeadStatus = 'NEW' | 'CONTACTED' | 'QUALIFIED' | 'ONBOARDED' | 'REJECTED'
+export type LeadStatus = 'NEW' | 'CONTACTED' | 'QUALIFIED' | 'ONBOARDED' | 'REJECTED' | 'SUSPENDED'
 export type AdminRole = 'SUPER_ADMIN' | 'ADMIN'
 
 export interface PartnerLead {

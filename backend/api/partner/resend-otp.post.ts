@@ -5,7 +5,7 @@ import { normalizePhone } from '~/lib/phone'
 import { partnerRegistrationSchema, zodErrorMessage } from '~/lib/validation'
 
 const bodySchema = partnerRegistrationSchema.extend({
-  challengeToken: z.string().min(1, 'Verification session expired. Submit the form again.'),
+  challengeToken: z.string().optional(),
 })
 
 export default defineEventHandler(async (event) => {

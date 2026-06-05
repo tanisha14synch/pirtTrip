@@ -50,6 +50,6 @@ export const adminLoginSchema = z.object({
 })
 
 export const leadUpdateSchema = z.object({
-  status: z.enum(['NEW', 'CONTACTED', 'QUALIFIED', 'ONBOARDED', 'REJECTED']).optional(),
+  status: z.enum(['NEW', 'CONTACTED', 'QUALIFIED', 'ONBOARDED', 'REJECTED', 'SUSPENDED']).optional(),
   notes: z.string().max(5000).optional().nullable(),
 })

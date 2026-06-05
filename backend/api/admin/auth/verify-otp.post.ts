@@ -1,5 +1,7 @@
 import { z } from 'zod'
+import { logAdminAction, recordAdminSession } from '~/lib/admin-audit'
 import { verifyEmailOtp } from '~/lib/email-otp-service'
+import { zodErrorMessage } from '~/lib/validation'
 
 const bodySchema = z.object({
   code: z.string().regex(/^\d{6}$/, 'Enter the 6-digit code from your email'),
@@ -14,7 +16,7 @@ export default defineEventHandler(async (event) => {
   if (!parsed.success) {
     throw createError({
       statusCode: 400,
-      statusMessage: parsed.error.errors[0]?.message ?? 'Invalid code',
+      statusMessage: zodErrorMessage(parsed.error, 'Invalid code'),
     })
   }
 
@@ -43,12 +45,23 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, statusMessage: metaError.message })
   }
 
+  const maxAgeSeconds = 60 * 60 * 12
+  const expiresAt = new Date(Date.now() + maxAgeSeconds * 1000)
+
   setCookie(event, 'admin_2fa_verified', `${user.id}:${Date.now()}`, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: 60 * 60 * 12, // 12 hours
+    maxAge: maxAgeSeconds,
     path: '/',
+  })
+
+  await recordAdminSession(event, user.id, expiresAt)
+  await logAdminAction(event, {
+    adminId: user.id,
+    action: 'ADMIN_LOGIN_VERIFIED',
+    resourceType: 'admin_user',
+    resourceId: user.id,
   })
 
   return { success: true, verifiedAt }

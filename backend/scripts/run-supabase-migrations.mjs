@@ -89,6 +89,7 @@ const migrationFiles = [
   'supabase/migrations/20250601000004_email_otp.sql',
   'supabase/migrations/20250601000005_partner_business_name.sql',
   'supabase/migrations/20250601000006_phone_otps.sql',
+  'supabase/migrations/20250601000007_admin_panel.sql',
 ]
 
 async function verifyTables(client) {

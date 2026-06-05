@@ -20,7 +20,17 @@ export function usePartnerRegistration() {
   const errorMessage = ref<string | null>(null)
   const successLead = ref<PartnerLead | null>(null)
 
-  const otpFlow = useEmailOtp()
+  const {
+    expiresInSeconds: otpExpiresInSeconds,
+    resendWaitSeconds: otpResendWaitSeconds,
+    otpSessionActive,
+    expiryLabel: otpExpiryLabel,
+    canResend: otpCanResend,
+    isExpired: otpIsExpired,
+    applySendResponse,
+    parseFetchError: parseOtpFetchError,
+    clearTimers: clearOtpTimers,
+  } = useEmailOtp()
   const challengeToken = ref<string | null>(null)
   const otpPhoneMasked = ref('')
   const otpDebugMode = ref(false)
@@ -37,7 +47,7 @@ export function usePartnerRegistration() {
 
   const otpDigits = ref(['', '', '', '', '', ''])
   const otpCode = computed(() => otpDigits.value.join(''))
-  const canVerifyOtp = computed(() => otpCode.value.length === 6 && !otpFlow.isExpired.value)
+  const canVerifyOtp = computed(() => otpCode.value.length === 6 && !otpIsExpired.value)
 
   function getFormPayload() {
     return {
@@ -54,7 +64,7 @@ export function usePartnerRegistration() {
     otpPhoneMasked.value = response.phoneMasked || `+91 ******${phone.slice(-4)}`
     step.value = 'otp'
     otpDigits.value = ['', '', '', '', '', '']
-    otpFlow.applySendResponse(response)
+    applySendResponse(response)
     otpDebugMode.value = Boolean(response.debugCode)
 
     if (response.debugCode) {
@@ -90,16 +100,17 @@ export function usePartnerRegistration() {
       await nextTick()
       document.getElementById('partner-otp-0')?.focus()
     } catch (err: unknown) {
-      errorMessage.value = otpFlow.parseFetchError(err)
+      errorMessage.value = parseOtpFetchError(err)
     } finally {
       loading.value = false
     }
   }
 
   async function resendOtp() {
-    if (!otpFlow.canResend.value || loading.value) return
-    if (!challengeToken.value) {
-      errorMessage.value = 'Verification session expired. Submit the form again.'
+    if (loading.value) return
+
+    if (otpResendWaitSeconds.value > 0) {
+      errorMessage.value = `Please wait ${otpResendWaitSeconds.value}s before resending.`
       return
     }
 
@@ -117,7 +128,7 @@ export function usePartnerRegistration() {
         timeout: 30_000,
         body: {
           ...parsed.data,
-          challengeToken: challengeToken.value,
+          challengeToken: challengeToken.value ?? undefined,
         },
       })
 
@@ -126,7 +137,7 @@ export function usePartnerRegistration() {
       await nextTick()
       document.getElementById('partner-otp-0')?.focus()
     } catch (err: unknown) {
-      errorMessage.value = otpFlow.parseFetchError(err)
+      errorMessage.value = parseOtpFetchError(err)
     } finally {
       loading.value = false
     }
@@ -134,7 +145,7 @@ export function usePartnerRegistration() {
 
   async function verifyOtpAndRegister() {
     if (!canVerifyOtp.value) {
-      errorMessage.value = otpFlow.isExpired.value
+      errorMessage.value = otpIsExpired.value
         ? 'Code expired. Tap “Resend OTP” to get a new one.'
         : 'Enter the 6-digit verification code'
       return
@@ -168,9 +179,9 @@ export function usePartnerRegistration() {
 
       successLead.value = result.lead
       step.value = 'success'
-      otpFlow.clearTimers()
+      clearOtpTimers()
     } catch (err: unknown) {
-      errorMessage.value = otpFlow.parseFetchError(err)
+      errorMessage.value = parseOtpFetchError(err)
     } finally {
       loading.value = false
     }
@@ -217,7 +228,7 @@ export function usePartnerRegistration() {
     challengeToken.value = null
     otpPhoneMasked.value = ''
     otpDebugMode.value = false
-    otpFlow.clearTimers()
+    clearOtpTimers()
   }
 
   return {
@@ -231,7 +242,12 @@ export function usePartnerRegistration() {
     successLead,
     otpPhoneMasked,
     otpDebugMode,
-    otpFlow,
+    otpExpiresInSeconds,
+    otpResendWaitSeconds,
+    otpSessionActive,
+    otpExpiryLabel,
+    otpCanResend,
+    otpIsExpired,
     otpEnabled: OTP_ENABLED,
     sendOtp,
     resendOtp,
