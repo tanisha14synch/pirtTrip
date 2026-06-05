@@ -109,11 +109,15 @@ const rowTwo = [
     ],
   },
 ]
+
+const trustBenefits = [...rowOne, ...rowTwo]
+const mobileRowOne = trustBenefits.slice(0, 9)
+const mobileRowTwo = trustBenefits.slice(9)
 </script>
 
 <template>
-  <section class="relative overflow-hidden bg-[#f5f5f5] py-10 md:py-16">
-    <div class="relative z-10 mx-auto w-[94%] max-w-[1280px]">
+  <section class="relative overflow-x-hidden bg-[#f5f5f5] py-10 md:py-16">
+    <div class="relative z-10 mx-auto w-full max-w-[1280px] px-1.5 sm:w-[94%] sm:px-0">
       <header class="text-center">
         <p class="font-plein text-[14px] font-bold leading-[130%] tracking-[0] text-[#F76517] sm:text-[18px] md:text-[22px]">
           - Why Trust PirtTrip? -
@@ -126,11 +130,36 @@ const rowTwo = [
         </h2>
       </header>
 
-      <div class="mt-8 flex flex-col items-center gap-10 md:mt-9">
+      <!-- Mobile only: 3 cards per row; last 2 centered -->
+      <div class="trust-mobile-layout mx-auto mt-8 w-full md:hidden">
+        <div class="trust-mobile-grid">
+          <UpcomingTrustBenefitCard
+            v-for="benefit in mobileRowOne"
+            :key="`m-${benefit.id}`"
+            :icon-src="benefit.iconSrc"
+            :icon-alt="benefit.iconAlt"
+            :parts="benefit.parts"
+          />
+        </div>
+
+        <div class="trust-mobile-last-row">
+          <UpcomingTrustBenefitCard
+            v-for="benefit in mobileRowTwo"
+            :key="`m-${benefit.id}`"
+            :icon-src="benefit.iconSrc"
+            :icon-alt="benefit.iconAlt"
+            :parts="benefit.parts"
+          />
+        </div>
+      </div>
+
+      <!-- Desktop: unchanged flex layout -->
+      <div class="mt-8 hidden flex-col items-center gap-10 md:flex md:mt-9">
         <div class="flex max-w-full flex-wrap justify-center gap-x-3 gap-y-14">
           <UpcomingTrustBenefitCard
             v-for="benefit in rowOne"
             :key="benefit.id"
+            variant="desktop"
             :icon-src="benefit.iconSrc"
             :icon-alt="benefit.iconAlt"
             :parts="benefit.parts"
@@ -141,6 +170,7 @@ const rowTwo = [
           <UpcomingTrustBenefitCard
             v-for="benefit in rowTwo"
             :key="benefit.id"
+            variant="desktop"
             :icon-src="benefit.iconSrc"
             :icon-alt="benefit.iconAlt"
             :parts="benefit.parts"
@@ -158,3 +188,31 @@ const rowTwo = [
     <!-- Optional: add /images/trust/trust-skyline.png when asset is ready -->
   </section>
 </template>
+
+<style scoped>
+.trust-mobile-layout {
+  --trust-mobile-gap: clamp(10px, 3.2vw, 16px);
+  --trust-mobile-row-gap: clamp(24px, 6vw, 32px);
+}
+
+.trust-mobile-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: var(--trust-mobile-gap);
+  row-gap: var(--trust-mobile-row-gap);
+  padding-inline: var(--trust-mobile-gap);
+}
+
+.trust-mobile-last-row {
+  display: flex;
+  justify-content: center;
+  gap: var(--trust-mobile-gap);
+  padding-inline: var(--trust-mobile-gap);
+  margin-top: var(--trust-mobile-row-gap);
+}
+
+.trust-mobile-last-row > :deep(.trust-benefit-card) {
+  width: calc((100% - 2 * var(--trust-mobile-gap)) / 3);
+  flex-shrink: 0;
+}
+</style>
