@@ -7,6 +7,10 @@ const props = defineProps({
     default: 'registration',
     validator: (value) => ['registration', 'waitlist'].includes(value),
   },
+  showCta: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const emit = defineEmits(['open-waitlist'])
@@ -73,12 +77,21 @@ function handleCtaClick(event) {
 const ctaButtonLabel = computed(() =>
   props.ctaMode === 'waitlist' ? 'Join Traveler Waitlist' : 'Join as Business',
 )
+
+const brandDescription = computed(() =>
+  props.ctaMode === 'waitlist'
+    ? 'Discover, compare, and book group trips — or partner with PirtTrip to grow your travel business.'
+    : 'Grow your travel business with verified leads and tools built for travel partners on PirtTrip.',
+)
 </script>
 
 <template>
   <footer class="w-full bg-[#f5f5f5]">
-    <!-- Vendor CTA — Figma Frame 696:4084 -->
-    <div class="mx-auto w-[94%] max-w-[1280px] pb-14 pt-10 md:pb-16 md:pt-12">
+    <!-- Vendor CTA — business landing only -->
+    <div
+      v-if="showCta"
+      class="mx-auto w-[94%] max-w-[1280px] pb-14 pt-10 md:pb-16 md:pt-12"
+    >
       <div
         class="relative mx-auto min-h-[360px] w-full max-w-[1261px] overflow-hidden rounded-tl-[72px] rounded-tr-[10px] rounded-br-[10px] rounded-bl-[10px] sm:min-h-[380px] md:h-[456px] md:rounded-tl-[100px]"
       >
@@ -100,9 +113,9 @@ const ctaButtonLabel = computed(() =>
           class="relative z-10 flex min-h-[360px] flex-col items-center justify-center gap-8 px-5 py-8 text-center sm:px-10 md:h-full md:flex-row md:items-center md:gap-12 md:px-14 md:text-left lg:px-16"
         >
           <div class="w-full max-w-[620px]">
-            <p class="font-plein text-[14px] font-bold leading-[130%] tracking-[0] text-[#F76517] sm:text-[16px] md:text-[18px]">
+            <!-- <p class="font-plein text-[14px] font-bold leading-[130%] tracking-[0] text-[#F76517] sm:text-[16px] md:text-[18px]">
               Let's Grow
-            </p>
+            </p> -->
 
             <h2
               class="mt-2 font-plein text-[22px] font-bold leading-[130%] tracking-[0] text-white sm:mt-3 sm:text-[34px] md:text-[40px] lg:text-[44px]"
@@ -147,7 +160,10 @@ const ctaButtonLabel = computed(() =>
     </div>
 
     <!-- Footer links -->
-    <div class="mx-auto w-[94%] max-w-[1200px] pb-10">
+    <div
+      class="mx-auto w-[94%] max-w-[1200px] pb-10"
+      :class="showCta ? '' : 'pt-10 md:pt-12'"
+    >
       <div
         class="flex flex-col items-center gap-10 border-t border-black/[0.06] py-12 text-center lg:flex-row lg:items-start lg:gap-12 lg:py-14 lg:text-left xl:gap-16"
       >
@@ -185,7 +201,7 @@ const ctaButtonLabel = computed(() =>
           <p
             class="mt-5 font-plein text-[15px] font-normal leading-[145%] tracking-[0] text-black/75"
           >
-            Grow your travel business with verified leads and tools built for travel partners on PirtTrip.
+            {{ brandDescription }}
           </p>
         </div>
 

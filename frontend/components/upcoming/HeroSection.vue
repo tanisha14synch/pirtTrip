@@ -264,8 +264,7 @@ onUnmounted(() => {
         >
         <article class="mx-auto max-w-[580px] text-center lg:mx-0 lg:pt-1 lg:text-left xl:max-w-[500px]">
             <p class="font-plein text-[14px] font-normal leading-[135%] tracking-[0] text-white">
-              Lets Grow Your Travel Business with
-              <span class="text-brand-gold font-bold">PirtTrip</span>
+              <span class="text-brand-gold font-bold">Register Today & Get 20 CONNECT CREDITs for FREE.</span>
             </p>
 
             <h1

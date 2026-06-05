@@ -92,15 +92,15 @@ onUnmounted(() => {
             For Businesses
           </NuxtLink>
 
-          <span class="hidden h-10 w-px shrink-0 bg-white/35 sm:block" aria-hidden="true" />
+          <!-- <span class="hidden h-10 w-px shrink-0 bg-white/35 sm:block" aria-hidden="true" /> -->
 
-          <div class="hidden font-plein text-[13px] font-normal leading-[140%] text-white sm:block sm:text-[14px]">
+          <!-- <div class="hidden font-plein text-[13px] font-normal leading-[140%] text-white sm:block sm:text-[14px]">
             <p>For any information, Contact</p>
             <p>
               Partner Support at:
               <a href="tel:+919711104186" class="text-white hover:underline">+91-9711104186</a>
             </p>
-          </div>
+          </div> -->
         </div>
       </div>
     </header>
@@ -161,16 +161,11 @@ onUnmounted(() => {
       </button>
     </div>
 
-    <LayoutFooterCopyright
-      variant="dark"
-      class="absolute bottom-0 left-0 right-0 z-20 hidden px-4 pb-5 md:block sm:pb-6"
-    />
-
     <LandingWaitlistModal v-model:open="waitlistOpen" />
   </section>
 
   <UpcomingFooterSection
-    class="md:hidden"
+    :show-cta="false"
     cta-mode="waitlist"
     @open-waitlist="waitlistOpen = true"
   />
