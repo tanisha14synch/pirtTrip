@@ -7,6 +7,7 @@ export type EmailOtpSendResponse = {
 
 const DEFAULT_OTP_TTL_SECONDS = 300
 const DEFAULT_RESEND_COOLDOWN_SECONDS = 300
+const OTP_SEND_FAILED_MSG = 'Unable to send OTP. Please try again later.'
 
 export function useEmailOtp(options: { resendCooldownSeconds?: number } = {}) {
   const expiresInSeconds = ref(0)
@@ -95,14 +96,22 @@ export function useEmailOtp(options: { resendCooldownSeconds?: number } = {}) {
       || code === 'OTP_SMS_PROVIDER_MISSING'
       || code === 'OTP_SEND_FAILED'
     ) {
-      return 'Unable to send OTP now. Please try again later.'
+      return OTP_SEND_FAILED_MSG
     }
 
-    return (
+    const rawMessage =
       fetchError?.data?.statusMessage
       || fetchError?.statusMessage
       || fetchError?.data?.message
       || fetchError?.message
+      || ''
+
+    if (/^\[POST\]\s*"\/api\//.test(rawMessage) || /^\[GET\]\s*"\/api\//.test(rawMessage)) {
+      return OTP_SEND_FAILED_MSG
+    }
+
+    return (
+      rawMessage
       || 'Something went wrong. Please try again.'
     )
   }

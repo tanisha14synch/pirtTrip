@@ -1,5 +1,5 @@
 import { logAdminAction } from '~/lib/admin-audit'
-import { clearStalePartnerOtpSessions } from '~/lib/partner-registration-otp'
+import { purgePartnerRegistrationForPhone } from '~/lib/partner-registration-otp'
 import { getSupabaseAdmin, requireAdminWith2fa } from '~/lib/supabase'
 
 export default defineEventHandler(async (event) => {
@@ -24,12 +24,13 @@ export default defineEventHandler(async (event) => {
 
   const displayName = `${existing.first_name} ${existing.last_name}`.trim()
 
-  await clearStalePartnerOtpSessions(existing.phone)
+  const removedCount = await purgePartnerRegistrationForPhone(existing.phone)
 
-  const { error } = await admin.from('partner_leads').delete().eq('id', id)
-
-  if (error) {
-    throw createError({ statusCode: 500, statusMessage: error.message })
+  if (removedCount === 0) {
+    const { error } = await admin.from('partner_leads').delete().eq('id', id)
+    if (error) {
+      throw createError({ statusCode: 500, statusMessage: error.message })
+    }
   }
 
   await logAdminAction(event, {

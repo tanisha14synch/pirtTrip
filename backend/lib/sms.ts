@@ -11,12 +11,16 @@ type AquaSmsConfig = {
   aquasmsBaseUrl: string
 }
 
+/** Approved AquaSMS / DLT template (must match provider registration exactly). */
+const PARTNER_OTP_SMS_TEMPLATE =
+  'Your login verification OTP For PirtTrip is {code}. This code is valid for 10 minutes. MARTYRS SERVICES Website : business.pirttrip.com'
+
 export function buildPartnerOtpSmsMessage(code: string): string {
-  return `Your login verification OTP For PirtTrip is ${code}. This code is valid for 5 minutes. MARTYRS SERVICES Website : business.pirttrip.com`
+  return PARTNER_OTP_SMS_TEMPLATE.replace('{code}', code)
 }
 
 export function buildAdminLoginOtpSmsMessage(code: string): string {
-  return `Your login verification OTP For PirtTrip is ${code}. This code is valid for 10 minutes. MARTYRS SERVICES Website : business.pirttrip.com`
+  return PARTNER_OTP_SMS_TEMPLATE.replace('{code}', code)
 }
 
 export function buildPartnerRegistrationThankYouMessage(): string {
@@ -107,12 +111,62 @@ function parseAquaSmsResponse(body: string): { ok: boolean; detail?: string } {
       return { ok: false, detail: responseCode }
     }
   } catch {
-    // Fall through to plain-text checks.
+    // Malformed JSON — try to extract responseCode from the raw body.
+    const codeMatch = trimmed.match(/"responseCode"\s*:\s*"([^"]+)"/i)
+    if (codeMatch?.[1]) {
+      const lower = codeMatch[1].toLowerCase()
+      const isFailure = AQUA_SMS_FAILURE_HINTS.some((hint) => lower.includes(hint))
+      if (isFailure) {
+        return { ok: false, detail: codeMatch[1] }
+      }
+      if (
+        lower.includes('success')
+        || lower.includes('submitted')
+        || lower.includes('sent')
+        || lower === 'ok'
+      ) {
+        return { ok: true, detail: codeMatch[1] }
+      }
+      return { ok: false, detail: codeMatch[1] }
+    }
   }
 
   const normalized = trimmed.toLowerCase()
   const isFailure = AQUA_SMS_FAILURE_HINTS.some((hint) => normalized.includes(hint))
   return isFailure ? { ok: false, detail: trimmed.slice(0, 200) } : { ok: true }
+}
+
+export type SmsSendResult = {
+  provider: 'aquasms'
+  responseCode: string
+  msgId?: string
+  numberSent: string
+}
+
+function extractAquaSmsSuccess(body: string): { responseCode: string; msgId?: string } | null {
+  const parsed = parseAquaSmsResponse(body)
+  if (!parsed.ok || !parsed.detail) {
+    return parsed.ok ? { responseCode: 'ok' } : null
+  }
+
+  let msgId: string | undefined
+  try {
+    const json = JSON.parse(body.trim()) as unknown
+    const items = Array.isArray(json) ? json : [json]
+    for (const item of items) {
+      if (!item || typeof item !== 'object') continue
+      const record = item as Record<string, unknown>
+      const id = String(record.msgid ?? record.msgId ?? record.MsgId ?? '').trim()
+      if (id) {
+        msgId = id
+        break
+      }
+    }
+  } catch {
+    // msgId is optional
+  }
+
+  return { responseCode: parsed.detail, msgId }
 }
 
 function isAquaSmsSuccess(status: number, body: string): boolean {
@@ -123,7 +177,7 @@ function isAquaSmsSuccess(status: number, body: string): boolean {
 }
 
 export function partnerOtpDeliveryErrorMessage(): string {
-  return 'Unable to send OTP now. Please try again later.'
+  return 'Unable to send OTP. Please try again later.'
 }
 
 function logSmsEvent(event: string, payload: Record<string, unknown>) {
@@ -137,22 +191,25 @@ function logSmsEvent(event: string, payload: Record<string, unknown>) {
   )
 }
 
-async function sendViaAquaSms(aquaConfig: AquaSmsConfig, payload: SmsPayload) {
+async function sendViaAquaSms(aquaConfig: AquaSmsConfig, payload: SmsPayload): Promise<SmsSendResult> {
+  const smsNumber = toAquaSmsNumber(payload.to)
   const url = new URL(aquaConfig.aquasmsBaseUrl)
   url.searchParams.set('username', aquaConfig.aquasmsUsername)
   url.searchParams.set('message', payload.message)
   url.searchParams.set('sendername', aquaConfig.aquasmsSenderName)
   url.searchParams.set('smstype', aquaConfig.aquasmsSmsType)
-  url.searchParams.set('numbers', toAquaSmsNumber(payload.to))
+  url.searchParams.set('numbers', smsNumber)
   url.searchParams.set('apikey', aquaConfig.aquasmsApiKey)
 
   const startedAt = Date.now()
-  const maskedNumber = `******${toAquaSmsNumber(payload.to).slice(-4)}`
+  const maskedNumber = `******${smsNumber.slice(-4)}`
   const requestUrl = url.toString().replace(aquaConfig.aquasmsApiKey, '***')
 
   logSmsEvent('aquasms.request', {
     url: requestUrl,
     numberHint: maskedNumber,
+    smsNumber,
+    messageLength: payload.message.length,
   })
 
   try {
@@ -164,6 +221,7 @@ async function sendViaAquaSms(aquaConfig: AquaSmsConfig, payload: SmsPayload) {
       logSmsEvent('aquasms.failed', {
         status: response.status,
         numberHint: maskedNumber,
+        smsNumber,
         response: body.slice(0, 300),
         providerCode: parsed.detail,
         latencyMs: Date.now() - startedAt,
@@ -179,11 +237,22 @@ async function sendViaAquaSms(aquaConfig: AquaSmsConfig, payload: SmsPayload) {
       })
     }
 
+    const success = extractAquaSmsSuccess(body)
     logSmsEvent('aquasms.success', {
       status: response.status,
       numberHint: maskedNumber,
+      smsNumber,
+      providerCode: success?.responseCode,
+      msgId: success?.msgId,
       latencyMs: Date.now() - startedAt,
     })
+
+    return {
+      provider: 'aquasms',
+      responseCode: success?.responseCode || parsed.detail || 'ok',
+      msgId: success?.msgId,
+      numberSent: smsNumber,
+    }
   } catch (error: unknown) {
     if (error && typeof error === 'object' && 'statusCode' in error) {
       throw error
@@ -191,6 +260,7 @@ async function sendViaAquaSms(aquaConfig: AquaSmsConfig, payload: SmsPayload) {
 
     logSmsEvent('aquasms.request_error', {
       numberHint: maskedNumber,
+      smsNumber,
       message: error instanceof Error ? error.message : 'unknown',
       latencyMs: Date.now() - startedAt,
     })
@@ -208,7 +278,7 @@ export function hasSmsProvider(): boolean {
   return Boolean(getAquaSmsConfig(config))
 }
 
-export async function sendTransactionalSms(payload: SmsPayload): Promise<void> {
+export async function sendTransactionalSms(payload: SmsPayload): Promise<SmsSendResult> {
   const config = useRuntimeConfig()
   const aquaConfig = getAquaSmsConfig(config)
 
@@ -220,7 +290,7 @@ export async function sendTransactionalSms(payload: SmsPayload): Promise<void> {
     })
   }
 
-  await sendViaAquaSms(aquaConfig, payload)
+  return sendViaAquaSms(aquaConfig, payload)
 }
 
 export function maskPhoneForDisplay(e164: string): string {

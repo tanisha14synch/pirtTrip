@@ -8,7 +8,8 @@ import {
   verifyOtpHash,
 } from './otp'
 import { buildOtpEmailContent, sendTransactionalEmail } from './mailer'
-import { buildPartnerOtpSmsMessage, hasSmsProvider, sendTransactionalSms } from './sms'
+import { buildPartnerOtpSmsMessage, hasSmsProvider, partnerOtpDeliveryErrorMessage, sendTransactionalSms } from './sms'
+import { maskOtpForAudit, maskPhoneForAudit, partnerOtpAudit } from './partner-otp-audit'
 import {
   buildChallengePayload,
   createChallengeToken,
@@ -49,10 +50,13 @@ export async function createAndSendOtp(options: {
     phone: string
     buildMessage?: (code: string) => string
   }
+  /** Partner OTP: SMS must succeed before a challenge is created; never use console fallback. */
+  strictSmsDelivery?: boolean
 }) {
   const email = options.email.trim().toLowerCase()
   const deliveryEmail = (options.deliveryEmail || email).trim().toLowerCase()
   const useSms = Boolean(options.smsDelivery)
+  const strictSms = Boolean(options.strictSmsDelivery && useSms)
 
   const resendCheck = await validateResendForEmail({
     email,
@@ -69,6 +73,143 @@ export async function createAndSendOtp(options: {
 
   const resendCount = resendCheck.resendCount + (resendCheck.challenge ? 1 : 0)
   const code = generateOtpCode()
+  const mail = options.buildMailContent
+    ? options.buildMailContent(code)
+    : buildOtpEmailContent(code, PURPOSE_LABELS[options.purpose])
+  const smsMessage = options.smsDelivery
+    ? (options.smsDelivery.buildMessage?.(code) ?? buildPartnerOtpSmsMessage(code))
+    : ''
+
+  const config = useRuntimeConfig()
+  const isDev = process.env.NODE_ENV !== 'production'
+  const hasMailProvider =
+    Boolean(config.resendApiKey) || Boolean(config.smtpHost && config.smtpUser && config.smtpPass)
+  const smsReady = useSms ? hasSmsProvider() : false
+  const smsConsoleFallback = !strictSms && useSms && !smsReady
+  const emailConsoleFallback = !strictSms && !useSms && isDev && (
+    process.env.OTP_DEBUG === 'true' || !hasMailProvider
+  )
+  const showDevCode = smsConsoleFallback || emailConsoleFallback
+
+  if (strictSms) {
+    if (!smsReady) {
+      partnerOtpAudit('send.sms_provider_missing', {
+        purpose: options.purpose,
+        phone: maskPhoneForAudit(options.smsDelivery!.phone),
+      })
+      throw createError({
+        statusCode: 502,
+        statusMessage: partnerOtpDeliveryErrorMessage(),
+        data: { code: 'OTP_SMS_PROVIDER_MISSING' },
+      })
+    }
+
+    const smsPhone = options.smsDelivery!.phone
+    if (!smsMessage.includes(code)) {
+      partnerOtpAudit('send.message_code_mismatch', {
+        purpose: options.purpose,
+        phone: maskPhoneForAudit(smsPhone),
+        otp: maskOtpForAudit(code),
+      })
+      throw createError({
+        statusCode: 500,
+        statusMessage: partnerOtpDeliveryErrorMessage(),
+        data: { code: 'OTP_MESSAGE_BUILD_FAILED' },
+      })
+    }
+
+    partnerOtpAudit('send.start', {
+      purpose: options.purpose,
+      phone: maskPhoneForAudit(smsPhone),
+      otp: maskOtpForAudit(code),
+      challengeEmail: email,
+    })
+
+    let challenge
+    try {
+      challenge = await upsertOtpChallenge({
+        challengeId: resendCheck.challenge?.id || null,
+        email,
+        purpose: options.purpose,
+        code,
+        resendCount,
+        metadata: options.metadata,
+      })
+    } catch (dbError: unknown) {
+      partnerOtpAudit('send.db_save_failed', {
+        purpose: options.purpose,
+        phone: maskPhoneForAudit(smsPhone),
+        otp: maskOtpForAudit(code),
+        error: dbError instanceof Error ? dbError.message : 'unknown',
+      })
+      throw dbError
+    }
+
+    partnerOtpAudit('send.db_saved', {
+      purpose: options.purpose,
+      phone: maskPhoneForAudit(smsPhone),
+      otp: maskOtpForAudit(code),
+      challengeId: challenge.id,
+      expiresAt: challenge.expires_at,
+    })
+
+    const startedAt = Date.now()
+    try {
+      const smsResult = await sendTransactionalSms({
+        to: smsPhone,
+        message: smsMessage,
+      })
+
+      partnerOtpAudit('send.sms_success', {
+        purpose: options.purpose,
+        phone: maskPhoneForAudit(smsPhone),
+        otp: maskOtpForAudit(code),
+        challengeId: challenge.id,
+        provider: smsResult.provider,
+        providerCode: smsResult.responseCode,
+        msgId: smsResult.msgId,
+        smsNumber: smsResult.numberSent,
+        latencyMs: Date.now() - startedAt,
+      })
+    } catch (deliveryError: unknown) {
+      await deleteOtpChallenge(challenge.id).catch(() => {})
+      partnerOtpAudit('send.sms_failed', {
+        purpose: options.purpose,
+        phone: maskPhoneForAudit(smsPhone),
+        otp: maskOtpForAudit(code),
+        challengeId: challenge.id,
+        error: deliveryError instanceof Error ? deliveryError.message : 'unknown',
+        latencyMs: Date.now() - startedAt,
+      })
+      throw deliveryError
+    }
+
+    const challengeToken = createChallengeToken(
+      buildChallengePayload({
+        id: challenge.id,
+        email,
+        purpose: options.purpose,
+        expiresAt: challenge.expires_at,
+      }),
+    )
+
+    partnerOtpAudit('send.complete', {
+      purpose: options.purpose,
+      phone: maskPhoneForAudit(smsPhone),
+      challengeId: challenge.id,
+      otpStored: true,
+      smsDelivered: true,
+    })
+
+    return {
+      challengeToken,
+      expiresInSeconds: getOtpTtlSeconds(options.purpose),
+      resendCooldownSeconds: getResendCooldownSeconds(options.purpose),
+      smsDelivered: true as const,
+      challengeId: challenge.id,
+    }
+  }
+
   const challenge = await upsertOtpChallenge({
     challengeId: resendCheck.challenge?.id || null,
     email,
@@ -84,23 +225,6 @@ export async function createAndSendOtp(options: {
     expiresAt: challenge.expires_at,
   })
   const challengeToken = createChallengeToken(payload)
-  const mail = options.buildMailContent
-    ? options.buildMailContent(code)
-    : buildOtpEmailContent(code, PURPOSE_LABELS[options.purpose])
-  const smsMessage = options.smsDelivery
-    ? (options.smsDelivery.buildMessage?.(code) ?? buildPartnerOtpSmsMessage(code))
-    : ''
-
-  const config = useRuntimeConfig()
-  const isDev = process.env.NODE_ENV !== 'production'
-  const hasMailProvider =
-    Boolean(config.resendApiKey) || Boolean(config.smtpHost && config.smtpUser && config.smtpPass)
-  const smsReady = useSms ? hasSmsProvider() : false
-  const smsConsoleFallback = useSms && !smsReady
-  const emailConsoleFallback = !useSms && isDev && (
-    process.env.OTP_DEBUG === 'true' || !hasMailProvider
-  )
-  const showDevCode = smsConsoleFallback || emailConsoleFallback
 
   // Without AquaSMS credentials, log OTP to server console and continue verification.
   if (showDevCode) {

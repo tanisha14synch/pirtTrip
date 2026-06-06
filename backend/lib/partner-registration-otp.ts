@@ -1,5 +1,6 @@
 import { createAndSendOtp } from '~/lib/email-otp-service'
 import { partnerOtpChallengeEmail, partnerOtpChallengeEmailVariants } from '~/lib/partner-otp'
+import { maskPhoneForAudit, partnerOtpAudit } from '~/lib/partner-otp-audit'
 import {
   buildPartnerRegistrationThankYouMessage,
   hasSmsProvider,
@@ -27,16 +28,24 @@ export function phoneLookupVariants(phone: string): string[] {
   ].filter(Boolean))]
 }
 
-export async function findPartnerLeadByPhone(phone: string) {
+function phoneLocalDigits(phone: string): string {
+  return phone.replace(/\D/g, '').slice(-10)
+}
+
+function matchesPhoneLocal(storedPhone: string, local: string): boolean {
+  return phoneLocalDigits(storedPhone) === local
+}
+
+export async function findAllPartnerLeadsByPhone(phone: string) {
   const admin = getSupabaseAdmin()
-  const local = phone.replace(/\D/g, '').slice(-10)
+  const local = phoneLocalDigits(phone)
   const variants = phoneLookupVariants(phone)
 
   const { data: exactMatches, error: exactError } = await admin
     .from('partner_leads')
-    .select('id, phone')
+    .select('id, phone, auth_user_id')
     .in('phone', variants)
-    .limit(5)
+    .limit(10)
 
   if (exactError) {
     throw createError({
@@ -45,16 +54,17 @@ export async function findPartnerLeadByPhone(phone: string) {
     })
   }
 
-  const exact = (exactMatches ?? []).find(
-    (row) => row.phone.replace(/\D/g, '').slice(-10) === local,
-  )
-  if (exact) return exact
+  const leads = (exactMatches ?? []).filter((row) => matchesPhoneLocal(row.phone, local))
+
+  if (leads.length > 0) {
+    return leads
+  }
 
   const { data: fuzzyMatches, error: fuzzyError } = await admin
     .from('partner_leads')
-    .select('id, phone')
+    .select('id, phone, auth_user_id')
     .ilike('phone', `%${local}`)
-    .limit(10)
+    .limit(20)
 
   if (fuzzyError) {
     throw createError({
@@ -63,9 +73,37 @@ export async function findPartnerLeadByPhone(phone: string) {
     })
   }
 
-  return (fuzzyMatches ?? []).find(
-    (row) => row.phone.replace(/\D/g, '').slice(-10) === local,
-  ) ?? null
+  return (fuzzyMatches ?? []).filter((row) => matchesPhoneLocal(row.phone, local))
+}
+
+export async function findPartnerLeadByPhone(phone: string) {
+  const leads = await findAllPartnerLeadsByPhone(phone)
+  return leads[0] ?? null
+}
+
+/** Remove all partner rows + linked auth users for a phone so the number can register again. */
+export async function purgePartnerRegistrationForPhone(phone: string) {
+  const admin = getSupabaseAdmin()
+  const leads = await findAllPartnerLeadsByPhone(phone)
+
+  for (const lead of leads) {
+    if (lead.auth_user_id) {
+      await admin.auth.admin.deleteUser(lead.auth_user_id).catch((err) => {
+        console.warn('[partner/purge] auth user cleanup failed:', err.message)
+      })
+    }
+
+    const { error } = await admin.from('partner_leads').delete().eq('id', lead.id)
+    if (error) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Failed to remove existing registration for this phone',
+      })
+    }
+  }
+
+  await clearStalePartnerOtpSessions(phone)
+  return leads.length
 }
 
 export async function assertPartnerPhoneAvailable(phone: string) {
@@ -74,7 +112,7 @@ export async function assertPartnerPhoneAvailable(phone: string) {
   if (existing) {
     throw createError({
       statusCode: 409,
-      statusMessage: 'This phone number is already registered',
+      statusMessage: 'This phone number is already registered. Please contact support to register again.',
       data: { code: 'PHONE_ALREADY_REGISTERED' },
     })
   }
@@ -194,15 +232,37 @@ async function deliverPartnerRegistrationOtp(options: {
   challengeToken?: string | null
 }) {
   const phone = normalizePhone(options.data.phone)
+  const inputPhone = options.data.phone.replace(/\D/g, '').slice(-10)
+  const normalizedLocal = phone.replace(/\D/g, '').slice(-10)
+
+  if (inputPhone !== normalizedLocal) {
+    partnerOtpAudit('send.phone_normalization_mismatch', {
+      inputPhone: maskPhoneForAudit(`+91${inputPhone}`),
+      normalizedPhone: maskPhoneForAudit(phone),
+    })
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Invalid phone number',
+      data: { code: 'INVALID_PHONE' },
+    })
+  }
+
   const challengeEmail = partnerOtpChallengeEmail(phone)
   const firstName = options.data.firstName.trim()
   const lastName = options.data.lastName.trim()
   const businessName = options.data.businessName.trim()
 
+  partnerOtpAudit('send.deliver', {
+    inputPhone: maskPhoneForAudit(`+91${inputPhone}`),
+    normalizedPhone: maskPhoneForAudit(phone),
+    challengeEmail,
+  })
+
   return createAndSendOtp({
     email: challengeEmail,
     purpose: 'partner_registration',
     challengeToken: options.challengeToken,
+    strictSmsDelivery: true,
     metadata: {
       firstName,
       lastName,
@@ -258,11 +318,19 @@ export async function sendPartnerRegistrationOtp(
 
   await logPartnerOtpSent(phone)
 
+  const readyForVerify = result.smsDelivered === true && Boolean(result.challengeToken)
+
+  partnerOtpAudit('send.api_response', {
+    phone: maskPhoneForAudit(phone),
+    readyForVerify,
+    challengeId: 'challengeId' in result ? result.challengeId : undefined,
+  })
+
   return {
     challengeToken: result.challengeToken,
     expiresInSeconds: result.expiresInSeconds,
     resendCooldownSeconds: result.resendCooldownSeconds,
     phoneMasked: maskPhoneForDisplay(phone),
-    ...('debugCode' in result ? { debugCode: result.debugCode } : {}),
+    readyForVerify,
   }
 }

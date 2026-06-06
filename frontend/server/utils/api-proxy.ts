@@ -1,6 +1,12 @@
 import type { H3Event } from 'h3'
 import { getQuery, getRequestHeaders, readBody, setResponseStatus } from 'h3'
 import { hasSupabaseServerConfig } from './supabase-config'
+import { isPartnerOtpApiPath } from './partner-otp-handlers'
+
+const PARTNER_OTP_SEND_FAILED_MSG = 'Unable to send OTP. Please try again later.'
+
+const PARTNER_OTP_PROXY_TIMEOUT_MS = 90_000
+const DEFAULT_PROXY_TIMEOUT_MS = 30_000
 
 export function resolveApiOrigin(): string {
   const config = useRuntimeConfig()
@@ -55,6 +61,8 @@ export async function proxyApiToBackend(event: H3Event) {
 
   const target = buildProxyUrl(event, origin)
   const method = event.method || 'GET'
+  const path = event.path || '/'
+  const timeoutMs = isPartnerOtpApiPath(path) ? PARTNER_OTP_PROXY_TIMEOUT_MS : DEFAULT_PROXY_TIMEOUT_MS
   const headers = getRequestHeaders(event)
   const forwardHeaders: Record<string, string> = {
     accept: headers.accept || 'application/json',
@@ -72,7 +80,7 @@ export async function proxyApiToBackend(event: H3Event) {
       method,
       headers: forwardHeaders,
       body,
-      timeout: 30_000,
+      timeout: timeoutMs,
     })
 
     setResponseStatus(event, response.status)
@@ -89,6 +97,13 @@ export async function proxyApiToBackend(event: H3Event) {
 
     const code = err.cause?.code
     if (code === 'ECONNREFUSED' || code === 'ENOTFOUND' || code === 'ETIMEDOUT') {
+      if (isPartnerOtpApiPath(path)) {
+        throw createError({
+          statusCode: 502,
+          statusMessage: PARTNER_OTP_SEND_FAILED_MSG,
+          data: { code: 'OTP_SEND_FAILED', success: false },
+        })
+      }
       throw createError({
         statusCode: 503,
         statusMessage: 'Backend API is not reachable. Ensure the API server is running on port 3001.',
@@ -96,8 +111,37 @@ export async function proxyApiToBackend(event: H3Event) {
       })
     }
 
+    const statusCode = err.statusCode || err.status || 502
+    const isPartnerOtpSend = isPartnerOtpApiPath(path)
+      && (path.endsWith('/send-otp') || path.endsWith('/resend-otp'))
+
+    if (isPartnerOtpSend) {
+      const partnerCode = err.data?.code
+      if (statusCode === 409 || partnerCode === 'PHONE_ALREADY_REGISTERED') {
+        throw createError({
+          statusCode: 409,
+          statusMessage: 'This phone number is already registered.',
+          data: { code: 'PHONE_ALREADY_REGISTERED', success: false },
+        })
+      }
+
+      if (statusCode === 400) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: err.data?.statusMessage || err.statusMessage || 'Invalid form',
+          data: { ...(err.data || {}), success: false },
+        })
+      }
+
+      throw createError({
+        statusCode: statusCode >= 400 && statusCode < 600 ? statusCode : 502,
+        statusMessage: PARTNER_OTP_SEND_FAILED_MSG,
+        data: { code: partnerCode || 'OTP_SEND_FAILED', success: false },
+      })
+    }
+
     throw createError({
-      statusCode: err.statusCode || err.status || 502,
+      statusCode,
       statusMessage:
         err.data?.statusMessage
         || err.statusMessage

@@ -4,7 +4,7 @@ import { getOtpSigningSecret } from './runtime-env'
 const OTP_LENGTH = 6
 const OTP_TTL_MS = 10 * 60 * 1000 // 10 minutes (default)
 const RESEND_COOLDOWN_MS = 60 * 1000 // 60 seconds (default)
-const PARTNER_OTP_TTL_MS = 5 * 60 * 1000 // 5 minutes
+const PARTNER_OTP_TTL_MS = 10 * 60 * 1000 // 10 minutes — matches AquaSMS DLT template
 const PARTNER_RESEND_COOLDOWN_MS = 5 * 60 * 1000 // 5 minutes
 const MAX_RESENDS_PER_WINDOW = 5
 const RESEND_WINDOW_MS = 15 * 60 * 1000

@@ -1,9 +1,12 @@
+import { PARTNER_OTP_SEND_FAILED_MSG, isPartnerOtpSendSuccess } from '~/constants/partner-otp'
 import { partnerRegistrationSchema } from '~/utils/validation'
 import type { PartnerLead } from '~/types/database'
 
 export type RegistrationStep = 'form' | 'otp' | 'success'
 
 const OTP_ENABLED = true
+const PARTNER_OTP_FETCH_TIMEOUT_MS = 90_000
+const PHONE_REGISTERED_MSG = 'This phone number is already registered.'
 
 type OtpSendResponse = {
   success: boolean
@@ -11,7 +14,36 @@ type OtpSendResponse = {
   expiresInSeconds: number
   resendCooldownSeconds: number
   phoneMasked: string
-  debugCode?: string
+}
+
+function isFormValidationError(err: unknown): err is Error {
+  if (!(err instanceof Error)) return false
+  const msg = err.message
+  return (
+    msg.includes('policy')
+    || msg.includes('Invalid form')
+    || msg.includes('valid')
+  )
+}
+
+function getSendOtpUserMessage(err: unknown): string {
+  if (isFormValidationError(err)) {
+    return err.message
+  }
+
+  const fetchError = err as {
+    data?: { code?: string }
+    statusCode?: number
+  }
+
+  if (
+    fetchError.statusCode === 409
+    || fetchError.data?.code === 'PHONE_ALREADY_REGISTERED'
+  ) {
+    return PHONE_REGISTERED_MSG
+  }
+
+  return PARTNER_OTP_SEND_FAILED_MSG
 }
 
 export function usePartnerRegistration() {
@@ -34,7 +66,6 @@ export function usePartnerRegistration() {
   } = useEmailOtp()
   const challengeToken = ref<string | null>(null)
   const otpPhoneMasked = ref('')
-  const otpDebugMode = ref(false)
 
   const form = reactive({
     firstName: '',
@@ -63,19 +94,23 @@ export function usePartnerRegistration() {
   function applyOtpSendResponse(response: OtpSendResponse, phone: string) {
     challengeToken.value = response.challengeToken
     otpPhoneMasked.value = response.phoneMasked || `+91 ******${phone.slice(-4)}`
-    step.value = 'otp'
     otpDigits.value = ['', '', '', '', '', '']
     applySendResponse(response)
-    otpDebugMode.value = Boolean(response.debugCode)
+    step.value = 'otp'
+  }
 
-    if (response.debugCode) {
-      console.info('[partner OTP]', response.debugCode)
-    }
+  function failSendOtp(err?: unknown) {
+    step.value = 'form'
+    challengeToken.value = null
+    errorMessage.value = err ? getSendOtpUserMessage(err) : PARTNER_OTP_SEND_FAILED_MSG
   }
 
   async function sendOtp() {
+    if (loading.value) return
+
     loading.value = true
     errorMessage.value = null
+    step.value = 'form'
 
     try {
       if (!form.agreePolicies1 || !form.agreePolicies2) {
@@ -89,17 +124,18 @@ export function usePartnerRegistration() {
 
       challengeToken.value = null
 
-      const response = await $fetch<OtpSendResponse & { success?: boolean }>(
+      const response = await $fetch<OtpSendResponse>(
         apiUrl('/api/partner/send-otp'),
         {
           method: 'POST',
-          timeout: 30_000,
+          timeout: PARTNER_OTP_FETCH_TIMEOUT_MS,
           body: parsed.data,
         },
       )
 
-      if (!response?.challengeToken) {
-        throw new Error('Unable to send OTP now. Please try again later.')
+      if (!isPartnerOtpSendSuccess(response)) {
+        failSendOtp()
+        return
       }
 
       applyOtpSendResponse(response, parsed.data.phone)
@@ -107,7 +143,7 @@ export function usePartnerRegistration() {
       await nextTick()
       document.getElementById('partner-otp-0')?.focus()
     } catch (err: unknown) {
-      errorMessage.value = parseOtpFetchError(err)
+      failSendOtp(err)
     } finally {
       loading.value = false
     }
@@ -132,19 +168,24 @@ export function usePartnerRegistration() {
 
       const response = await $fetch<OtpSendResponse>(apiUrl('/api/partner/resend-otp'), {
         method: 'POST',
-        timeout: 30_000,
+        timeout: PARTNER_OTP_FETCH_TIMEOUT_MS,
         body: {
           ...parsed.data,
           challengeToken: challengeToken.value ?? undefined,
         },
       })
 
+      if (!isPartnerOtpSendSuccess(response)) {
+        errorMessage.value = PARTNER_OTP_SEND_FAILED_MSG
+        return
+      }
+
       applyOtpSendResponse(response, parsed.data.phone)
 
       await nextTick()
       document.getElementById('partner-otp-0')?.focus()
     } catch (err: unknown) {
-      errorMessage.value = parseOtpFetchError(err)
+      errorMessage.value = getSendOtpUserMessage(err)
     } finally {
       loading.value = false
     }
@@ -175,7 +216,7 @@ export function usePartnerRegistration() {
         apiUrl('/api/partner/verify-otp'),
         {
           method: 'POST',
-          timeout: 30_000,
+          timeout: PARTNER_OTP_FETCH_TIMEOUT_MS,
           body: {
             ...parsed.data,
             code: otpCode.value,
@@ -183,6 +224,10 @@ export function usePartnerRegistration() {
           },
         },
       )
+
+      if (!result?.success || !result.lead) {
+        throw new Error('Verification failed. Please check the code and try again.')
+      }
 
       successLead.value = result.lead
       step.value = 'success'
@@ -234,7 +279,6 @@ export function usePartnerRegistration() {
     successLead.value = null
     challengeToken.value = null
     otpPhoneMasked.value = ''
-    otpDebugMode.value = false
     clearOtpTimers()
   }
 
@@ -248,7 +292,6 @@ export function usePartnerRegistration() {
     errorMessage,
     successLead,
     otpPhoneMasked,
-    otpDebugMode,
     otpExpiresInSeconds,
     otpResendWaitSeconds,
     otpSessionActive,

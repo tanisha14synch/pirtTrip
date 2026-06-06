@@ -7,7 +7,6 @@ const {
   errorMessage,
   successLead,
   otpPhoneMasked,
-  otpDebugMode,
   canVerifyOtp,
   otpExpiresInSeconds,
   otpResendWaitSeconds,
@@ -340,8 +339,30 @@ function onOtpInput(index, event) {
         <button
           type="submit"
           :disabled="loading"
-          class="mt-0.5 flex h-[44px] w-full items-center justify-center gap-2 rounded-[8px] bg-[#F3A81A] font-plein text-[15px] font-bold leading-[140%] tracking-[0] text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+          :aria-busy="loading"
+          class="mt-0.5 flex h-[44px] w-full items-center justify-center gap-2 rounded-[8px] bg-[#F3A81A] font-plein text-[15px] font-bold leading-[140%] tracking-[0] text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
+          <svg
+            v-if="loading"
+            class="h-4 w-4 shrink-0 animate-spin"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            />
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+            />
+          </svg>
           {{ loading ? 'Sending OTP…' : 'Register Now' }}
           <svg
             v-if="!loading"
@@ -368,12 +389,6 @@ function onOtpInput(index, event) {
         <p class="font-plein text-[14px] leading-[140%] text-white/80">
           Enter the 6-digit code sent to
           <span class="font-medium text-white">{{ otpPhoneMasked }}</span>
-        </p>
-        <p
-          v-if="otpDebugMode"
-          class="font-plein text-[12px] leading-[140%] text-white/55"
-        >
-          SMS is not configured. Check the backend server console for the OTP code.
         </p>
 
         <p
