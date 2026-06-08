@@ -6,8 +6,7 @@ const OTP_TTL_MS = 10 * 60 * 1000 // 10 minutes (default)
 const RESEND_COOLDOWN_MS = 60 * 1000 // 60 seconds (default)
 const ADMIN_OTP_TTL_MS = 5 * 60 * 1000 // 5 minutes
 const ADMIN_RESEND_COOLDOWN_MS = 5 * 60 * 1000 // 5 minutes
-const PARTNER_OTP_TTL_MS = 10 * 60 * 1000 // 10 minutes — matches AquaSMS DLT template
-const PARTNER_RESEND_COOLDOWN_MS = 5 * 60 * 1000 // 5 minutes
+const PARTNER_OTP_WINDOW_MS = 10 * 60 * 1000 // 10 minutes — expiry and resend use the same window
 const MAX_RESENDS_PER_WINDOW = 5
 const RESEND_WINDOW_MS = 15 * 60 * 1000
 const MAX_VERIFY_ATTEMPTS = 5
@@ -23,8 +22,8 @@ const OTP_LIMITS_BY_PURPOSE: Record<OtpPurpose, OtpPurposeLimits> = {
   waitlist: { ttlMs: OTP_TTL_MS, resendCooldownMs: RESEND_COOLDOWN_MS },
   admin_login: { ttlMs: ADMIN_OTP_TTL_MS, resendCooldownMs: ADMIN_RESEND_COOLDOWN_MS },
   partner_registration: {
-    ttlMs: PARTNER_OTP_TTL_MS,
-    resendCooldownMs: PARTNER_RESEND_COOLDOWN_MS,
+    ttlMs: PARTNER_OTP_WINDOW_MS,
+    resendCooldownMs: PARTNER_OTP_WINDOW_MS,
   },
 }
 

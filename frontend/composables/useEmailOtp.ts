@@ -9,7 +9,11 @@ const DEFAULT_OTP_TTL_SECONDS = 300
 const DEFAULT_RESEND_COOLDOWN_SECONDS = 300
 const OTP_SEND_FAILED_MSG = 'Unable to send OTP. Please try again later.'
 
-export function useEmailOtp(options: { resendCooldownSeconds?: number } = {}) {
+export function useEmailOtp(options: {
+  resendCooldownSeconds?: number
+  /** Match resend countdown to OTP expiry (partner registration). */
+  syncResendWithExpiry?: boolean
+} = {}) {
   const expiresInSeconds = ref(0)
   const resendCooldownSeconds = ref(options.resendCooldownSeconds ?? DEFAULT_RESEND_COOLDOWN_SECONDS)
   const resendWaitSeconds = ref(0)
@@ -71,11 +75,18 @@ export function useEmailOtp(options: { resendCooldownSeconds?: number } = {}) {
   }
 
   function applySendResponse(response: EmailOtpSendResponse) {
-    startExpiryCountdown(response.expiresInSeconds)
-    startResendCooldown(response.resendCooldownSeconds)
-    if (response.resendCooldownSeconds) {
-      resendCooldownSeconds.value = response.resendCooldownSeconds
-    }
+    const ttlSeconds = Number.isFinite(response.expiresInSeconds) && response.expiresInSeconds > 0
+      ? Math.floor(response.expiresInSeconds)
+      : DEFAULT_OTP_TTL_SECONDS
+    const resendSeconds = options.syncResendWithExpiry
+      ? ttlSeconds
+      : (Number.isFinite(response.resendCooldownSeconds) && response.resendCooldownSeconds >= 0
+          ? Math.floor(response.resendCooldownSeconds)
+          : DEFAULT_RESEND_COOLDOWN_SECONDS)
+
+    startExpiryCountdown(ttlSeconds)
+    startResendCooldown(resendSeconds)
+    resendCooldownSeconds.value = resendSeconds
   }
 
   function parseFetchError(err: unknown): string {

@@ -63,7 +63,7 @@ export function usePartnerRegistration() {
     applySendResponse,
     parseFetchError: parseOtpFetchError,
     clearTimers: clearOtpTimers,
-  } = useEmailOtp()
+  } = useEmailOtp({ syncResendWithExpiry: true })
   const challengeToken = ref<string | null>(null)
   const otpPhoneMasked = ref('')
 
