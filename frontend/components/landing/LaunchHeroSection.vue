@@ -1,5 +1,6 @@
 <script setup>
 const { partnerLandingUrl } = usePartnerSite()
+const { countdownUnits, pad } = useLaunchCountdown()
 
 const HERO_BG = '/images/hero/hero-bg.png'
 
@@ -15,40 +16,11 @@ const heroStyle = {
   backgroundRepeat: 'no-repeat',
 }
 
-const timeLeft = ref({
-  days: 20,
-  hours: 5,
-  minutes: 55,
-  seconds: 39,
-})
-
 const waitlistOpen = ref(false)
 const route = useRoute()
 const router = useRouter()
 
-let timerId
-
-const pad = (value) => String(value).padStart(2, '0')
-
-const tickCountdown = () => {
-  let total = timeLeft.value.days * 86400
-    + timeLeft.value.hours * 3600
-    + timeLeft.value.minutes * 60
-    + timeLeft.value.seconds
-
-  total = Math.max(0, total - 1)
-
-  timeLeft.value = {
-    days: Math.floor(total / 86400),
-    hours: Math.floor((total % 86400) / 3600),
-    minutes: Math.floor((total % 3600) / 60),
-    seconds: total % 60,
-  }
-}
-
 onMounted(() => {
-  timerId = window.setInterval(tickCountdown, 1000)
-
   if (route.query.join === 'waitlist') {
     waitlistOpen.value = true
     const nextQuery = { ...route.query }
@@ -57,9 +29,6 @@ onMounted(() => {
   }
 })
 
-onUnmounted(() => {
-  if (timerId) clearInterval(timerId)
-})
 </script>
 
 <template>
@@ -124,19 +93,14 @@ onUnmounted(() => {
       <!-- Countdown -->
       <div class="mt-10 flex flex-wrap justify-center gap-2 sm:gap-3">
         <div
-          v-for="unit in [
-            { label: 'DAYS', value: timeLeft.days },
-            { label: 'HRS', value: timeLeft.hours },
-            { label: 'MINS', value: timeLeft.minutes },
-            { label: 'SECS', value: timeLeft.seconds },
-          ]"
+          v-for="unit in countdownUnits"
           :key="unit.label"
-          class="flex min-w-[64px] flex-col items-center justify-center rounded-[10px] border border-white/10 bg-black/45 px-3 py-3 backdrop-blur-sm sm:min-w-[72px] sm:px-4 sm:py-3.5"
+          class="flex min-w-[68px] flex-col items-center justify-center rounded-[10px] border border-white/10 bg-black/45 px-3 py-3 backdrop-blur-sm sm:min-w-[78px] sm:px-4 sm:py-3.5"
         >
           <span class="font-plein text-[22px] font-bold leading-none text-white sm:text-[26px]">
             {{ pad(unit.value) }}
           </span>
-          <span class="mt-1.5 font-plein text-[10px] font-medium uppercase tracking-[0.06em] text-white/65 sm:text-[11px]">
+          <span class="mt-1.5 font-plein text-[12px] font-bold uppercase leading-none tracking-[0.06em] text-white sm:text-[13px]">
             {{ unit.label }}
           </span>
         </div>

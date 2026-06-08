@@ -4,6 +4,7 @@ import { BUSINESS_HERO_BG_SRC } from '~/constants/business-hero-assets'
 const HERO_BG_SRC = BUSINESS_HERO_BG_SRC
 
 const { homeHref, homeIsExternal } = useMainSite()
+const { countdownUnits, pad } = useLaunchCountdown()
 
 useHead({
   link: [
@@ -14,13 +15,6 @@ useHead({
       type: 'image/svg+xml',
     },
   ],
-})
-
-const timeLeft = ref({
-  days: 20,
-  hours: 5,
-  minutes: 55,
-  seconds: 39,
 })
 
 const featureCards = [
@@ -45,41 +39,6 @@ const featureCards = [
     alt: 'Branding and visibility',
   },
 ]
-
-let timerId
-
-const countdownUnits = computed(() => [
-  { label: 'DAYS', value: timeLeft.value.days },
-  { label: 'HRS', value: timeLeft.value.hours },
-  { label: 'MINS', value: timeLeft.value.minutes },
-  { label: 'SECS', value: timeLeft.value.seconds },
-])
-
-const pad = (value) => String(value).padStart(2, '0')
-
-const tickCountdown = () => {
-  let total = timeLeft.value.days * 86400
-    + timeLeft.value.hours * 3600
-    + timeLeft.value.minutes * 60
-    + timeLeft.value.seconds
-
-  total = Math.max(0, total - 1)
-
-  timeLeft.value = {
-    days: Math.floor(total / 86400),
-    hours: Math.floor((total % 86400) / 3600),
-    minutes: Math.floor((total % 3600) / 60),
-    seconds: total % 60,
-  }
-}
-
-onMounted(() => {
-  timerId = window.setInterval(tickCountdown, 1000)
-})
-
-onUnmounted(() => {
-  if (timerId) clearInterval(timerId)
-})
 </script>
 
 <template>
@@ -151,21 +110,21 @@ onUnmounted(() => {
             </NuxtLink>
 
             <div class="flex min-w-0 shrink-0 flex-col items-end gap-1">
-              <p class="font-plein text-[9px] font-bold leading-[130%] tracking-[0] text-white">
+              <p class="font-plein text-[12px] font-bold leading-[130%] tracking-[0] text-white sm:text-[13px]">
                 We are launching Soon!
               </p>
 
-              <div class="flex gap-1">
+              <div class="flex gap-1.5">
                 <div
                   v-for="unit in countdownUnits"
                   :key="unit.label"
-                  class="flex min-w-[30px] flex-col items-center justify-center rounded-[4px] bg-white px-1 py-1"
+                  class="flex min-w-[42px] flex-col items-center justify-center rounded-[5px] bg-white px-2 py-1.5 sm:min-w-[44px]"
                 >
-                  <span class="font-plein text-[10px] font-bold leading-none text-black">
+                  <span class="font-plein text-[12px] font-bold leading-none text-black sm:text-[13px]">
                     {{ pad(unit.value) }}
                   </span>
                   <span
-                    class="mt-0.5 font-plein text-[5px] font-medium uppercase leading-none tracking-[0.02em] text-black/65"
+                    class="mt-1 font-plein text-[11px] font-bold uppercase leading-none tracking-[0.04em] text-black sm:text-[12px]"
                   >
                     {{ unit.label }}
                   </span>
@@ -208,21 +167,21 @@ onUnmounted(() => {
 
           <div class="flex items-center gap-5">
             <div class="flex items-center gap-3">
-              <p class="shrink-0 font-plein text-[14px] font-normal leading-[135%] tracking-[0] text-white">
+              <p class="shrink-0 font-plein text-[16px] font-bold leading-[135%] tracking-[0] text-white lg:text-[18px]">
                 We are launching Soon!
               </p>
 
-              <div class="flex gap-1.5">
+              <div class="flex gap-2">
                 <div
                   v-for="unit in countdownUnits"
                   :key="unit.label"
-                  class="flex min-w-[46px] flex-col items-center justify-center rounded-[5px] bg-white px-2 py-1.5"
+                  class="flex min-w-[52px] flex-col items-center justify-center rounded-[6px] bg-white px-2.5 py-2"
                 >
-                  <span class="font-plein text-[16px] font-bold leading-none text-black">
+                  <span class="font-plein text-[18px] font-bold leading-none text-black">
                     {{ pad(unit.value) }}
                   </span>
                   <span
-                    class="mt-0.5 font-plein text-[9px] font-medium uppercase leading-none tracking-[0.02em] text-black/65"
+                    class="mt-1 font-plein text-[11px] font-bold uppercase leading-none tracking-[0.04em] text-black"
                   >
                     {{ unit.label }}
                   </span>

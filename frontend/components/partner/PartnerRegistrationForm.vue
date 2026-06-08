@@ -192,7 +192,7 @@ function onOtpInput(index, event) {
         <span class="font-plein text-[13px] leading-[135%] text-white/70">What are connects</span>
         <button
           type="button"
-          class="connects-help-trigger -ml-px inline-flex h-[18px] w-[14px] shrink-0 items-center justify-center font-plein text-[15px] font-bold leading-none text-[#F3A81A] transition-colors hover:text-white"
+          class="connects-help-trigger ml-1 inline-flex h-[16px] w-[16px] shrink-0 items-center justify-center rounded-full border border-[#F3A81A] font-plein text-[11px] font-bold leading-none text-[#F3A81A] transition-colors hover:border-white hover:text-white"
           aria-describedby="connects-help-tooltip"
           aria-label="What are connects?"
           :aria-expanded="connectsHelpOpen"
@@ -460,9 +460,11 @@ function onOtpInput(index, event) {
 <style scoped>
 .connects-help-trigger {
   color: #f3a81a;
+  border-color: #f3a81a;
 }
 
 .connects-help-trigger:hover {
   color: #fff;
+  border-color: #fff;
 }
 </style>
