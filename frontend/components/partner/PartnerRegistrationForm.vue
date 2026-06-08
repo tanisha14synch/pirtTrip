@@ -27,6 +27,43 @@ const {
 const connectsHelpOpen = ref(false)
 const connectsHelpRef = ref(null)
 
+function isFinePointerHoverDevice() {
+  if (import.meta.server) return false
+  return window.matchMedia('(hover: hover) and (pointer: fine)').matches
+}
+
+function showConnectsHelp() {
+  if (isFinePointerHoverDevice()) {
+    connectsHelpOpen.value = true
+  }
+}
+
+function hideConnectsHelp() {
+  if (isFinePointerHoverDevice()) {
+    connectsHelpOpen.value = false
+  }
+}
+
+function toggleConnectsHelp() {
+  connectsHelpOpen.value = !connectsHelpOpen.value
+}
+
+function onConnectsHelpClickOutside(event) {
+  if (!connectsHelpOpen.value) return
+  const root = connectsHelpRef.value
+  if (root && !root.contains(event.target)) {
+    connectsHelpOpen.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('pointerdown', onConnectsHelpClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('pointerdown', onConnectsHelpClickOutside)
+})
+
 const inputClass =
   'h-[40px] w-full rounded-[8px] border border-[#3a3530] bg-[#1e1b18] px-3 font-plein text-[14px] font-normal leading-[140%] text-white placeholder:text-white/35 outline-none transition-colors focus:border-[#F3A81A]/70'
 
@@ -120,14 +157,6 @@ function onBusinessNameInput(event) {
   form.businessName = event.target.value.slice(0, 120)
 }
 
-function showConnectsHelp() {
-  connectsHelpOpen.value = true
-}
-
-function hideConnectsHelp() {
-  connectsHelpOpen.value = false
-}
-
 async function onSubmitDetails() {
   try {
     await sendOtp()
@@ -185,21 +214,25 @@ function onOtpInput(index, event) {
 
       <div
         ref="connectsHelpRef"
-        class="relative mt-2 inline-flex items-center"
+        class="connects-help-wrap relative mt-2 inline-flex items-center"
         @mouseenter="showConnectsHelp"
         @mouseleave="hideConnectsHelp"
       >
         <span class="font-plein text-[13px] leading-[135%] text-white/70">What are connects</span>
-        <button
-          type="button"
-          class="connects-help-trigger ml-1 inline-flex h-[16px] w-[16px] shrink-0 items-center justify-center rounded-full border border-[#F3A81A] font-plein text-[11px] font-bold leading-none text-[#F3A81A] transition-colors hover:border-white hover:text-white"
+        <span
+          role="button"
+          tabindex="0"
+          class="connects-help-trigger ml-1 inline-flex h-[16px] w-[16px] shrink-0 cursor-pointer items-center justify-center rounded-full font-plein text-[11px] font-bold leading-none"
+          :class="{ 'connects-help-trigger--open': connectsHelpOpen }"
           aria-describedby="connects-help-tooltip"
           aria-label="What are connects?"
           :aria-expanded="connectsHelpOpen"
-          @click="connectsHelpOpen = !connectsHelpOpen"
+          @click.stop="toggleConnectsHelp"
+          @keydown.enter.prevent="toggleConnectsHelp"
+          @keydown.space.prevent="toggleConnectsHelp"
         >
           ?
-        </button>
+        </span>
 
         <div
           v-show="connectsHelpOpen"
@@ -458,13 +491,60 @@ function onOtpInput(index, event) {
 </template>
 
 <style scoped>
-.connects-help-trigger {
-  color: #f3a81a;
-  border-color: #f3a81a;
+.connects-help-wrap {
+  -webkit-tap-highlight-color: transparent;
+  tap-highlight-color: transparent;
 }
 
-.connects-help-trigger:hover {
-  color: #fff;
-  border-color: #fff;
+.connects-help-trigger {
+  color: #f3a81a;
+  border: 1px solid #f3a81a;
+  background: transparent;
+  -webkit-tap-highlight-color: transparent;
+  tap-highlight-color: transparent;
+  touch-action: manipulation;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.connects-help-trigger:focus {
+  outline: none;
+}
+
+.connects-help-trigger:focus-visible {
+  outline: 2px solid #f3a81a;
+  outline-offset: 2px;
+}
+
+/* Mobile: yellow when closed, white only while tooltip is open */
+@media (hover: none), (pointer: coarse) {
+  .connects-help-trigger {
+    color: #f3a81a;
+    border-color: #f3a81a;
+    background: transparent;
+  }
+
+  .connects-help-trigger--open {
+    color: #fff;
+    border-color: #fff;
+  }
+
+  .connects-help-trigger:not(.connects-help-trigger--open),
+  .connects-help-trigger:not(.connects-help-trigger--open):hover,
+  .connects-help-trigger:not(.connects-help-trigger--open):focus,
+  .connects-help-trigger:not(.connects-help-trigger--open):active {
+    color: #f3a81a !important;
+    border-color: #f3a81a !important;
+    background: transparent !important;
+  }
+}
+
+/* Desktop: white on hover (unchanged) */
+@media (hover: hover) and (pointer: fine) {
+  .connects-help-trigger:hover {
+    color: #fff;
+    border-color: #fff;
+  }
 }
 </style>

@@ -8,7 +8,26 @@
 @layer base {
   html {
     @apply scroll-smooth antialiased;
+    -webkit-tap-highlight-color: transparent;
   }
+}
+
+/* Block text selection site-wide; form fields remain editable */
+html,
+body,
+body *:not(input):not(textarea):not(select):not([contenteditable='true']) {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+
+input,
+textarea,
+select,
+[contenteditable='true'] {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+  -webkit-touch-callout: default;
 }
 
 @layer components {

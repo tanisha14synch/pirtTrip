@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="select-none">
     <NuxtRouteAnnouncer />
     <NuxtLayout>
       <NuxtPage />
