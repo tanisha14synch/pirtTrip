@@ -6,6 +6,7 @@ This monorepo has **two deployable apps**. Deploy them as **separate Railway ser
 |---------|--------|----------------|--------------|
 | **API** | Nitro (Node) | `backend` | `GET /api/health` |
 | **Web** | Nuxt 3 (Node) | `frontend` | `GET /` |
+| **Admin** | Nuxt 3 (Node) | `admin` | `GET /login` |
 
 **Do not** expect the backend URL to serve the Nuxt homepage. Users visit the **frontend** URL; the UI calls the **backend** via `NUXT_PUBLIC_API_URL`.
 
@@ -70,6 +71,25 @@ Browser → https://your-app.up.railway.app/          (Nuxt frontend)
 5. Health check path: `/` (see `frontend/railway.json`).
 6. Open the frontend domain in a browser — homepage should load.
 
+## 3. Admin service (Nuxt)
+
+1. **New service** → same repo.
+2. **Settings → Root Directory** → `admin` (required — do **not** use repo root or `backend`).
+3. **Build:** `admin/Dockerfile` — configured in `admin/railway.json`.
+4. **Variables:**
+
+   | Variable | Value |
+   |----------|--------|
+   | `NUXT_PUBLIC_SUPABASE_URL` | Your Supabase URL |
+   | `NUXT_PUBLIC_SUPABASE_ANON_KEY` | Anon key |
+   | `API_URL` | `https://api.pirttrip.com` (backend origin; no `/api` suffix) |
+   | `NUXT_PUBLIC_MAIN_SITE_URL` | `https://business.pirttrip.com` |
+
+5. Custom domain: e.g. `admin.pirttrip.com`.
+6. Health check path: `/login` (see `admin/railway.json`).
+
+**Common build error:** `"/backend/package.json": not found` means Root Directory is wrong or the service is using the repo-root `Dockerfile` instead of `admin/Dockerfile`.
+
 ### Partner subdomain (`business.pirttrip.com` → `/`)
 
 The partner landing page lives in **`frontend/`** only (no separate `business/` app). Use **one** of these setups:
@@ -111,7 +131,7 @@ The partner landing page lives in **`frontend/`** only (no separate `business/` 
 
 Nuxt 3 works well on Vercel. Use Vercel for `frontend/` and Railway for `backend/` if you prefer edge hosting for static/SSR. Set `NUXT_PUBLIC_API_URL` in Vercel project settings to your Railway API URL.
 
-## 3. Local development
+## 4. Local development
 
 ```bash
 cd frontend && npm install && npm run dev
