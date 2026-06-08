@@ -7,9 +7,11 @@ import {
 import { sendPartnerRegistrationOtp } from '~/lib/partner-registration-otp'
 import { maskPhoneForAudit, partnerOtpAudit } from '~/lib/partner-otp-audit'
 import { normalizePhone } from '~/lib/phone'
-import { partnerRegistrationSchema, zodErrorMessage } from '~/lib/validation'
+import { partnerRegistrationSchema, webOtpHostSchema, zodErrorMessage } from '~/lib/validation'
 
-const bodySchema = partnerRegistrationSchema
+const bodySchema = partnerRegistrationSchema.extend({
+  webOtpHost: webOtpHostSchema,
+})
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -42,8 +44,10 @@ export default defineEventHandler(async (event) => {
       normalizedPhone: maskPhoneForAudit(phone),
     })
 
+    const { webOtpHost, ...registration } = parsed.data
     const result = await sendPartnerRegistrationOtp(event, {
-      data: parsed.data,
+      data: registration,
+      webOtpHost,
       isResend: false,
     })
 

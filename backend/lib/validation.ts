@@ -36,6 +36,9 @@ export const partnerRegistrationSchema = z.object({
   whatsappOptIn: z.boolean().optional(),
 })
 
+/** Browser hostname for Android/iOS Web OTP SMS suffix (optional, validated server-side). */
+export const webOtpHostSchema = z.string().max(253).optional()
+
 export const otpSchema = z.object({
   token: z
     .string()

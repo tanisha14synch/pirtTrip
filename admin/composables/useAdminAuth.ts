@@ -140,6 +140,7 @@ export function useAdminAuth() {
         body: {
           phone: loginPhone.value.trim(),
           challengeToken: challengeToken.value ?? undefined,
+          webOtpHost: getClientWebOtpHost(),
         },
       })
       challengeToken.value = response.challengeToken

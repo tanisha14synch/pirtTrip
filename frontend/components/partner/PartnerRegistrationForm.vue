@@ -18,9 +18,6 @@ const {
   sendOtp,
   resendOtp,
   verifyOtpAndRegister,
-  setOtpDigit,
-  handleOtpKeydown,
-  handleOtpPaste,
   reset,
 } = usePartnerRegistration()
 
@@ -169,9 +166,8 @@ async function onSubmitOtp() {
   } catch {}
 }
 
-function onOtpInput(index, event) {
-  setOtpDigit(index, event.target.value)
-}
+const partnerOtpBoxClass =
+  'h-[52px] max-w-[52px] rounded-[8px] border border-[#3a3530] bg-[#1e1b18] font-plein text-[20px] font-bold text-white'
 </script>
 
 <template>
@@ -437,24 +433,12 @@ function onOtpInput(index, event) {
           OTP expired. Resend to get a new one.
         </p>
 
-        <div
-          class="flex justify-between gap-2"
-          @paste="handleOtpPaste"
-        >
-          <input
-            v-for="(_, index) in otpDigits"
-            :id="`partner-otp-${index}`"
-            :key="index"
-            :value="otpDigits[index]"
-            type="text"
-            inputmode="numeric"
-            maxlength="1"
-            autocomplete="one-time-code"
-            class="h-[52px] w-full max-w-[52px] rounded-[8px] border border-[#3a3530] bg-[#1e1b18] text-center font-plein text-[20px] font-bold text-white outline-none focus:border-[#F3A81A]/70"
-            @input="onOtpInput(index, $event)"
-            @keydown="handleOtpKeydown(index, $event)"
-          >
-        </div>
+        <UiOtpCodeInput
+          v-model="otpDigits"
+          input-id="partner-otp"
+          :box-class="partnerOtpBoxClass"
+          aria-label="Partner registration verification code"
+        />
 
         <button
           type="submit"

@@ -25,6 +25,7 @@ export default defineNuxtConfig({
       supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL || '',
       supabaseAnonKey: process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY || '',
       mainSiteUrl: process.env.NUXT_PUBLIC_MAIN_SITE_URL || 'https://business.pirttrip.com',
+      adminSiteUrl: (process.env.NUXT_PUBLIC_ADMIN_SITE_URL || 'https://admin.pirttrip.com').replace(/\/$/, ''),
     },
   },
   nitro: {
@@ -36,7 +37,12 @@ export default defineNuxtConfig({
     },
   },
   routeRules: {
-    '/**': { ssr: false },
+    '/**': {
+      ssr: false,
+      headers: {
+        'Permissions-Policy': 'otp-credentials=(self)',
+      },
+    },
   },
   css: ['~/assets/css/main.css'],
   app: {

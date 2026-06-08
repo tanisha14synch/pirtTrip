@@ -2,6 +2,7 @@ import { createAndSendOtp } from '~/lib/email-otp-service'
 import { partnerOtpChallengeEmail, partnerOtpChallengeEmailVariants } from '~/lib/partner-otp'
 import { maskPhoneForAudit, partnerOtpAudit } from '~/lib/partner-otp-audit'
 import {
+  buildPartnerOtpSmsMessage,
   buildPartnerRegistrationThankYouMessage,
   hasSmsProvider,
   maskPhoneForDisplay,
@@ -230,6 +231,7 @@ export async function sendPartnerRegistrationThankYouSms(phone: string) {
 async function deliverPartnerRegistrationOtp(options: {
   data: PartnerRegistrationInput
   challengeToken?: string | null
+  webOtpHost?: string
 }) {
   const phone = normalizePhone(options.data.phone)
   const inputPhone = options.data.phone.replace(/\D/g, '').slice(-10)
@@ -272,6 +274,7 @@ async function deliverPartnerRegistrationOtp(options: {
     },
     smsDelivery: {
       phone,
+      buildMessage: (code) => buildPartnerOtpSmsMessage(code, options.webOtpHost),
     },
   })
 }
@@ -282,6 +285,7 @@ export async function sendPartnerRegistrationOtp(
     data: PartnerRegistrationInput
     challengeToken?: string | null
     isResend?: boolean
+    webOtpHost?: string
   },
 ) {
   const phone = normalizePhone(options.data.phone)
@@ -298,7 +302,10 @@ export async function sendPartnerRegistrationOtp(
 
   let result
   try {
-    result = await deliverPartnerRegistrationOtp(deliveryOptions)
+    result = await deliverPartnerRegistrationOtp({
+      ...deliveryOptions,
+      webOtpHost: options.webOtpHost,
+    })
   } catch (error: unknown) {
     const err = error as { statusCode?: number; data?: { code?: string } }
     const retriable = err.statusCode === 429
@@ -310,6 +317,7 @@ export async function sendPartnerRegistrationOtp(
       result = await deliverPartnerRegistrationOtp({
         ...deliveryOptions,
         challengeToken: null,
+        webOtpHost: options.webOtpHost,
       })
     } else {
       throw error

@@ -44,6 +44,11 @@ const routeRules: Record<
   | { ssr: false }
   | { headers: Record<string, string> }
 > = {
+  '/**': {
+    headers: {
+      'Permissions-Policy': 'otp-credentials=(self)',
+    },
+  },
   '/admin/**': { ssr: false },
   // Hero bg: avoid long-lived CDN/browser cache after asset swaps (see BUSINESS_HERO_BG_VERSION)
   '/images/upcoming-hero-bg.svg': {
