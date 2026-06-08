@@ -4,7 +4,10 @@ import { assertOtpSendRateLimit } from '~/lib/otp-ip-rate-limit'
 import { zodErrorMessage } from '~/lib/validation'
 
 const bodySchema = z.object({
-  phone: z.string().trim().min(10, 'Enter a valid 10-digit mobile number'),
+  phone: z
+    .string()
+    .trim()
+    .regex(/^\d{10}$/, 'Enter a valid 10-digit mobile number'),
   challengeToken: z.string().optional(),
 })
 
@@ -35,6 +38,5 @@ export default defineEventHandler(async (event) => {
     challengeToken: result.challengeToken,
     expiresInSeconds: result.expiresInSeconds,
     resendCooldownSeconds: result.resendCooldownSeconds,
-    ...('debugCode' in result ? { debugCode: result.debugCode } : {}),
   }
 })

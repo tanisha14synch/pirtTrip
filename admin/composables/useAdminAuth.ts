@@ -1,4 +1,5 @@
 import type { AdminUser } from '~/types/database'
+import { ADMIN_NOT_REGISTERED_MESSAGE, isAllowedAdminPhone } from '~/constants/allowed-admin-phones'
 
 type OtpSendResponse = {
   success: boolean
@@ -7,7 +8,6 @@ type OtpSendResponse = {
   challengeToken: string
   expiresInSeconds: number
   resendCooldownSeconds: number
-  debugCode?: string
 }
 
 export function useAdminAuth() {
@@ -16,7 +16,7 @@ export function useAdminAuth() {
   const adminUser = useState<AdminUser | null>('admin-user', () => null)
   const loading = ref(false)
   const errorMessage = ref<string | null>(null)
-  const loginPhone = ref('9876543210')
+  const loginPhone = ref('')
   const phoneMasked = ref('')
   const challengeToken = ref<string | null>(null)
   const otpDigits = ref(['', '', '', '', '', ''])
@@ -122,6 +122,16 @@ export function useAdminAuth() {
   }
 
   async function requestOtp() {
+    const localPhone = loginPhone.value.replace(/\D/g, '').slice(-10)
+    if (!/^\d{10}$/.test(localPhone)) {
+      errorMessage.value = 'Enter a valid 10-digit mobile number'
+      return
+    }
+    if (!isAllowedAdminPhone(localPhone)) {
+      errorMessage.value = ADMIN_NOT_REGISTERED_MESSAGE
+      return
+    }
+
     loading.value = true
     errorMessage.value = null
     try {
@@ -139,7 +149,6 @@ export function useAdminAuth() {
       otpDigits.value = ['', '', '', '', '', '']
       startExpiryCountdown(response.expiresInSeconds)
       startResendCooldown(response.resendCooldownSeconds)
-      if (response.debugCode) console.info('[admin OTP]', response.debugCode)
     } catch (err: unknown) {
       errorMessage.value = parseError(err)
     } finally {
@@ -148,6 +157,14 @@ export function useAdminAuth() {
   }
 
   async function verifyOtp() {
+    const localPhone = loginPhone.value.replace(/\D/g, '').slice(-10)
+    if (!isAllowedAdminPhone(localPhone)) {
+      errorMessage.value = ADMIN_NOT_REGISTERED_MESSAGE
+      step.value = 'phone'
+      challengeToken.value = null
+      return
+    }
+
     loading.value = true
     errorMessage.value = null
     const code = otpDigits.value.join('')
@@ -202,7 +219,14 @@ export function useAdminAuth() {
   }
 
   function parseError(err: unknown): string {
-    const e = err as { data?: { statusMessage?: string }; statusMessage?: string; message?: string }
+    const e = err as {
+      data?: { statusMessage?: string; code?: string }
+      statusMessage?: string
+      message?: string
+    }
+    if (e?.data?.code === 'ADMIN_NOT_AUTHORIZED') {
+      return ADMIN_NOT_REGISTERED_MESSAGE
+    }
     return e?.data?.statusMessage || e?.statusMessage || e?.message || 'Something went wrong'
   }
 
@@ -232,6 +256,11 @@ export function useAdminAuth() {
     clearTimers()
   }
 
+  function resetLoginForm() {
+    loginPhone.value = ''
+    resetToPhoneStep()
+  }
+
   return {
     accessToken,
     adminUser,
@@ -255,6 +284,7 @@ export function useAdminAuth() {
     verifyOtp,
     signOut,
     resetToPhoneStep,
+    resetLoginForm,
     getAuthHeaders,
     refreshProfile,
   }

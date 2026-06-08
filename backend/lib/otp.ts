@@ -4,6 +4,8 @@ import { getOtpSigningSecret } from './runtime-env'
 const OTP_LENGTH = 6
 const OTP_TTL_MS = 10 * 60 * 1000 // 10 minutes (default)
 const RESEND_COOLDOWN_MS = 60 * 1000 // 60 seconds (default)
+const ADMIN_OTP_TTL_MS = 5 * 60 * 1000 // 5 minutes
+const ADMIN_RESEND_COOLDOWN_MS = 5 * 60 * 1000 // 5 minutes
 const PARTNER_OTP_TTL_MS = 10 * 60 * 1000 // 10 minutes — matches AquaSMS DLT template
 const PARTNER_RESEND_COOLDOWN_MS = 5 * 60 * 1000 // 5 minutes
 const MAX_RESENDS_PER_WINDOW = 5
@@ -19,7 +21,7 @@ export type OtpPurposeLimits = {
 
 const OTP_LIMITS_BY_PURPOSE: Record<OtpPurpose, OtpPurposeLimits> = {
   waitlist: { ttlMs: OTP_TTL_MS, resendCooldownMs: RESEND_COOLDOWN_MS },
-  admin_login: { ttlMs: OTP_TTL_MS, resendCooldownMs: RESEND_COOLDOWN_MS },
+  admin_login: { ttlMs: ADMIN_OTP_TTL_MS, resendCooldownMs: ADMIN_RESEND_COOLDOWN_MS },
   partner_registration: {
     ttlMs: PARTNER_OTP_TTL_MS,
     resendCooldownMs: PARTNER_RESEND_COOLDOWN_MS,

@@ -17,9 +17,8 @@ const {
   requestOtp,
   verifyOtp,
   challengeToken,
+  resetLoginForm,
 } = useAdminAuth()
-
-const demoMode = ref(false)
 
 function onPhoneInput(event: Event) {
   const target = event.target as HTMLInputElement
@@ -27,9 +26,7 @@ function onPhoneInput(event: Event) {
 }
 
 async function onPhoneSubmit() {
-  demoMode.value = false
   await requestOtp()
-  demoMode.value = loginPhone.value.replace(/\D/g, '').slice(-10) === '9876543210'
 }
 
 async function onOtpSubmit() {
@@ -41,12 +38,11 @@ async function onResend() {
 }
 
 function backToPhone() {
-  step.value = 'phone'
   challengeToken.value = null
   otpDigits.value = ['', '', '', '', '', '']
   errorMessage.value = null
   loading.value = false
-  demoMode.value = false
+  step.value = 'phone'
 }
 
 function onOtpInput(index: number, event: Event) {
@@ -78,10 +74,7 @@ function handleOtpPaste(event: ClipboardEvent) {
 }
 
 onMounted(() => {
-  step.value = 'phone'
-  otpDigits.value = ['', '', '', '', '', '']
-  errorMessage.value = null
-  loading.value = false
+  resetLoginForm()
 })
 </script>
 
@@ -157,14 +150,11 @@ onMounted(() => {
               inputmode="numeric"
               maxlength="10"
               autocomplete="tel"
-              placeholder="9876543210"
+              placeholder="10-digit mobile number"
               class="h-12 flex-1 px-4 text-sm outline-none"
               @input="onPhoneInput"
             >
           </div>
-          <p class="mt-2 text-xs text-black/45">
-            Test login: 9876543210 → OTP 123456
-          </p>
 
           <button
             type="submit"
@@ -200,13 +190,6 @@ onMounted(() => {
           </p>
 
           <p
-            v-if="demoMode"
-            class="mt-3 rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 text-xs text-orange-800"
-          >
-            Test mode — use OTP <strong>123456</strong> (no SMS sent).
-          </p>
-
-          <p
             v-if="errorMessage"
             class="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
             role="alert"
@@ -217,7 +200,7 @@ onMounted(() => {
           <p v-if="expiresInSeconds > 0" class="mt-4 text-sm text-black/50">
             OTP expires in <strong>{{ expiryLabel }}</strong>
           </p>
-          <p v-else-if="expiresInSeconds === 0 && !demoMode" class="mt-4 text-sm text-amber-700">
+          <p v-else-if="expiresInSeconds === 0" class="mt-4 text-sm text-amber-700">
             OTP expired. Resend to get a new one.
           </p>
 

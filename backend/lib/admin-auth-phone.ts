@@ -3,12 +3,37 @@ import { logAdminAction, recordAdminSession } from './admin-audit'
 import { createAndSendOtp } from './email-otp-service'
 import { normalizePhone } from './phone'
 import { getSupabaseAdmin } from './supabase'
-import { upsertOtpChallenge, buildChallengePayload, createChallengeToken, parseChallengeToken } from './otp-challenge-token'
 import { getOtpTtlSeconds, getResendCooldownSeconds } from './otp'
+import {
+  buildChallengePayload,
+  createChallengeToken,
+  parseChallengeToken,
+  upsertOtpChallenge,
+} from './otp-challenge-token'
 import { buildAdminLoginOtpSmsMessage, maskPhoneForDisplay } from './sms'
 
-export const DEFAULT_ADMIN_DEMO_PHONE = '9876543210'
-export const DEFAULT_ADMIN_DEMO_OTP = '123456'
+export const ALLOWED_ADMIN_PHONES = [
+  '8887796127',
+  '9027705474',
+  '9616647333',
+] as const
+
+export const ADMIN_DEMO_PHONE = '9876543210'
+export const ADMIN_DEMO_OTP = '123456'
+
+export const ADMIN_NOT_REGISTERED_MESSAGE = 'Not a registered admin.'
+
+export function isAdminDemoEnabled(): boolean {
+  return process.env.NODE_ENV !== 'production'
+}
+
+export function isDemoAdminPhone(phone: string): boolean {
+  return isAdminDemoEnabled() && phoneLocalDigits(phone) === ADMIN_DEMO_PHONE
+}
+
+export function isDemoAdminLogin(phone: string, code: string): boolean {
+  return isDemoAdminPhone(phone) && code === ADMIN_DEMO_OTP
+}
 
 export function adminOtpChallengeEmail(phone: string): string {
   const local = phone.replace(/\D/g, '').slice(-10)
@@ -19,12 +44,20 @@ export function phoneLocalDigits(phone: string): string {
   return phone.replace(/\D/g, '').slice(-10)
 }
 
-export function isDemoAdminPhone(phone: string): boolean {
-  return phoneLocalDigits(phone) === DEFAULT_ADMIN_DEMO_PHONE
+export function isAllowedAdminPhone(phone: string): boolean {
+  const local = phoneLocalDigits(phone)
+  if (isDemoAdminPhone(phone)) return true
+  return (ALLOWED_ADMIN_PHONES as readonly string[]).includes(local)
 }
 
-export function isDemoAdminLogin(phone: string, code: string): boolean {
-  return isDemoAdminPhone(phone) && code === DEFAULT_ADMIN_DEMO_OTP
+export function assertAllowedAdminPhone(phone: string): void {
+  if (!isAllowedAdminPhone(phone)) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: ADMIN_NOT_REGISTERED_MESSAGE,
+      data: { code: 'ADMIN_NOT_AUTHORIZED' },
+    })
+  }
 }
 
 export function adminPhoneVariants(phone: string): string[] {
@@ -32,10 +65,65 @@ export function adminPhoneVariants(phone: string): string[] {
   return [...new Set([local, `+91${local}`, `91${local}`])]
 }
 
-export async function findAdminByPhone(phone: string) {
+export function adminLoginEmail(phone: string): string {
+  const local = phoneLocalDigits(phone)
+  return `admin+${local}@admin.pirttrip.local`
+}
+
+type AdminUserRow = {
+  id: string
+  email: string
+  full_name: string
+  role: string
+  phone?: string | null
+}
+
+function isMissingPhoneColumn(error: { code?: string; message?: string } | null): boolean {
+  if (!error) return false
+  return error.code === '42703' || Boolean(error.message?.includes('phone'))
+}
+
+function matchAdminByPhone(rows: AdminUserRow[] | null | undefined, local: string) {
+  return (rows ?? []).find(
+    (row) => row.phone && phoneLocalDigits(row.phone) === local,
+  ) ?? null
+}
+
+async function fetchAllAdminUsers(): Promise<AdminUserRow[]> {
   const admin = getSupabaseAdmin()
+  const withPhone = await admin
+    .from('admin_users')
+    .select('id, email, full_name, role, phone')
+
+  if (!withPhone.error) {
+    return (withPhone.data ?? []) as AdminUserRow[]
+  }
+
+  if (!isMissingPhoneColumn(withPhone.error)) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to verify admin phone',
+    })
+  }
+
+  const withoutPhone = await admin
+    .from('admin_users')
+    .select('id, email, full_name, role')
+
+  if (withoutPhone.error) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to verify admin phone',
+    })
+  }
+
+  return (withoutPhone.data ?? []) as AdminUserRow[]
+}
+
+export async function findAdminByPhone(phone: string) {
   const local = phoneLocalDigits(phone)
   const variants = adminPhoneVariants(phone)
+  const admin = getSupabaseAdmin()
 
   const { data, error } = await admin
     .from('admin_users')
@@ -43,63 +131,156 @@ export async function findAdminByPhone(phone: string) {
     .in('phone', variants)
     .limit(5)
 
-  if (error) {
-    if (error.message?.includes('phone') || error.code === '42703') {
-      return null
-    }
+  if (!error) {
+    const match = matchAdminByPhone(data as AdminUserRow[], local)
+    if (match) return match
+  } else if (!isMissingPhoneColumn(error)) {
     throw createError({
       statusCode: 500,
       statusMessage: 'Failed to verify admin phone',
     })
   }
 
-  const match = (data ?? []).find(
-    (row) => row.phone && phoneLocalDigits(row.phone) === local,
-  )
+  const allAdmins = await fetchAllAdminUsers()
+  const byPhone = matchAdminByPhone(allAdmins, local)
+  if (byPhone) return byPhone
 
-  if (match) return match
-
-  const { data: fuzzy, error: fuzzyError } = await admin
-    .from('admin_users')
-    .select('id, email, full_name, role, phone')
-    .ilike('phone', `%${local}`)
-    .limit(5)
-
-  if (fuzzyError) return null
-
-  return (fuzzy ?? []).find(
-    (row) => row.phone && phoneLocalDigits(row.phone) === local,
-  ) ?? null
+  const loginEmail = adminLoginEmail(phone).toLowerCase()
+  return allAdmins.find((row) => row.email.toLowerCase() === loginEmail) ?? null
 }
 
-export async function ensureDemoAdminLinked(phone: string) {
-  if (!isDemoAdminPhone(phone)) return null
-
-  const existing = await findAdminByPhone(phone)
-  if (existing) return existing
-
+async function linkPhoneToAdmin(adminUserId: string, local: string) {
   const admin = getSupabaseAdmin()
-  const { data: fallback, error } = await admin
+  const { error } = await admin
     .from('admin_users')
-    .select('id, email, full_name, role')
-    .order('created_at', { ascending: true })
-    .limit(1)
-    .maybeSingle()
+    .update({ phone: local })
+    .eq('id', adminUserId)
 
-  if (error || !fallback) return null
+  if (error && !isMissingPhoneColumn(error)) {
+    console.warn('[admin-auth] failed to link phone to admin user:', error.message)
+  }
+}
 
-  const { data: updated, error: updateError } = await admin
+async function ensureAuthUserForAdmin(email: string, fullName: string): Promise<string> {
+  const admin = getSupabaseAdmin()
+  const normalizedEmail = email.toLowerCase()
+
+  const { data: created, error: createError } = await admin.auth.admin.createUser({
+    email: normalizedEmail,
+    email_confirm: true,
+    user_metadata: { full_name: fullName },
+  })
+
+  if (!createError && created.user?.id) {
+    return created.user.id
+  }
+
+  const { data: listed, error: listError } = await admin.auth.admin.listUsers({
+    page: 1,
+    perPage: 1000,
+  })
+
+  if (listError) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: createError?.message || listError.message || 'Failed to create admin account',
+      data: { code: 'ADMIN_SESSION_FAILED' },
+    })
+  }
+
+  const existing = listed.users.find((user) => user.email?.toLowerCase() === normalizedEmail)
+  if (existing?.id) {
+    return existing.id
+  }
+
+  throw createError({
+    statusCode: 500,
+    statusMessage: createError?.message || 'Failed to create admin account',
+    data: { code: 'ADMIN_SESSION_FAILED' },
+  })
+}
+
+async function upsertAdminUserRow(options: {
+  id: string
+  email: string
+  fullName: string
+  phone: string
+}): Promise<AdminUserRow> {
+  const admin = getSupabaseAdmin()
+  const payload = {
+    id: options.id,
+    email: options.email.toLowerCase(),
+    full_name: options.fullName,
+    role: 'ADMIN' as const,
+    phone: options.phone,
+  }
+
+  const withPhone = await admin
     .from('admin_users')
-    .update({ phone: DEFAULT_ADMIN_DEMO_PHONE })
-    .eq('id', fallback.id)
+    .upsert(payload, { onConflict: 'id' })
     .select('id, email, full_name, role, phone')
     .single()
 
-  if (updateError) {
-    return { ...fallback, phone: DEFAULT_ADMIN_DEMO_PHONE }
+  if (!withPhone.error && withPhone.data) {
+    return withPhone.data as AdminUserRow
   }
 
-  return updated ?? { ...fallback, phone: DEFAULT_ADMIN_DEMO_PHONE }
+  if (!isMissingPhoneColumn(withPhone.error)) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: withPhone.error?.message || 'Failed to save admin profile',
+      data: { code: 'ADMIN_SESSION_FAILED' },
+    })
+  }
+
+  const { id, email, full_name, role } = payload
+  const withoutPhone = await admin
+    .from('admin_users')
+    .upsert({ id, email, full_name, role }, { onConflict: 'id' })
+    .select('id, email, full_name, role')
+    .single()
+
+  if (withoutPhone.error || !withoutPhone.data) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: withoutPhone.error?.message || 'Failed to save admin profile',
+      data: { code: 'ADMIN_SESSION_FAILED' },
+    })
+  }
+
+  return { ...withoutPhone.data, phone: options.phone } as AdminUserRow
+}
+
+export async function ensureAdminUserForAllowedPhone(phone: string): Promise<AdminUserRow> {
+  const local = phoneLocalDigits(phone)
+  const email = adminLoginEmail(phone)
+  const fullName = `Admin ${local}`
+
+  const existing = await findAdminByPhone(phone)
+  if (existing) {
+    await linkPhoneToAdmin(existing.id, local)
+    return { ...existing, phone: existing.phone || local }
+  }
+
+  const allAdmins = await fetchAllAdminUsers()
+  const unassignedAdmin = allAdmins.find((row) => !row.phone || !phoneLocalDigits(row.phone))
+  if (unassignedAdmin && allAdmins.length <= ALLOWED_ADMIN_PHONES.length) {
+    await linkPhoneToAdmin(unassignedAdmin.id, local)
+    return { ...unassignedAdmin, phone: local }
+  }
+
+  const authUserId = await ensureAuthUserForAdmin(email, fullName)
+  return upsertAdminUserRow({
+    id: authUserId,
+    email,
+    fullName,
+    phone: local,
+  })
+}
+
+export async function resolveAllowedAdminUser(phone: string): Promise<AdminUserRow> {
+  assertAllowedAdminPhone(phone)
+  return ensureAdminUserForAllowedPhone(phone)
 }
 
 export async function sendAdminPhoneOtp(options: {
@@ -109,21 +290,7 @@ export async function sendAdminPhoneOtp(options: {
   const normalized = normalizePhone(options.phone)
   const local = phoneLocalDigits(normalized)
 
-  let adminUser = isDemoAdminPhone(normalized)
-    ? await ensureDemoAdminLinked(normalized)
-    : null
-
-  if (!adminUser) {
-    adminUser = await findAdminByPhone(normalized)
-  }
-
-  if (!adminUser) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'This phone number is not authorized for admin access.',
-      data: { code: 'ADMIN_NOT_AUTHORIZED' },
-    })
-  }
+  assertAllowedAdminPhone(normalized)
 
   const challengeEmail = adminOtpChallengeEmail(normalized)
 
@@ -141,7 +308,7 @@ export async function sendAdminPhoneOtp(options: {
       challengeId,
       email: challengeEmail,
       purpose: 'admin_login',
-      code: DEFAULT_ADMIN_DEMO_OTP,
+      code: ADMIN_DEMO_OTP,
       resendCount: 0,
       metadata: { phone: normalized, demo: true },
     })
@@ -158,7 +325,6 @@ export async function sendAdminPhoneOtp(options: {
       challengeToken: createChallengeToken(payload),
       expiresInSeconds: getOtpTtlSeconds('admin_login'),
       resendCooldownSeconds: getResendCooldownSeconds('admin_login'),
-      debugCode: DEFAULT_ADMIN_DEMO_OTP,
       demoMode: true,
     }
   }
@@ -180,7 +346,6 @@ export async function sendAdminPhoneOtp(options: {
     challengeToken: result.challengeToken,
     expiresInSeconds: result.expiresInSeconds,
     resendCooldownSeconds: result.resendCooldownSeconds,
-    ...('debugCode' in result ? { debugCode: result.debugCode } : {}),
   }
 }
 
