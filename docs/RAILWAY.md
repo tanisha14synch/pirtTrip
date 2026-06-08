@@ -73,22 +73,39 @@ Browser → https://your-app.up.railway.app/          (Nuxt frontend)
 
 ## 3. Admin service (Nuxt)
 
+Use **one** of these setups (pick A or B).
+
+### Option A — Root Directory `admin` (recommended)
+
 1. **New service** → same repo.
-2. **Settings → Root Directory** → `admin` (required — do **not** use repo root or `backend`).
-3. **Build:** `admin/Dockerfile` — configured in `admin/railway.json`.
-4. **Variables:**
+2. **Settings → Root Directory** → `admin`
+3. **Dockerfile Path** → `Dockerfile` (uses `admin/Dockerfile` via `admin/railway.json`)
 
-   | Variable | Value |
-   |----------|--------|
-   | `NUXT_PUBLIC_SUPABASE_URL` | Your Supabase URL |
-   | `NUXT_PUBLIC_SUPABASE_ANON_KEY` | Anon key |
-   | `API_URL` | `https://api.pirttrip.com` (backend origin; no `/api` suffix) |
-   | `NUXT_PUBLIC_MAIN_SITE_URL` | `https://business.pirttrip.com` |
+### Option B — Repo root (if you cannot change Root Directory)
 
-5. Custom domain: e.g. `admin.pirttrip.com`.
-6. Health check path: `/login` (see `admin/railway.json`).
+1. **Settings → Root Directory** → leave empty / `.`
+2. **Dockerfile Path** → `Dockerfile.admin` (repo root file — **not** `Dockerfile`)
+3. Copy config from `railway.admin.json` or set health check to `/login`
 
-**Common build error:** `"/backend/package.json": not found` means Root Directory is wrong or the service is using the repo-root `Dockerfile` instead of `admin/Dockerfile`.
+### Variables (both options)
+
+| Variable | Value |
+|----------|--------|
+| `NUXT_PUBLIC_SUPABASE_URL` | Your Supabase URL |
+| `NUXT_PUBLIC_SUPABASE_ANON_KEY` | Anon key |
+| `API_URL` | `https://api.pirttrip.com` (backend origin; no `/api` suffix) |
+| `NUXT_PUBLIC_MAIN_SITE_URL` | `https://business.pirttrip.com` |
+
+Custom domain: e.g. `admin.pirttrip.com`.
+
+### Build error: `"/backend/package.json": not found`
+
+The admin service is using the **backend** root `Dockerfile`. Fix:
+
+1. **Root Directory** → `admin`, **or**
+2. **Dockerfile Path** → `Dockerfile.admin` (not `Dockerfile`)
+
+Then **Redeploy**.
 
 ### Partner subdomain (`business.pirttrip.com` → `/`)
 
