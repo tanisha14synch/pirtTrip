@@ -2,8 +2,8 @@
 # Use when Dockerfile path is misconfigured — builder: NIXPACKS in admin/railway.json
 
 [variables]
-NODE_VERSION = "20"
-NIXPACKS_NODE_VERSION = "20"
+NODE_VERSION = "22"
+NIXPACKS_NODE_VERSION = "22"
 
 [phases.install]
 cmds = ["npm ci"]
