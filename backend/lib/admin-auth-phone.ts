@@ -286,7 +286,6 @@ export async function resolveAllowedAdminUser(phone: string): Promise<AdminUserR
 export async function sendAdminPhoneOtp(options: {
   phone: string
   challengeToken?: string | null
-  webOtpHost?: string
 }) {
   const normalized = normalizePhone(options.phone)
   const local = phoneLocalDigits(normalized)
@@ -337,7 +336,7 @@ export async function sendAdminPhoneOtp(options: {
     metadata: { phone: normalized },
     smsDelivery: {
       phone: normalized,
-      buildMessage: (code) => buildAdminLoginOtpSmsMessage(code, options.webOtpHost),
+      buildMessage: buildAdminLoginOtpSmsMessage,
     },
   })
 

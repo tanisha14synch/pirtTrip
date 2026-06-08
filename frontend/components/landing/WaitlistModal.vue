@@ -14,6 +14,9 @@ const {
   sendEmailOtp,
   resendEmailOtp,
   verifyOtpAndJoin,
+  setOtpDigit,
+  handleOtpKeydown,
+  handleOtpPaste,
 } = useWaitlistRegistration()
 
 function close() {
@@ -38,8 +41,9 @@ async function onEnterOtp() {
   } catch {}
 }
 
-const waitlistOtpBoxClass =
-  'max-w-[52px] rounded-[10px] border border-white/15 bg-black/35 font-plein text-[20px] font-bold text-white'
+function onOtpInput(index, event) {
+  setOtpDigit(index, event.target.value)
+}
 </script>
 
 <template>
@@ -156,12 +160,24 @@ const waitlistOtpBoxClass =
                 Code expired. Resend to get a new one.
               </p>
 
-              <UiOtpCodeInput
-                v-model="otpDigits"
-                input-id="waitlist-otp"
-                :box-class="waitlistOtpBoxClass"
-                aria-label="Waitlist verification code"
-              />
+              <div
+                class="flex justify-between gap-2 sm:gap-3"
+                @paste="handleOtpPaste"
+              >
+                <input
+                  v-for="(_, index) in otpDigits"
+                  :id="`waitlist-otp-${index}`"
+                  :key="index"
+                  :value="otpDigits[index]"
+                  type="text"
+                  inputmode="numeric"
+                  maxlength="1"
+                  autocomplete="one-time-code"
+                  class="h-[52px] w-full max-w-[52px] rounded-[10px] border border-white/15 bg-black/35 text-center font-plein text-[20px] font-bold text-white outline-none transition-colors focus:border-[#F3A81A]/70"
+                  @input="onOtpInput(index, $event)"
+                  @keydown="handleOtpKeydown(index, $event)"
+                >
+              </div>
 
               <button
                 type="submit"

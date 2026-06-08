@@ -9,7 +9,6 @@ const {
   fetchLeads,
   deleteLead,
   exportCsv,
-  createExportShare,
 } = useAdminLeads()
 const toast = useAdminToast()
 
@@ -33,13 +32,6 @@ const sortColumns = [
 const confirmOpen = ref(false)
 const confirmLoading = ref(false)
 const pendingDelete = ref<PartnerLead | null>(null)
-
-const shareOpen = ref(false)
-const shareLoading = ref(false)
-const sharePassword = ref('')
-const sharePasswordConfirm = ref('')
-const shareLink = ref('')
-const shareRowCount = ref(0)
 
 const totalPages = computed(() => Math.max(1, Math.ceil(total.value / pageSize)))
 
@@ -98,53 +90,10 @@ async function runConfirm() {
 
 async function onExportAll() {
   try {
-    await exportCsv({ search: search.value })
+    await exportCsv({})
     toast.success('CSV downloaded')
   } catch {
     toast.error('Export failed')
-  }
-}
-
-function openShareModal() {
-  sharePassword.value = ''
-  sharePasswordConfirm.value = ''
-  shareLink.value = ''
-  shareRowCount.value = 0
-  shareOpen.value = true
-}
-
-async function onCreateShareLink() {
-  if (sharePassword.value.length < 6) {
-    toast.error('Password must be at least 6 characters')
-    return
-  }
-  if (sharePassword.value !== sharePasswordConfirm.value) {
-    toast.error('Passwords do not match')
-    return
-  }
-
-  shareLoading.value = true
-  try {
-    const result = await createExportShare({
-      password: sharePassword.value,
-    })
-    shareRowCount.value = result.rowCount
-    shareLink.value = result.shareUrl
-    toast.success('Share link created')
-  } catch {
-    toast.error(leadsError.value || 'Could not create share link')
-  } finally {
-    shareLoading.value = false
-  }
-}
-
-async function copyShareLink() {
-  if (!shareLink.value) return
-  try {
-    await navigator.clipboard.writeText(shareLink.value)
-    toast.success('Link copied')
-  } catch {
-    toast.error('Could not copy link')
   }
 }
 
@@ -192,22 +141,13 @@ watch(page, loadLeads)
           {{ total.toLocaleString('en-IN') }} businesses · showing {{ pageSize }} per page
         </p>
       </div>
-      <div class="flex flex-wrap gap-2">
-        <button
-          type="button"
-          class="rounded-lg border border-brand-primary px-4 py-2 text-sm font-bold text-brand-primary hover:bg-brand-primary/5"
-          @click="openShareModal"
-        >
-          Create share link
-        </button>
-        <button
-          type="button"
-          class="rounded-lg bg-brand-primary px-4 py-2 text-sm font-bold text-white hover:bg-brand-primary-dark"
-          @click="onExportAll"
-        >
-          Download CSV
-        </button>
-      </div>
+      <button
+        type="button"
+        class="rounded-lg bg-brand-primary px-4 py-2 text-sm font-bold text-white hover:bg-brand-primary-dark"
+        @click="onExportAll"
+      >
+        Download CSV
+      </button>
     </div>
 
     <div class="relative mt-6 max-w-md">
@@ -315,94 +255,6 @@ watch(page, loadLeads)
       >
         Next
       </button>
-    </div>
-
-    <div
-      v-if="shareOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
-      @click.self="shareOpen = false"
-    >
-      <div class="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
-        <h3 class="text-lg font-bold">
-          Create password-protected share link
-        </h3>
-        <p class="mt-2 text-sm text-black/60">
-          Generate a permanent link. The password never expires. Each visit loads all current vendor data from the database.
-        </p>
-
-        <template v-if="!shareLink">
-          <div class="mt-5 space-y-3">
-            <div>
-              <label class="block text-xs font-semibold uppercase tracking-wide text-black/50">Password</label>
-              <input
-                v-model="sharePassword"
-                type="password"
-                class="mt-1 h-10 w-full rounded-lg border border-black/15 px-3 text-sm outline-none focus:border-brand-primary focus:ring-2 focus:ring-orange-100"
-                placeholder="Min. 6 characters"
-              >
-            </div>
-            <div>
-              <label class="block text-xs font-semibold uppercase tracking-wide text-black/50">Confirm password</label>
-              <input
-                v-model="sharePasswordConfirm"
-                type="password"
-                class="mt-1 h-10 w-full rounded-lg border border-black/15 px-3 text-sm outline-none focus:border-brand-primary focus:ring-2 focus:ring-orange-100"
-                placeholder="Re-enter password"
-              >
-            </div>
-          </div>
-          <div class="mt-6 flex justify-end gap-3">
-            <button
-              type="button"
-              class="rounded-lg border border-black/15 px-4 py-2 text-sm font-medium"
-              :disabled="shareLoading"
-              @click="shareOpen = false"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              class="rounded-lg bg-brand-primary px-4 py-2 text-sm font-bold text-white disabled:opacity-60"
-              :disabled="shareLoading"
-              @click="onCreateShareLink"
-            >
-              {{ shareLoading ? 'Creating…' : 'Create link' }}
-            </button>
-          </div>
-        </template>
-
-        <template v-else>
-          <p class="mt-4 text-sm text-black/70">
-            {{ shareRowCount.toLocaleString('en-IN') }} rows right now · live data on every visit
-          </p>
-          <div class="mt-3 flex gap-2">
-            <input
-              :value="shareLink"
-              readonly
-              class="h-10 min-w-0 flex-1 rounded-lg border border-black/15 bg-black/[0.02] px-3 text-xs outline-none"
-            >
-            <button
-              type="button"
-              class="shrink-0 rounded-lg bg-brand-primary px-4 py-2 text-sm font-bold text-white"
-              @click="copyShareLink"
-            >
-              Copy
-            </button>
-          </div>
-          <p class="mt-3 text-xs text-black/50">
-            Share this link and password separately. New registrations appear automatically when the link is opened.
-          </p>
-          <div class="mt-6 flex justify-end">
-            <button
-              type="button"
-              class="rounded-lg border border-black/15 px-4 py-2 text-sm font-medium"
-              @click="shareOpen = false"
-            >
-              Done
-            </button>
-          </div>
-        </template>
-      </div>
     </div>
 
     <AdminConfirmModal

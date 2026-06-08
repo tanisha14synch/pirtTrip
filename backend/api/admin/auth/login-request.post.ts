@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { phoneLocalDigits, sendAdminPhoneOtp } from '~/lib/admin-auth-phone'
 import { assertOtpSendRateLimit } from '~/lib/otp-ip-rate-limit'
-import { webOtpHostSchema, zodErrorMessage } from '~/lib/validation'
+import { zodErrorMessage } from '~/lib/validation'
 
 const bodySchema = z.object({
   phone: z
@@ -9,7 +9,6 @@ const bodySchema = z.object({
     .trim()
     .regex(/^\d{10}$/, 'Enter a valid 10-digit mobile number'),
   challengeToken: z.string().optional(),
-  webOtpHost: webOtpHostSchema,
 })
 
 export default defineEventHandler(async (event) => {
@@ -30,7 +29,6 @@ export default defineEventHandler(async (event) => {
   const result = await sendAdminPhoneOtp({
     phone: parsed.data.phone,
     challengeToken: parsed.data.challengeToken,
-    webOtpHost: parsed.data.webOtpHost,
   })
 
   return {

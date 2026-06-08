@@ -45,6 +45,34 @@ function backToPhone() {
   step.value = 'phone'
 }
 
+function onOtpInput(index: number, event: Event) {
+  const target = event.target as HTMLInputElement
+  const digit = target.value.replace(/\D/g, '').slice(-1)
+  const next = [...otpDigits.value]
+  next[index] = digit
+  otpDigits.value = next
+  if (digit && index < next.length - 1) {
+    document.getElementById(`admin-otp-${index + 1}`)?.focus()
+  }
+}
+
+function handleOtpKeydown(index: number, event: KeyboardEvent) {
+  if (event.key === 'Backspace' && !otpDigits.value[index] && index > 0) {
+    document.getElementById(`admin-otp-${index - 1}`)?.focus()
+  }
+}
+
+function handleOtpPaste(event: ClipboardEvent) {
+  const pasted = event.clipboardData?.getData('text')?.replace(/\D/g, '').slice(0, 6)
+  if (!pasted) return
+  event.preventDefault()
+  const next = [...otpDigits.value]
+  pasted.split('').forEach((char, i) => {
+    if (i < next.length) next[i] = char
+  })
+  otpDigits.value = next
+}
+
 onMounted(() => {
   resetLoginForm()
 })
@@ -176,13 +204,24 @@ onMounted(() => {
             OTP expired. Resend to get a new one.
           </p>
 
-          <UiOtpCodeInput
-            v-model="otpDigits"
-            input-id="admin-otp"
-            box-class="rounded-xl border border-black/15 text-black focus-within:border-brand-primary"
-            aria-label="Admin login verification code"
-            class="mt-6"
-          />
+          <div
+            class="mt-6 flex justify-between gap-2"
+            @paste="handleOtpPaste"
+          >
+            <input
+              v-for="(_, index) in otpDigits"
+              :id="`admin-otp-${index}`"
+              :key="index"
+              :value="otpDigits[index]"
+              type="text"
+              inputmode="numeric"
+              maxlength="1"
+              autocomplete="one-time-code"
+              class="h-[52px] w-full max-w-[52px] rounded-xl border border-black/15 text-center text-xl font-bold text-black outline-none focus:border-brand-primary focus:ring-2 focus:ring-orange-100"
+              @input="onOtpInput(index, $event)"
+              @keydown="handleOtpKeydown(index, $event)"
+            >
+          </div>
 
           <button
             type="submit"

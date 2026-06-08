@@ -108,34 +108,6 @@ export function useAdminLeads() {
     }
   }
 
-  async function createExportShare(options: {
-    password: string
-    label?: string
-  }) {
-    loading.value = true
-    errorMessage.value = null
-    try {
-      return await $fetch<{
-        success: boolean
-        token: string
-        shareUrl: string
-        rowCount: number
-        label: string | null
-        createdAt: string
-        live: boolean
-      }>(apiUrl('/api/admin/leads/export-share'), {
-        method: 'POST',
-        headers: auth.getAuthHeaders(),
-        body: options,
-      })
-    } catch (err: unknown) {
-      errorMessage.value = parseFetchError(err)
-      throw err
-    } finally {
-      loading.value = false
-    }
-  }
-
   async function exportCsv(params: { search?: string; status?: string } = {}) {
     const headers = auth.getAuthHeaders()
     const query = new URLSearchParams()
@@ -161,7 +133,6 @@ export function useAdminLeads() {
     updateLead,
     deleteLead,
     exportCsv,
-    createExportShare,
   }
 }
 

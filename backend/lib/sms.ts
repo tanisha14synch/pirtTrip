@@ -1,5 +1,3 @@
-import { resolveAdminWebOtpHost, resolvePartnerWebOtpHost } from './web-otp-host'
-
 type SmsPayload = {
   to: string
   message: string
@@ -13,38 +11,16 @@ type AquaSmsConfig = {
   aquasmsBaseUrl: string
 }
 
-function readEnv(name: string): string {
-  return process.env[name]?.trim() || ''
-}
-
 /** Approved AquaSMS / DLT template (must match provider registration exactly). */
 const PARTNER_OTP_SMS_TEMPLATE =
   'Your login verification OTP For PirtTrip is {code}. This code is valid for 10 minutes. MARTYRS SERVICES Website : business.pirttrip.com'
 
-/**
- * Chrome/Android Web OTP autofill suffix: `@host #code` (web.dev/web-otp).
- * Appended on the same line so Indian SMS/DLT gateways that strip newlines still work.
- */
-export function appendWebOtpAutofillLine(message: string, code: string, host: string): string {
-  const flag = readEnv('OTP_WEB_OTP_LINE')
-  if (flag === 'false' || flag === '0') return message
-
-  const domain = host.trim().replace(/^https?:\/\//, '').replace(/\/$/, '').replace(/:\d+$/, '')
-  if (!domain) return message
-
-  const suffix = `@${domain} #${code}`
-  if (message.includes(suffix)) return message
-  return `${message.trimEnd()} ${suffix}`
+export function buildPartnerOtpSmsMessage(code: string): string {
+  return PARTNER_OTP_SMS_TEMPLATE.replace('{code}', code)
 }
 
-export function buildPartnerOtpSmsMessage(code: string, webOtpHost?: string): string {
-  const base = PARTNER_OTP_SMS_TEMPLATE.replace('{code}', code)
-  return appendWebOtpAutofillLine(base, code, resolvePartnerWebOtpHost(webOtpHost))
-}
-
-export function buildAdminLoginOtpSmsMessage(code: string, webOtpHost?: string): string {
-  const base = PARTNER_OTP_SMS_TEMPLATE.replace('{code}', code)
-  return appendWebOtpAutofillLine(base, code, resolveAdminWebOtpHost(webOtpHost))
+export function buildAdminLoginOtpSmsMessage(code: string): string {
+  return PARTNER_OTP_SMS_TEMPLATE.replace('{code}', code)
 }
 
 export function buildPartnerRegistrationThankYouMessage(): string {
@@ -63,6 +39,10 @@ function toAquaSmsNumber(e164: string): string {
   }
 
   return `+91${local}`
+}
+
+function readEnv(name: string): string {
+  return process.env[name]?.trim() || ''
 }
 
 function getAquaSmsConfig(config: ReturnType<typeof useRuntimeConfig>): AquaSmsConfig | null {

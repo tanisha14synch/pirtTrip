@@ -6,11 +6,10 @@ import {
 } from '~/lib/partner-otp-response'
 import { sendPartnerRegistrationOtp } from '~/lib/partner-registration-otp'
 import { normalizePhone } from '~/lib/phone'
-import { partnerRegistrationSchema, webOtpHostSchema, zodErrorMessage } from '~/lib/validation'
+import { partnerRegistrationSchema, zodErrorMessage } from '~/lib/validation'
 
 const bodySchema = partnerRegistrationSchema.extend({
   challengeToken: z.string().optional(),
-  webOtpHost: webOtpHostSchema,
 })
 
 export default defineEventHandler(async (event) => {
@@ -39,11 +38,9 @@ export default defineEventHandler(async (event) => {
   try {
     assertOtpSendRateLimit(event, phone)
 
-    const { webOtpHost, challengeToken, ...registration } = parsed.data
     const result = await sendPartnerRegistrationOtp(event, {
-      data: registration,
-      webOtpHost,
-      challengeToken,
+      data: parsed.data,
+      challengeToken: parsed.data.challengeToken,
       isResend: true,
     })
 

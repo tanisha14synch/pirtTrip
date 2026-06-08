@@ -90,8 +90,6 @@ const migrationFiles = [
   'supabase/migrations/20250601000005_partner_business_name.sql',
   'supabase/migrations/20250601000006_phone_otps.sql',
   'supabase/migrations/20250601000007_admin_panel.sql',
-  'supabase/migrations/20250608000001_admin_csv_shares.sql',
-  'supabase/migrations/20250608000002_admin_csv_shares_live.sql',
 ]
 
 async function verifyTables(client) {
@@ -101,7 +99,7 @@ async function verifyTables(client) {
     WHERE table_schema = 'public'
       AND table_name IN (
         'partner_leads', 'otp_logs', 'admin_users', 'lead_activity_logs',
-        'waitlist_subscribers', 'email_otp_challenges', 'phone_otps', 'admin_csv_shares'
+        'waitlist_subscribers', 'email_otp_challenges', 'phone_otps'
       )
     ORDER BY table_name
   `)

@@ -129,10 +129,7 @@ export function usePartnerRegistration() {
         {
           method: 'POST',
           timeout: PARTNER_OTP_FETCH_TIMEOUT_MS,
-          body: {
-            ...parsed.data,
-            webOtpHost: getClientWebOtpHost(),
-          },
+          body: parsed.data,
         },
       )
 
@@ -142,6 +139,9 @@ export function usePartnerRegistration() {
       }
 
       applyOtpSendResponse(response, parsed.data.phone)
+
+      await nextTick()
+      document.getElementById('partner-otp-0')?.focus()
     } catch (err: unknown) {
       failSendOtp(err)
     } finally {
@@ -172,7 +172,6 @@ export function usePartnerRegistration() {
         body: {
           ...parsed.data,
           challengeToken: challengeToken.value ?? undefined,
-          webOtpHost: getClientWebOtpHost(),
         },
       })
 
@@ -182,6 +181,9 @@ export function usePartnerRegistration() {
       }
 
       applyOtpSendResponse(response, parsed.data.phone)
+
+      await nextTick()
+      document.getElementById('partner-otp-0')?.focus()
     } catch (err: unknown) {
       errorMessage.value = getSendOtpUserMessage(err)
     } finally {

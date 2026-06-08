@@ -48,7 +48,7 @@ export async function insertPartnerLead(
     phone: input.phone,
     email: input.email,
     otp_verified: input.otpVerified ?? false,
-    source_page: 'business',
+    source_page: 'become-a-partner',
     status: 'NEW' as const,
     ...(input.authUserId ? { auth_user_id: input.authUserId } : {}),
   }

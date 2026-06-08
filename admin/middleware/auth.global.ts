@@ -11,11 +11,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   const isLogin = to.path === '/login'
-  const isPublicShare = to.path.startsWith('/export/share/')
-
-  if (isPublicShare) {
-    return
-  }
 
   if (isLogin) {
     if (auth.isAuthenticated.value) {
