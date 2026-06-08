@@ -1,30 +1,56 @@
-# Admin panel — Railway deploy
+# Admin panel — Railway deploy (fix build failures)
 
 ## Error: `"/backend/package.json": not found`
 
-Your admin service is building with the **backend** Dockerfile. Fix in Railway → **admin** service → **Settings**:
+The **admin** service is using the **backend** Dockerfile. Fix in Railway → **admin** service → **Settings**.
 
-### Fix (choose one)
+---
 
-**A — Recommended**
-
-| Setting | Value |
-|---------|--------|
-| Root Directory | `admin` |
-| Dockerfile Path | `Dockerfile` |
-
-**B — Repo root**
+## ✅ Recommended setup (Nixpacks — easiest)
 
 | Setting | Value |
 |---------|--------|
-| Root Directory | `.` (empty) |
-| Dockerfile Path | `Dockerfile.admin` |
+| **Root Directory** | `admin` |
+| **Builder** | `Nixpacks` (or leave default; `admin/railway.json` sets this) |
+| **Dockerfile Path** | *(leave empty / clear any custom path)* |
 
-Click **Redeploy** after saving.
+Then **Redeploy**.
 
-## Environment variables
+---
 
-```
+## Alternative A — Docker from `admin/` folder
+
+| Setting | Value |
+|---------|--------|
+| **Root Directory** | `admin` |
+| **Builder** | `Dockerfile` |
+| **Dockerfile Path** | `Dockerfile` |
+
+---
+
+## Alternative B — Docker from repo root
+
+| Setting | Value |
+|---------|--------|
+| **Root Directory** | `.` (empty) |
+| **Builder** | `Dockerfile` |
+| **Dockerfile Path** | `Dockerfile.admin` |
+
+---
+
+## Alternative C — Shared root Dockerfile
+
+| Setting | Value |
+|---------|--------|
+| **Root Directory** | `.` (empty) |
+| **Dockerfile Path** | `Dockerfile` |
+| **Variable** | `BUILD_TARGET` = `admin` *(enable for build)* |
+
+---
+
+## Required variables
+
+```env
 NUXT_PUBLIC_SUPABASE_URL=https://YOUR_REF.supabase.co
 NUXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 API_URL=https://api.pirttrip.com
@@ -34,3 +60,9 @@ NUXT_PUBLIC_MAIN_SITE_URL=https://business.pirttrip.com
 ## Health check
 
 Path: `/login`
+
+## After changing settings
+
+1. Save settings
+2. Click **Deploy** → **Redeploy**
+3. Open build logs — you should see `npm ci` / `nuxt build`, **not** `COPY backend/`

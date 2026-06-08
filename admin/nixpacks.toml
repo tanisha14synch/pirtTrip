@@ -1,0 +1,15 @@
+# Railway Nixpacks build (Root Directory must be "admin")
+# Use when Dockerfile path is misconfigured — builder: NIXPACKS in admin/railway.json
+
+[variables]
+NODE_VERSION = "20"
+NIXPACKS_NODE_VERSION = "20"
+
+[phases.install]
+cmds = ["npm ci"]
+
+[phases.build]
+cmds = ["npm run build"]
+
+[start]
+cmd = "node .output/server/index.mjs"

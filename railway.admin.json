@@ -2,7 +2,8 @@
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
     "builder": "DOCKERFILE",
-    "dockerfilePath": "Dockerfile.admin"
+    "dockerfilePath": "Dockerfile.admin",
+    "watchPatterns": ["admin/**", "Dockerfile.admin"]
   },
   "deploy": {
     "startCommand": "node .output/server/index.mjs",

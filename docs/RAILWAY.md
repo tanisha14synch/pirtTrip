@@ -75,11 +75,12 @@ Browser → https://your-app.up.railway.app/          (Nuxt frontend)
 
 Use **one** of these setups (pick A or B).
 
-### Option A — Root Directory `admin` (recommended)
+### Option A — Root Directory `admin` + Nixpacks (recommended)
 
 1. **New service** → same repo.
 2. **Settings → Root Directory** → `admin`
-3. **Dockerfile Path** → `Dockerfile` (uses `admin/Dockerfile` via `admin/railway.json`)
+3. **Builder** → `Nixpacks` (configured in `admin/railway.json` + `admin/nixpacks.toml`)
+4. **Clear** any custom Dockerfile path in the Railway UI
 
 ### Option B — Repo root (if you cannot change Root Directory)
 
