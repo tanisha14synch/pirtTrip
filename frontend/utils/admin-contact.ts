@@ -10,7 +10,21 @@ export function telUrl(phone: string): string {
 
 export function whatsAppUrl(phone: string, message?: string): string {
   const local = phoneDigits(phone)
-  const base = `https://wa.me/91${local}`
+  const international = `91${local}`
+  const base = `https://wa.me/${international}`
   if (!message) return base
   return `${base}?text=${encodeURIComponent(message)}`
+}
+
+/** Opens WhatsApp Web on desktop with the same pre-filled message. */
+export function whatsAppWebUrl(phone: string, message?: string): string {
+  const local = phoneDigits(phone)
+  const params = new URLSearchParams({ phone: `91${local}` })
+  if (message) params.set('text', message)
+  return `https://web.whatsapp.com/send?${params.toString()}`
+}
+
+export function isMobileWhatsAppDevice(): boolean {
+  if (typeof navigator === 'undefined') return false
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
 }

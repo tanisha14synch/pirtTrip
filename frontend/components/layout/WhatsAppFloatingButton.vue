@@ -1,16 +1,46 @@
 <script setup lang="ts">
-const WHATSAPP_URL = 'https://wa.me/919319203573'
+import {
+  BUSINESS_WHATSAPP_PHONE,
+  BUSINESS_WHATSAPP_PREFILL_MESSAGE,
+} from '~/constants/whatsapp'
+import {
+  isMobileWhatsAppDevice,
+  whatsAppUrl,
+  whatsAppWebUrl,
+} from '~/utils/admin-contact'
+
+const WHATSAPP_URL = whatsAppUrl(
+  BUSINESS_WHATSAPP_PHONE,
+  BUSINESS_WHATSAPP_PREFILL_MESSAGE,
+)
+
+const WHATSAPP_WEB_URL = whatsAppWebUrl(
+  BUSINESS_WHATSAPP_PHONE,
+  BUSINESS_WHATSAPP_PREFILL_MESSAGE,
+)
+
+function openWhatsApp(event: MouseEvent) {
+  event.preventDefault()
+
+  if (isMobileWhatsAppDevice()) {
+    // Same-tab navigation keeps the pre-filled message on iOS/Android.
+    window.location.assign(WHATSAPP_URL)
+    return
+  }
+
+  window.open(WHATSAPP_WEB_URL, '_blank', 'noopener,noreferrer')
+}
 </script>
 
 <template>
   <Teleport to="body">
     <a
       :href="WHATSAPP_URL"
-      target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with us on WhatsApp"
       title="WhatsApp"
       class="whatsapp-float-btn"
+      @click="openWhatsApp"
     >
       <svg
         class="whatsapp-float-btn__icon"
