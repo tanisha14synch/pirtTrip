@@ -1,7 +1,4 @@
 import { DEFAULT_DEV_API_URL, resolveAdminApiOrigin } from './utils/api-origin'
-import { DEFAULT_PROD_SUPABASE_URL, resolveSupabasePublicConfig } from './utils/supabase-config'
-
-const supabasePublic = resolveSupabasePublicConfig()
 
 const isProd = process.env.NODE_ENV === 'production'
 const apiOrigin = resolveAdminApiOrigin(isProd)
@@ -20,8 +17,6 @@ export default defineNuxtConfig({
   runtimeConfig: {
     apiProxyOrigin: apiOrigin,
     public: {
-      supabaseUrl: supabasePublic.supabaseUrl || DEFAULT_PROD_SUPABASE_URL,
-      supabaseAnonKey: supabasePublic.supabaseAnonKey,
       mainSiteUrl: process.env.NUXT_PUBLIC_MAIN_SITE_URL || 'https://business.pirttrip.com',
     },
   },

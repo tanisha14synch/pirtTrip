@@ -4,14 +4,15 @@
 [variables]
 NODE_VERSION = "22"
 NIXPACKS_NODE_VERSION = "22"
+HOST = "0.0.0.0"
+NITRO_HOST = "0.0.0.0"
 API_URL = "https://api.pirttrip.com"
-NUXT_PUBLIC_SUPABASE_URL = "https://fvkwophzzyaukacuiszv.supabase.co"
 
 [phases.install]
 cmds = ["npm ci"]
 
 [phases.build]
-cmds = ["npm run build"]
+cmds = ["NODE_OPTIONS=--max-old-space-size=4096 npm run build"]
 
 [start]
-cmd = "node .output/server/index.mjs"
+cmd = "sh start.sh"

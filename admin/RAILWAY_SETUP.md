@@ -1,72 +1,46 @@
-# Admin panel — Railway deploy (fix build failures)
+# Admin panel — Railway deploy
 
-## Error: `"/backend/package.json": not found`
+## Fix 502 Bad Gateway
 
-The **admin** service is using the **backend** Dockerfile. Fix in Railway → **admin** service → **Settings**.
-
----
-
-## ✅ Recommended setup (Dockerfile)
+502 means the admin container is not running. Use this setup:
 
 | Setting | Value |
 |---------|--------|
 | **Root Directory** | `admin` |
-| **Builder** | `Dockerfile` |
-| **Dockerfile Path** | `Dockerfile` |
+| **Builder** | `Nixpacks` (default from `admin/railway.json`) |
+| **Dockerfile Path** | *(leave empty)* |
 
-Then **Redeploy**. Health check: `GET /api/health`
-
----
-
-## Alternative A — Docker from `admin/` folder
-
-| Setting | Value |
-|---------|--------|
-| **Root Directory** | `admin` |
-| **Builder** | `Dockerfile` |
-| **Dockerfile Path** | `Dockerfile` |
-
----
-
-## Alternative B — Docker from repo root
-
-| Setting | Value |
-|---------|--------|
-| **Root Directory** | `.` (empty) |
-| **Builder** | `Dockerfile` |
-| **Dockerfile Path** | `Dockerfile.admin` |
-
----
-
-## Alternative C — Shared root Dockerfile
-
-| Setting | Value |
-|---------|--------|
-| **Root Directory** | `.` (empty) |
-| **Dockerfile Path** | `Dockerfile` |
-| **Variable** | `BUILD_TARGET` = `admin` *(enable for build)* |
-
----
-
-## Required variables
+**Required variable:**
 
 ```env
-NUXT_PUBLIC_SUPABASE_URL=https://fvkwophzzyaukacuiszv.supabase.co
-NUXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 API_URL=https://api.pirttrip.com
-NUXT_PUBLIC_MAIN_SITE_URL=https://business.pirttrip.com
-
-**Required:**
-- `API_URL` → `https://api.pirttrip.com`
-- `NUXT_PUBLIC_SUPABASE_URL` + `NUXT_PUBLIC_SUPABASE_ANON_KEY` — same values as the frontend service (login calls Supabase Auth after OTP verify). Without the anon key, verify succeeds but session save fails with "Failed to fetch".
 ```
+
+Optional:
+
+```env
+NUXT_PUBLIC_MAIN_SITE_URL=https://business.pirttrip.com
+```
+
+Supabase keys are **not** required on the admin service (auth tokens are stored locally after OTP verify; backend handles Supabase).
 
 ## Health check
 
-Path: `/api/health` (returns `{"ok":true}`)
+`GET /api/health` → `{"ok":true}`
 
-## After changing settings
+## After deploy
 
-1. Save settings
-2. Click **Deploy** → **Redeploy**
-3. Open build logs — you should see `npm ci` / `nuxt build`, **not** `COPY backend/`
+1. Open `https://admin.pirttrip.com/api/health` — must return `ok: true`
+2. Then open `https://admin.pirttrip.com/login`
+
+## Wrong setup (causes 502)
+
+- Root Directory = repo root with backend `Dockerfile` → builds wrong app
+- Missing `API_URL` on admin service → API proxy errors (not 502, but login fails)
+
+## Docker alternative
+
+| Root Directory | Dockerfile Path |
+|----------------|-----------------|
+| `admin` | `Dockerfile` |
+| `.` (repo root) | `Dockerfile.admin` |
