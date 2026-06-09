@@ -31,6 +31,24 @@ export function buildPartnerRegistrationThankYouMessage(): string {
   return 'Thank you for registering on PirtTrip Business! We are launching soon. For queries: contact@pirttrip.com by MARTYRS SERVICES'
 }
 
+export function buildPartnerRegistrationAdminNotificationMessage(options: {
+  firstName: string
+  lastName: string
+  mobileNumber: string
+}): string {
+  return [
+    'A new registration has been successfully completed on your platform Pirttrip.',
+    '',
+    'Details:',
+    `First Name: ${options.firstName}`,
+    `Last Name: ${options.lastName}`,
+    `Mobile Number: ${options.mobileNumber}`,
+    '',
+    'Thank you.',
+    'MARTYRS SERVICES',
+  ].join('\n')
+}
+
 /** AquaSMS numbers param: +91XXXXXXXXXX (per provider docs). */
 function toAquaSmsNumber(e164: string): string {
   const digits = e164.replace(/\D/g, '')

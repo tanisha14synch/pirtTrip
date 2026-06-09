@@ -2,10 +2,16 @@ import { createAndSendOtp } from '~/lib/email-otp-service'
 import { partnerOtpChallengeEmail, partnerOtpChallengeEmailVariants } from '~/lib/partner-otp'
 import { maskPhoneForAudit, partnerOtpAudit } from '~/lib/partner-otp-audit'
 import {
+  formatMobileForAdminSms,
+  getPartnerRegistrationAdminNotifyPhone,
+} from '~/constants/partner-registration-notify'
+import {
+  buildPartnerRegistrationAdminNotificationMessage,
   buildPartnerRegistrationThankYouMessage,
   hasSmsProvider,
   maskPhoneForDisplay,
   sendTransactionalSms,
+  type SmsSendResult,
 } from '~/lib/sms'
 import { resetOtpSendRateLimit } from '~/lib/otp-ip-rate-limit'
 import { normalizePhone } from '~/lib/phone'
@@ -208,23 +214,92 @@ export async function markPartnerPhoneVerified(phone: string) {
   }
 }
 
-export async function sendPartnerRegistrationThankYouSms(phone: string) {
+function logPartnerRegistrationSms(event: string, payload: Record<string, unknown>) {
+  console.info(
+    JSON.stringify({
+      scope: 'partner_register_sms',
+      event,
+      timestamp: new Date().toISOString(),
+      ...payload,
+    }),
+  )
+}
+
+async function sendPartnerRegistrationSmsSafe(options: {
+  label: 'customer_thank_you' | 'admin_notify'
+  to: string
+  message: string
+  leadId?: string
+}): Promise<SmsSendResult | null> {
+  logPartnerRegistrationSms('request', {
+    label: options.label,
+    toHint: maskPhoneForDisplay(options.to),
+    messageLength: options.message.length,
+    leadId: options.leadId,
+  })
+
+  try {
+    const result = await sendTransactionalSms({
+      to: options.to,
+      message: options.message,
+    })
+    logPartnerRegistrationSms('success', {
+      label: options.label,
+      toHint: maskPhoneForDisplay(options.to),
+      provider: result.provider,
+      providerCode: result.responseCode,
+      msgId: result.msgId,
+      leadId: options.leadId,
+    })
+    return result
+  } catch (error: unknown) {
+    logPartnerRegistrationSms('failed', {
+      label: options.label,
+      toHint: maskPhoneForDisplay(options.to),
+      leadId: options.leadId,
+      error: error instanceof Error ? error.message : String(error),
+    })
+    return null
+  }
+}
+
+/** Customer thank-you + admin notification SMS after successful registration. */
+export async function sendPartnerRegistrationCompletionSms(options: {
+  phone: string
+  firstName: string
+  lastName: string
+  leadId?: string
+}) {
   if (!hasSmsProvider()) {
-    console.info(`[partner/register] thank-you SMS skipped (no AquaSMS config) for ${phone}`)
+    logPartnerRegistrationSms('skipped', {
+      reason: 'no_sms_provider',
+      phoneHint: maskPhoneForDisplay(options.phone),
+      leadId: options.leadId,
+    })
     return
   }
 
-  try {
-    await sendTransactionalSms({
-      to: phone,
+  const adminPhone = getPartnerRegistrationAdminNotifyPhone()
+  const mobileNumber = formatMobileForAdminSms(options.phone)
+
+  await Promise.all([
+    sendPartnerRegistrationSmsSafe({
+      label: 'customer_thank_you',
+      to: options.phone,
       message: buildPartnerRegistrationThankYouMessage(),
-    })
-  } catch (error: unknown) {
-    console.warn(
-      '[partner/register] thank-you SMS failed:',
-      error instanceof Error ? error.message : error,
-    )
-  }
+      leadId: options.leadId,
+    }),
+    sendPartnerRegistrationSmsSafe({
+      label: 'admin_notify',
+      to: adminPhone,
+      message: buildPartnerRegistrationAdminNotificationMessage({
+        firstName: options.firstName.trim(),
+        lastName: options.lastName.trim(),
+        mobileNumber,
+      }),
+      leadId: options.leadId,
+    }),
+  ])
 }
 
 async function deliverPartnerRegistrationOtp(options: {

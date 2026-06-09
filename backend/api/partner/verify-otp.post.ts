@@ -3,7 +3,7 @@ import { verifyEmailOtp } from '~/lib/email-otp-service'
 import {
   assertPartnerPhoneAvailable,
   markPartnerPhoneVerified,
-  sendPartnerRegistrationThankYouSms,
+  sendPartnerRegistrationCompletionSms,
 } from '~/lib/partner-registration-otp'
 import { partnerOtpChallengeEmail } from '~/lib/partner-otp'
 import { maskPhoneForAudit, partnerOtpAudit } from '~/lib/partner-otp-audit'
@@ -98,7 +98,12 @@ export default defineEventHandler(async (event) => {
   }
 
   await markPartnerPhoneVerified(phone)
-  await sendPartnerRegistrationThankYouSms(phone)
+  await sendPartnerRegistrationCompletionSms({
+    phone,
+    firstName: parsed.data.firstName,
+    lastName: parsed.data.lastName,
+    leadId: lead.id,
+  })
 
   partnerOtpAudit('verify.registration_complete', {
     phone: maskPhoneForAudit(phone),
