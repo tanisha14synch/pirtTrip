@@ -1,4 +1,5 @@
 import type { LeadStatus } from '~/types/database'
+import { applyPartnerLeadSearch } from '~/lib/partner-lead-search'
 import { getSupabaseAdmin, requireAdminWith2fa } from '~/lib/supabase'
 
 export default defineEventHandler(async (event) => {
@@ -7,7 +8,9 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const page = Math.max(1, Number(query.page) || 1)
   const pageSize = Math.min(100, Math.max(1, Number(query.pageSize) || 20))
-  const search = String(query.search ?? '').trim()
+  const search = String(
+    Array.isArray(query.search) ? query.search[0] ?? '' : query.search ?? '',
+  ).trim()
   const status = String(query.status ?? '').trim() as LeadStatus | ''
   const sortBy = String(query.sortBy ?? 'created_at')
   const sortOrder = query.sortOrder === 'asc' ? 'asc' : 'desc'
@@ -42,11 +45,7 @@ export default defineEventHandler(async (event) => {
     builder = builder.lte('created_at', end)
   }
 
-  if (search) {
-    builder = builder.or(
-      `first_name.ilike.%${search}%,last_name.ilike.%${search}%,business_name.ilike.%${search}%,phone.ilike.%${search}%,email.ilike.%${search}%`,
-    )
-  }
+  builder = applyPartnerLeadSearch(builder, search)
 
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1
