@@ -55,6 +55,8 @@ NUXT_PUBLIC_SUPABASE_URL=https://YOUR_REF.supabase.co
 NUXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 API_URL=https://api.pirttrip.com
 NUXT_PUBLIC_MAIN_SITE_URL=https://business.pirttrip.com
+
+**Required:** `API_URL` must point to your backend (`https://api.pirttrip.com`). The app defaults to this in production if unset, but set it explicitly on Railway.
 ```
 
 ## Health check

@@ -4,6 +4,7 @@
 [variables]
 NODE_VERSION = "22"
 NIXPACKS_NODE_VERSION = "22"
+API_URL = "https://api.pirttrip.com"
 
 [phases.install]
 cmds = ["npm ci"]

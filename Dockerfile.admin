@@ -24,8 +24,7 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
-ENV API_URL=
-ENV NUXT_API_PROXY_ORIGIN=
+ENV API_URL=https://api.pirttrip.com
 
 COPY --from=builder /app/.output ./.output
 WORKDIR /app/.output/server

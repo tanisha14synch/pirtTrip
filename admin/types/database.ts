@@ -44,3 +44,27 @@ export interface LeadsListResponse {
   page: number
   pageSize: number
 }
+
+export interface WaitlistSubscriber {
+  id: string
+  email: string
+  otp_verified: boolean
+  source_page: string
+  created_at: string
+}
+
+export interface WaitlistListQuery {
+  page?: number
+  pageSize?: number
+  search?: string
+  sortBy?: string
+  sortOrder?: 'asc' | 'desc'
+  otpVerified?: '' | 'true' | 'false'
+}
+
+export interface WaitlistListResponse {
+  data: WaitlistSubscriber[]
+  total: number
+  page: number
+  pageSize: number
+}

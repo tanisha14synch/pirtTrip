@@ -1,12 +1,7 @@
+import { DEFAULT_DEV_API_URL, resolveAdminApiOrigin } from './utils/api-origin'
+
 const isProd = process.env.NODE_ENV === 'production'
-const apiOrigin = (
-  process.env.API_URL
-  || process.env.NUXT_API_PROXY_ORIGIN
-  || (!isProd ? 'http://127.0.0.1:3001' : '')
-)
-  .trim()
-  .replace(/\/$/, '')
-  .replace(/\/api$/, '')
+const apiOrigin = resolveAdminApiOrigin(isProd)
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -30,7 +25,7 @@ export default defineNuxtConfig({
   nitro: {
     devProxy: {
       '/api': {
-        target: `${apiOrigin || 'http://127.0.0.1:3001'}/api`,
+        target: `${apiOrigin || DEFAULT_DEV_API_URL}/api`,
         changeOrigin: true,
       },
     },

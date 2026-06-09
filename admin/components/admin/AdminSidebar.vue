@@ -2,7 +2,7 @@
 const route = useRoute()
 
 const navItems = [
-  { label: 'Dashboard', to: '/', icon: 'dashboard' },
+  { label: 'Waitlist', to: '/', icon: 'dashboard' },
   { label: 'Businesses', to: '/vendors', icon: 'vendors' },
 ]
 
