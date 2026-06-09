@@ -25,6 +25,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV API_URL=https://api.pirttrip.com
+ENV NUXT_PUBLIC_SUPABASE_URL=https://fvkwophzzyaukacuiszv.supabase.co
 
 COPY --from=builder /app/.output ./.output
 WORKDIR /app/.output/server

@@ -1,17 +1,31 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import type { SupabasePublicConfig } from '~/utils/supabase-config'
+import { isSupabaseConfigured } from '~/utils/supabase-config'
 
-export default defineNuxtPlugin(() => {
-  const config = useRuntimeConfig()
-  const url = config.public.supabaseUrl?.trim()
-  const anonKey = config.public.supabaseAnonKey?.trim()
+async function loadSupabaseConfig(): Promise<SupabasePublicConfig> {
+  try {
+    return await $fetch<SupabasePublicConfig>('/api/public-config')
+  } catch {
+    const runtime = useRuntimeConfig()
+    return {
+      supabaseUrl: (runtime.public.supabaseUrl as string)?.trim() || '',
+      supabaseAnonKey: (runtime.public.supabaseAnonKey as string)?.trim() || '',
+    }
+  }
+}
 
-  if (!url || !anonKey) {
-    console.warn('[admin] NUXT_PUBLIC_SUPABASE_URL / NUXT_PUBLIC_SUPABASE_ANON_KEY missing in admin/.env')
+export default defineNuxtPlugin(async () => {
+  const config = await loadSupabaseConfig()
+
+  if (!isSupabaseConfigured(config)) {
+    console.error(
+      '[admin] Supabase not configured. Set NUXT_PUBLIC_SUPABASE_URL and NUXT_PUBLIC_SUPABASE_ANON_KEY on Railway.',
+    )
   }
 
-  const supabase = createClient(
-    url || 'https://placeholder.supabase.co',
-    anonKey || 'placeholder',
+  const supabase: SupabaseClient = createClient(
+    config.supabaseUrl || 'https://placeholder.supabase.co',
+    config.supabaseAnonKey || 'placeholder',
     {
       auth: {
         persistSession: true,
@@ -19,5 +33,6 @@ export default defineNuxtPlugin(() => {
       },
     },
   )
-  return { provide: { supabase } }
+
+  return { provide: { supabase, supabaseConfig: config } }
 })

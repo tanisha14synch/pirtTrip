@@ -203,7 +203,13 @@ export function useAdminAuth() {
       })
 
       if (sessionError) {
-        throw new Error(sessionError.message)
+        const msg = sessionError.message || 'Failed to save login session'
+        if (msg.toLowerCase().includes('fetch')) {
+          throw new Error(
+            'Supabase is not configured on the admin service. Set NUXT_PUBLIC_SUPABASE_ANON_KEY on Railway and redeploy.',
+          )
+        }
+        throw new Error(msg)
       }
 
       accessToken.value = result.accessToken
@@ -236,6 +242,9 @@ export function useAdminAuth() {
     }
     if (e?.data?.code === 'ADMIN_NOT_AUTHORIZED') {
       return ADMIN_NOT_REGISTERED_MESSAGE
+    }
+    if (e?.data?.code === 'SUPABASE_NOT_CONFIGURED') {
+      return 'Supabase is not configured on the admin service. Set NUXT_PUBLIC_SUPABASE_ANON_KEY on Railway and redeploy.'
     }
     if (e?.data?.code === 'OTP_RATE_LIMITED' && e.data.waitSeconds) {
       const wait = e.data.waitSeconds
