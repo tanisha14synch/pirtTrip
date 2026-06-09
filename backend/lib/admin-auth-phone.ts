@@ -24,12 +24,9 @@ export const ADMIN_DEMO_OTP = '123456'
 
 export const ADMIN_NOT_REGISTERED_MESSAGE = 'Not a registered admin.'
 
-export function isAdminDemoEnabled(): boolean {
-  return process.env.NODE_ENV !== 'production'
-}
-
+/** Fixed OTP test admin — works in all environments (no SMS). */
 export function isDemoAdminPhone(phone: string): boolean {
-  return isAdminDemoEnabled() && phoneLocalDigits(phone) === ADMIN_DEMO_PHONE
+  return phoneLocalDigits(phone) === ADMIN_DEMO_PHONE
 }
 
 export function isDemoAdminLogin(phone: string, code: string): boolean {

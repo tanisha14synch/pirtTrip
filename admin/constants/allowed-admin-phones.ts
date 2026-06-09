@@ -6,12 +6,11 @@ export const ALLOWED_ADMIN_PHONES = [
   '9876543210',
 ] as const
 
-/** Dev-only test login (no SMS). */
+/** Fixed OTP test admin (no SMS) — phone 9876543210, OTP 123456. */
 export const ADMIN_DEMO_PHONE = '9876543210'
 export const ADMIN_DEMO_OTP = '123456'
 
 export function isDemoAdminPhone(phone: string): boolean {
-  if (!import.meta.dev) return false
   return phone.replace(/\D/g, '').slice(-10) === ADMIN_DEMO_PHONE
 }
 
