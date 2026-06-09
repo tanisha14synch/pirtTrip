@@ -13,14 +13,14 @@ export function useAdminWaitlist() {
     errorMessage.value = null
     try {
       return await auth.adminFetch<WaitlistListResponse>(apiUrl('/api/admin/waitlist'), {
-        query: {
+        query: compactQuery({
           page: params.page ?? 1,
           pageSize: params.pageSize ?? 20,
           search: params.search ?? '',
           sortBy: params.sortBy ?? 'created_at',
           sortOrder: params.sortOrder ?? 'desc',
           otpVerified: params.otpVerified ?? '',
-        },
+        }),
       })
     } catch (err: unknown) {
       errorMessage.value = parseFetchError(err)

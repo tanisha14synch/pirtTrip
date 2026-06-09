@@ -36,7 +36,7 @@ export function useAdminLeads() {
     errorMessage.value = null
     try {
       return await auth.adminFetch<LeadsListResponse>(apiUrl('/api/admin/leads'), {
-        query: {
+        query: compactQuery({
           page: params.page ?? 1,
           pageSize: params.pageSize ?? 20,
           search: params.search ?? '',
@@ -46,7 +46,7 @@ export function useAdminLeads() {
           dateFrom: params.dateFrom ?? '',
           dateTo: params.dateTo ?? '',
           otpVerified: params.otpVerified ?? '',
-        },
+        }),
       })
     } catch (err: unknown) {
       errorMessage.value = parseFetchError(err)

@@ -1,5 +1,5 @@
-import type { LeadStatus } from '~/types/database'
-import { applyPartnerLeadSearch } from '~/lib/partner-lead-search'
+import { applyPartnerLeadSearch, parseLeadStatusFilter } from '~/lib/partner-lead-search'
+import { queryParamFirst } from '~/lib/query-params'
 import { getSupabaseAdmin, requireAdminWith2fa } from '~/lib/supabase'
 
 export default defineEventHandler(async (event) => {
@@ -8,15 +8,13 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const page = Math.max(1, Number(query.page) || 1)
   const pageSize = Math.min(100, Math.max(1, Number(query.pageSize) || 20))
-  const search = String(
-    Array.isArray(query.search) ? query.search[0] ?? '' : query.search ?? '',
-  ).trim()
-  const status = String(query.status ?? '').trim() as LeadStatus | ''
-  const sortBy = String(query.sortBy ?? 'created_at')
-  const sortOrder = query.sortOrder === 'asc' ? 'asc' : 'desc'
-  const dateFrom = String(query.dateFrom ?? '').trim()
-  const dateTo = String(query.dateTo ?? '').trim()
-  const otpVerified = String(query.otpVerified ?? '').trim()
+  const search = queryParamFirst(query.search)
+  const statusFilter = parseLeadStatusFilter(query.status)
+  const sortBy = queryParamFirst(query.sortBy) || 'created_at'
+  const sortOrder = queryParamFirst(query.sortOrder) === 'asc' ? 'asc' : 'desc'
+  const dateFrom = queryParamFirst(query.dateFrom)
+  const dateTo = queryParamFirst(query.dateTo)
+  const otpVerified = queryParamFirst(query.otpVerified)
 
   const allowedSort = ['created_at', 'updated_at', 'first_name', 'business_name', 'phone', 'status']
   const orderColumn = allowedSort.includes(sortBy) ? sortBy : 'created_at'
@@ -26,8 +24,8 @@ export default defineEventHandler(async (event) => {
     .from('partner_leads')
     .select('*', { count: 'exact' })
 
-  if (status) {
-    builder = builder.eq('status', status)
+  if (statusFilter) {
+    builder = builder.eq('status', statusFilter)
   }
 
   if (otpVerified === 'true') {

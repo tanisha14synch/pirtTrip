@@ -1,3 +1,23 @@
+import type { LeadStatus } from '~/types/database'
+import { queryParamFirst } from '~/lib/query-params'
+
+const LEAD_STATUSES = new Set<LeadStatus>([
+  'NEW',
+  'CONTACTED',
+  'QUALIFIED',
+  'ONBOARDED',
+  'REJECTED',
+  'SUSPENDED',
+])
+
+export function parseLeadStatusFilter(
+  value: string | string[] | undefined | null,
+): LeadStatus | null {
+  const raw = queryParamFirst(value)
+  if (!raw || !LEAD_STATUSES.has(raw as LeadStatus)) return null
+  return raw as LeadStatus
+}
+
 /** Escape user input for PostgREST ilike patterns (wildcards + quotes). */
 export function escapePostgrestIlike(value: string): string {
   return value
@@ -15,7 +35,7 @@ export function applyPartnerLeadSearch<T extends { or: (filters: string) => T }>
   builder: T,
   rawSearch: string | string[] | undefined | null,
 ): T {
-  const search = Array.isArray(rawSearch) ? rawSearch[0] ?? '' : String(rawSearch ?? '').trim()
+  const search = queryParamFirst(rawSearch)
   if (!search) return builder
 
   const pattern = `"%${escapePostgrestIlike(search)}%"`

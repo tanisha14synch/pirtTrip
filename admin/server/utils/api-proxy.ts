@@ -16,8 +16,15 @@ function buildProxyUrl(event: H3Event, origin: string): string {
   const search = new URLSearchParams()
   for (const [key, value] of Object.entries(query)) {
     if (value === undefined || value === null) continue
-    if (Array.isArray(value)) value.forEach((v) => search.append(key, String(v)))
-    else search.append(key, String(value))
+    if (Array.isArray(value)) {
+      const parts = value.map((v) => String(v)).filter((v) => v !== '')
+      if (!parts.length) continue
+      parts.forEach((v) => search.append(key, v))
+      continue
+    }
+    const scalar = String(value)
+    if (scalar === '') continue
+    search.append(key, scalar)
   }
   const qs = search.toString()
   return `${origin}${path}${qs ? `?${qs}` : ''}`
