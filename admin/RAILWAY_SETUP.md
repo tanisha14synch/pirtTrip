@@ -6,15 +6,15 @@ The **admin** service is using the **backend** Dockerfile. Fix in Railway → **
 
 ---
 
-## ✅ Recommended setup (Nixpacks — easiest)
+## ✅ Recommended setup (Dockerfile)
 
 | Setting | Value |
 |---------|--------|
 | **Root Directory** | `admin` |
-| **Builder** | `Nixpacks` (or leave default; `admin/railway.json` sets this) |
-| **Dockerfile Path** | *(leave empty / clear any custom path)* |
+| **Builder** | `Dockerfile` (`admin/railway.json` sets this) |
+| **Dockerfile Path** | `Dockerfile` |
 
-Then **Redeploy**.
+Then **Redeploy**. Health check: `GET /api/health`
 
 ---
 
@@ -53,13 +53,13 @@ Then **Redeploy**.
 ```env
 API_URL=https://api.pirttrip.com
 NUXT_PUBLIC_MAIN_SITE_URL=https://business.pirttrip.com
+```
 
 **Required:** `API_URL` → `https://api.pirttrip.com` (backend has Supabase keys; admin panel does not need them).
-```
 
 ## Health check
 
-Path: `/login`
+Path: `/api/health` (returns `{"ok":true}`)
 
 ## After changing settings
 

@@ -18,11 +18,13 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
+ENV NITRO_HOST=0.0.0.0
+ENV PORT=3000
 ENV API_URL=https://api.pirttrip.com
 
 COPY --from=builder /app/.output ./.output
 WORKDIR /app/.output/server
-RUN npm install --omit=dev
+RUN npm ci --omit=dev 2>/dev/null || npm install --omit=dev
 
 WORKDIR /app
 EXPOSE 3000
