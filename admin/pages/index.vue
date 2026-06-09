@@ -3,6 +3,7 @@ import type { WaitlistSubscriber } from '~/types/database'
 
 definePageMeta({ ssr: false })
 
+const auth = useAdminAuth()
 const { loading, errorMessage, fetchWaitlist } = useAdminWaitlist()
 
 const page = ref(1)
@@ -59,8 +60,14 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
 }
 
-onMounted(loadWaitlist)
-watch(page, loadWaitlist)
+onMounted(async () => {
+  await auth.ensureSession()
+  if (!auth.isAuthenticated.value) return
+  await loadWaitlist()
+})
+watch(page, () => {
+  if (auth.isAuthenticated.value) loadWaitlist()
+})
 </script>
 
 <template>

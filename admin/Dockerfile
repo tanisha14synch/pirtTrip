@@ -10,7 +10,7 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
-RUN npm run build
+RUN NODE_OPTIONS=--max-old-space-size=4096 npm run build
 
 FROM node:22-alpine AS runner
 
@@ -19,11 +19,11 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV NITRO_HOST=0.0.0.0
-ENV API_URL=https://api.pirttrip.com
 
 COPY --from=builder /app/.output ./.output
 COPY start.sh ./start.sh
 RUN chmod +x ./start.sh
+
 WORKDIR /app/.output/server
 RUN npm install --omit=dev
 

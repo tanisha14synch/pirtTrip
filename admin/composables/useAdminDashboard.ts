@@ -19,10 +19,7 @@ export function useAdminDashboard() {
     loading.value = true
     errorMessage.value = null
     try {
-      stats.value = await $fetch<DashboardStats>(apiUrl('/api/admin/dashboard/stats'), {
-        ...adminFetchOptions,
-        headers: auth.getAuthHeaders(),
-      })
+      stats.value = await auth.adminFetch<DashboardStats>(apiUrl('/api/admin/dashboard/stats'))
     } catch (err: unknown) {
       const e = err as { data?: { statusMessage?: string }; message?: string }
       errorMessage.value = e?.data?.statusMessage || e?.message || 'Failed to load dashboard'

@@ -22,6 +22,10 @@ export default defineNuxtConfig({
   },
   nitro: {
     preset: 'node-server',
+    serve: {
+      host: process.env.HOST || process.env.NITRO_HOST || '0.0.0.0',
+      port: Number(process.env.PORT || 3000),
+    },
     devProxy: {
       '/api': {
         target: `${apiOrigin || DEFAULT_DEV_API_URL}/api`,

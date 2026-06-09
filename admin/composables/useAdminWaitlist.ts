@@ -12,9 +12,7 @@ export function useAdminWaitlist() {
     loading.value = true
     errorMessage.value = null
     try {
-      return await $fetch<WaitlistListResponse>(apiUrl('/api/admin/waitlist'), {
-        ...adminFetchOptions,
-        headers: auth.getAuthHeaders(),
+      return await auth.adminFetch<WaitlistListResponse>(apiUrl('/api/admin/waitlist'), {
         query: {
           page: params.page ?? 1,
           pageSize: params.pageSize ?? 20,

@@ -6,9 +6,9 @@
     "watchPatterns": ["admin/**", "Dockerfile.admin"]
   },
   "deploy": {
-    "startCommand": "node .output/server/index.mjs",
-    "healthcheckPath": "/login",
-    "healthcheckTimeout": 120,
+    "startCommand": "sh start.sh",
+    "healthcheckPath": "/api/health",
+    "healthcheckTimeout": 300,
     "restartPolicyType": "ON_FAILURE"
   }
 }

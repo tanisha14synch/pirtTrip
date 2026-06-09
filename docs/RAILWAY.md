@@ -75,12 +75,14 @@ Browser → https://your-app.up.railway.app/          (Nuxt frontend)
 
 Use **one** of these setups (pick A or B).
 
-### Option A — Root Directory `admin` + Nixpacks (recommended)
+### Option A — Root Directory `admin` + Docker (recommended)
 
 1. **New service** → same repo.
 2. **Settings → Root Directory** → `admin`
-3. **Builder** → `Nixpacks` (configured in `admin/railway.json` + `admin/nixpacks.toml`)
-4. **Clear** any custom Dockerfile path in the Railway UI
+3. **Builder** → `Dockerfile` (configured in `admin/railway.json` + `admin/Dockerfile`)
+4. **Clear** any custom Dockerfile path in the Railway UI (use `admin/Dockerfile` only)
+5. **Health check** → `/api/health`
+6. Custom domain DNS: see [CLOUDFLARE_ADMIN_SUBDOMAIN.md](./CLOUDFLARE_ADMIN_SUBDOMAIN.md)
 
 ### Option B — Repo root (if you cannot change Root Directory)
 

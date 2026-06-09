@@ -46,6 +46,10 @@ export async function proxyApiToBackend(event: H3Event) {
   const body = hasBody ? await readBody(event) : undefined
 
   try {
+    if (process.env.NODE_ENV === 'production') {
+      console.info('[pirttrip-admin] proxy', { method, path: event.path, origin })
+    }
+
     const response = await $fetch.raw(target, {
       method,
       headers: forwardHeaders,
@@ -59,6 +63,12 @@ export async function proxyApiToBackend(event: H3Event) {
     }
     return response._data
   } catch (error: unknown) {
+    console.error('[pirttrip-admin] proxy failed', {
+      target,
+      method,
+      message: (error as Error)?.message,
+    })
+
     const err = error as {
       statusCode?: number
       status?: number

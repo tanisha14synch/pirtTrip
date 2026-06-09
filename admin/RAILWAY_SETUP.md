@@ -2,13 +2,20 @@
 
 ## Fix 502 Bad Gateway
 
-502 means the admin container is not running. Use this setup:
+502 on `https://admin.pirttrip.com` means Cloudflare cannot reach a running admin container on Railway.
+
+**Check:** response headers should include `x-railway-edge`. If they do not, DNS or the Railway service is wrong.
+
+See [docs/CLOUDFLARE_ADMIN_SUBDOMAIN.md](../docs/CLOUDFLARE_ADMIN_SUBDOMAIN.md) for DNS + SSL steps.
+
+## Railway settings
 
 | Setting | Value |
 |---------|--------|
 | **Root Directory** | `admin` |
-| **Builder** | `Nixpacks` (default from `admin/railway.json`) |
-| **Dockerfile Path** | *(leave empty)* |
+| **Builder** | `Dockerfile` (`admin/railway.json`) |
+| **Dockerfile Path** | `Dockerfile` |
+| **Health check** | `/api/health` |
 
 **Required variable:**
 
@@ -22,25 +29,33 @@ Optional:
 NUXT_PUBLIC_MAIN_SITE_URL=https://business.pirttrip.com
 ```
 
-Supabase keys are **not** required on the admin service (auth tokens are stored locally after OTP verify; backend handles Supabase).
-
 ## Health check
 
-`GET /api/health` → `{"ok":true}`
+```bash
+curl -s https://admin.pirttrip.com/api/health
+# {"ok":true,"service":"pirttrip-admin",...}
+```
 
 ## After deploy
 
-1. Open `https://admin.pirttrip.com/api/health` — must return `ok: true`
-2. Then open `https://admin.pirttrip.com/login`
+1. Railway URL: `https://<service>.up.railway.app/api/health` → `ok: true`
+2. Custom domain: `https://admin.pirttrip.com/api/health` → `ok: true` + `x-railway-edge` header
+3. Open `https://admin.pirttrip.com/login`
 
-## Wrong setup (causes 502)
+## Wrong setup (causes 502 or build failure)
 
-- Root Directory = repo root with backend `Dockerfile` → builds wrong app
-- Missing `API_URL` on admin service → API proxy errors (not 502, but login fails)
+| Mistake | Result |
+|---------|--------|
+| Root Directory = repo root + default `Dockerfile` | Builds **backend**, not admin |
+| No admin Railway service | Cloudflare 502 (no origin) |
+| CNAME points to frontend/API service | Wrong app or connection failure |
+| Cloudflare SSL = Flexible | 502/525 to Railway |
 
-## Docker alternative
+## Repo-root alternative
 
 | Root Directory | Dockerfile Path |
 |----------------|-----------------|
 | `admin` | `Dockerfile` |
 | `.` (repo root) | `Dockerfile.admin` |
+
+Use `railway.admin.json` for health check settings when deploying from repo root.

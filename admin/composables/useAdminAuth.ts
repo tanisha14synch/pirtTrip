@@ -11,9 +11,12 @@ type OtpSendResponse = {
   resendCooldownSeconds: number
 }
 
+let sessionInitPromise: Promise<void> | null = null
+
 export function useAdminAuth() {
   const accessToken = useState<string | null>('admin-access-token', () => null)
   const adminUser = useState<AdminUser | null>('admin-user', () => null)
+  const authReady = useState('admin-auth-ready', () => false)
   const loading = ref(false)
   const errorMessage = ref<string | null>(null)
   const loginPhone = ref('')
@@ -68,20 +71,72 @@ export function useAdminAuth() {
     accessToken.value = null
     adminUser.value = null
     clearAdminSession()
+    authReady.value = true
   }
 
   async function initSession() {
     if (import.meta.server) return
-
-    const stored = loadAdminSession()
-    if (!stored) {
-      clearSession()
+    if (sessionInitPromise) {
+      await sessionInitPromise
       return
     }
 
-    accessToken.value = stored.accessToken
-    adminUser.value = stored.user
-    await refreshProfile()
+    sessionInitPromise = (async () => {
+      const stored = loadAdminSession()
+      if (!stored) {
+        clearSession()
+        return
+      }
+
+      accessToken.value = stored.accessToken
+      adminUser.value = stored.user
+      await refreshProfile()
+      authReady.value = true
+    })()
+
+    try {
+      await sessionInitPromise
+    } finally {
+      sessionInitPromise = null
+    }
+  }
+
+  async function ensureSession() {
+    if (import.meta.server) return
+    if (authReady.value && accessToken.value) return
+    await initSession()
+  }
+
+  async function adminFetch<T>(url: string, options: Parameters<typeof $fetch>[1] = {}): Promise<T> {
+    await ensureSession()
+    if (!accessToken.value) {
+      await navigateTo('/login')
+      throw new Error('Unauthorized')
+    }
+
+    const optionHeaders = options.headers
+    const mergedHeaders: Record<string, string> = {
+      ...getAuthHeaders(),
+      ...(optionHeaders instanceof Headers
+        ? Object.fromEntries(optionHeaders.entries())
+        : (optionHeaders as Record<string, string> | undefined)),
+    }
+
+    try {
+      return await $fetch<T>(url, {
+        ...adminFetchOptions,
+        ...options,
+        headers: mergedHeaders,
+      })
+    } catch (err: unknown) {
+      const status = (err as { statusCode?: number }).statusCode
+      if (status === 401 || status === 403) {
+        clearSession()
+        authReady.value = true
+        await navigateTo('/login')
+      }
+      throw err
+    }
   }
 
   async function refreshProfile() {
@@ -108,7 +163,12 @@ export function useAdminAuth() {
         }
       }
       return profile.user
-    } catch {
+    } catch (err: unknown) {
+      const status = (err as { statusCode?: number }).statusCode
+      if (status === 401 || status === 403) {
+        clearSession()
+        return null
+      }
       if (!adminUser.value) {
         clearSession()
       }
@@ -201,6 +261,7 @@ export function useAdminAuth() {
         refreshToken: result.refreshToken,
         user: result.user,
       })
+      authReady.value = true
       clearTimers()
       await navigateTo('/vendors')
     } catch (err: unknown) {
@@ -273,6 +334,7 @@ export function useAdminAuth() {
   return {
     accessToken,
     adminUser,
+    authReady,
     loading,
     errorMessage,
     loginPhone,
@@ -289,6 +351,9 @@ export function useAdminAuth() {
     expiryLabel,
     resendWaitLabel,
     initSession,
+    ensureSession,
+    adminFetch,
+    clearSession,
     requestOtp,
     verifyOtp,
     signOut,

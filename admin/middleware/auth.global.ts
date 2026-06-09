@@ -6,8 +6,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   try {
     await auth.initSession()
   } catch {
-    auth.accessToken.value = null
-    auth.adminUser.value = null
+    auth.clearSession()
   }
 
   const isLogin = to.path === '/login'

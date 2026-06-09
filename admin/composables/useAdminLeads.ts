@@ -35,9 +35,7 @@ export function useAdminLeads() {
     loading.value = true
     errorMessage.value = null
     try {
-      return await $fetch<LeadsListResponse>(apiUrl('/api/admin/leads'), {
-        ...adminFetchOptions,
-        headers: auth.getAuthHeaders(),
+      return await auth.adminFetch<LeadsListResponse>(apiUrl('/api/admin/leads'), {
         query: {
           page: params.page ?? 1,
           pageSize: params.pageSize ?? 20,
@@ -62,10 +60,7 @@ export function useAdminLeads() {
     loading.value = true
     errorMessage.value = null
     try {
-      return await $fetch<LeadDetailResponse>(apiUrl(`/api/admin/leads/${id}`), {
-        ...adminFetchOptions,
-        headers: auth.getAuthHeaders(),
-      })
+      return await auth.adminFetch<LeadDetailResponse>(apiUrl(`/api/admin/leads/${id}`))
     } catch (err: unknown) {
       errorMessage.value = parseFetchError(err)
       throw err
@@ -81,10 +76,8 @@ export function useAdminLeads() {
     loading.value = true
     errorMessage.value = null
     try {
-      return await $fetch(apiUrl(`/api/admin/leads/${id}`), {
+      return await auth.adminFetch(apiUrl(`/api/admin/leads/${id}`), {
         method: 'PATCH',
-        ...adminFetchOptions,
-        headers: auth.getAuthHeaders(),
         body: payload,
       })
     } catch (err: unknown) {
@@ -99,10 +92,8 @@ export function useAdminLeads() {
     loading.value = true
     errorMessage.value = null
     try {
-      return await $fetch<{ success: boolean; message?: string }>(apiUrl(`/api/admin/leads/${id}`), {
+      return await auth.adminFetch<{ success: boolean; message?: string }>(apiUrl(`/api/admin/leads/${id}`), {
         method: 'DELETE',
-        ...adminFetchOptions,
-        headers: auth.getAuthHeaders(),
       })
     } catch (err: unknown) {
       errorMessage.value = parseFetchError(err)
@@ -113,6 +104,7 @@ export function useAdminLeads() {
   }
 
   async function exportCsv(params: { search?: string; status?: string } = {}) {
+    await auth.ensureSession()
     const headers = auth.getAuthHeaders()
     const query = new URLSearchParams()
     if (params.search) query.set('search', params.search)
