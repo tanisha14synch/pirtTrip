@@ -20,7 +20,6 @@ export function useAdminDashboard() {
     errorMessage.value = null
     try {
       stats.value = await $fetch<DashboardStats>(apiUrl('/api/admin/dashboard/stats'), {
-        ...adminFetchOptions,
         headers: auth.getAuthHeaders(),
       })
     } catch (err: unknown) {

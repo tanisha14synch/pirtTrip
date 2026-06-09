@@ -13,7 +13,6 @@ export function useAdminWaitlist() {
     errorMessage.value = null
     try {
       return await $fetch<WaitlistListResponse>(apiUrl('/api/admin/waitlist'), {
-        ...adminFetchOptions,
         headers: auth.getAuthHeaders(),
         query: {
           page: params.page ?? 1,

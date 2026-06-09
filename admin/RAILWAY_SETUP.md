@@ -51,10 +51,14 @@ Then **Redeploy**.
 ## Required variables
 
 ```env
+NUXT_PUBLIC_SUPABASE_URL=https://fvkwophzzyaukacuiszv.supabase.co
+NUXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 API_URL=https://api.pirttrip.com
 NUXT_PUBLIC_MAIN_SITE_URL=https://business.pirttrip.com
 
-**Required:** `API_URL` → `https://api.pirttrip.com` (backend has Supabase keys; admin panel does not need them).
+**Required:**
+- `API_URL` → `https://api.pirttrip.com`
+- `NUXT_PUBLIC_SUPABASE_URL` + `NUXT_PUBLIC_SUPABASE_ANON_KEY` — same values as the frontend service (login calls Supabase Auth after OTP verify). Without the anon key, verify succeeds but session save fails with "Failed to fetch".
 ```
 
 ## Health check

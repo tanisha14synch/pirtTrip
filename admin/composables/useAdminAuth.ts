@@ -1,6 +1,5 @@
 import type { AdminUser } from '~/types/database'
 import { ADMIN_NOT_REGISTERED_MESSAGE, isAllowedAdminPhone } from '~/constants/allowed-admin-phones'
-import { clearAdminSession, loadAdminSession, saveAdminSession } from '~/utils/admin-session'
 
 type OtpSendResponse = {
   success: boolean
@@ -11,8 +10,8 @@ type OtpSendResponse = {
   resendCooldownSeconds: number
 }
 
-
 export function useAdminAuth() {
+  const { $supabase } = useNuxtApp()
   const accessToken = useState<string | null>('admin-access-token', () => null)
   const adminUser = useState<AdminUser | null>('admin-user', () => null)
   const loading = ref(false)
@@ -65,24 +64,34 @@ export function useAdminAuth() {
     return { Authorization: `Bearer ${accessToken.value}` }
   }
 
-  function clearSession() {
-    accessToken.value = null
-    adminUser.value = null
-    clearAdminSession()
-  }
-
   async function initSession() {
     if (import.meta.server) return
 
-    const stored = loadAdminSession()
-    if (!stored) {
-      clearSession()
-      return
-    }
+    try {
+      if (!$supabase?.auth) return
 
-    accessToken.value = stored.accessToken
-    adminUser.value = stored.user
-    await refreshProfile()
+      const { data, error } = await $supabase.auth.getSession()
+      if (error) {
+        await $supabase.auth.signOut().catch(() => {})
+        accessToken.value = null
+        adminUser.value = null
+        return
+      }
+
+      const token = data.session?.access_token
+      if (!token) {
+        accessToken.value = null
+        adminUser.value = null
+        return
+      }
+
+      accessToken.value = token
+      await refreshProfile()
+    } catch {
+      accessToken.value = null
+      adminUser.value = null
+      await $supabase?.auth?.signOut().catch(() => {})
+    }
   }
 
   async function refreshProfile() {
@@ -93,7 +102,7 @@ export function useAdminAuth() {
     try {
       const profile = await $fetch<{ needs2fa: boolean; user: AdminUser | null }>(
         apiUrl('/api/admin/me'),
-        { ...adminFetchOptions, headers: getAuthHeaders() },
+        { headers: getAuthHeaders() },
       )
       if (profile.needs2fa) {
         if (!adminUser.value) {
@@ -102,16 +111,11 @@ export function useAdminAuth() {
         return adminUser.value
       }
       adminUser.value = profile.user
-      if (profile.user) {
-        const stored = loadAdminSession()
-        if (stored) {
-          saveAdminSession({ ...stored, user: profile.user })
-        }
-      }
       return profile.user
     } catch {
       if (!adminUser.value) {
-        clearSession()
+        accessToken.value = null
+        await $supabase.auth.signOut()
       }
       return adminUser.value
     }
@@ -138,7 +142,6 @@ export function useAdminAuth() {
     try {
       const response = await $fetch<OtpSendResponse>(apiUrl('/api/admin/auth/login-request'), {
         method: 'POST',
-        ...adminFetchOptions,
         body: {
           phone: localPhone,
           challengeToken: isResend ? challengeToken.value ?? undefined : undefined,
@@ -183,7 +186,6 @@ export function useAdminAuth() {
         user: AdminUser
       }>(apiUrl('/api/admin/auth/login-verify'), {
         method: 'POST',
-        ...adminFetchOptions,
         body: {
           phone: localPhone,
           code,
@@ -195,13 +197,23 @@ export function useAdminAuth() {
         throw new Error('Invalid login response from server')
       }
 
+      const { error: sessionError } = await $supabase.auth.setSession({
+        access_token: result.accessToken,
+        refresh_token: result.refreshToken,
+      })
+
+      if (sessionError) {
+        const msg = sessionError.message || 'Failed to save login session'
+        if (msg.toLowerCase().includes('fetch')) {
+          throw new Error(
+            'Supabase is not configured on the admin service. Set NUXT_PUBLIC_SUPABASE_ANON_KEY on Railway and redeploy.',
+          )
+        }
+        throw new Error(msg)
+      }
+
       accessToken.value = result.accessToken
       adminUser.value = result.user
-      saveAdminSession({
-        accessToken: result.accessToken,
-        refreshToken: result.refreshToken,
-        user: result.user,
-      })
       clearTimers()
       await navigateTo('/vendors')
     } catch (err: unknown) {
@@ -212,8 +224,10 @@ export function useAdminAuth() {
   }
 
   async function signOut() {
-    await $fetch(apiUrl('/api/admin/auth/sign-out'), { method: 'POST', ...adminFetchOptions }).catch(() => {})
-    clearSession()
+    await $fetch(apiUrl('/api/admin/auth/sign-out'), { method: 'POST' }).catch(() => {})
+    await $supabase.auth.signOut()
+    accessToken.value = null
+    adminUser.value = null
     step.value = 'phone'
     challengeToken.value = null
     clearTimers()
@@ -228,6 +242,9 @@ export function useAdminAuth() {
     }
     if (e?.data?.code === 'ADMIN_NOT_AUTHORIZED') {
       return ADMIN_NOT_REGISTERED_MESSAGE
+    }
+    if (e?.data?.code === 'SUPABASE_NOT_CONFIGURED') {
+      return 'Supabase is not configured on the admin service. Set NUXT_PUBLIC_SUPABASE_ANON_KEY on Railway and redeploy.'
     }
     if (e?.data?.code === 'OTP_RATE_LIMITED' && e.data.waitSeconds) {
       const wait = e.data.waitSeconds
