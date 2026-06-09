@@ -1,15 +1,13 @@
 import type { H3Event } from 'h3'
 import { getQuery, getRequestHeaders, readBody, setResponseStatus } from 'h3'
-import { normalizeApiOrigin, resolveAdminApiOrigin } from '~/utils/api-origin'
+import { resolveAdminApiOrigin } from '~/utils/api-origin'
 
 export function resolveApiOrigin(): string {
   const config = useRuntimeConfig()
   const isProd = process.env.NODE_ENV === 'production'
-  const fromEnv = process.env.API_URL || process.env.NUXT_API_PROXY_ORIGIN || ''
-  if (fromEnv.trim()) return normalizeApiOrigin(fromEnv)
-  const bakedOrigin = (config.apiProxyOrigin as string)?.trim()
-  if (bakedOrigin) return normalizeApiOrigin(bakedOrigin)
-  return resolveAdminApiOrigin(isProd)
+  return resolveAdminApiOrigin(isProd, {
+    bakedOrigin: config.apiProxyOrigin as string,
+  })
 }
 
 function buildProxyUrl(event: H3Event, origin: string): string {
