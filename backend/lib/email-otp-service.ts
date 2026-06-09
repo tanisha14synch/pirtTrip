@@ -43,6 +43,8 @@ export async function createAndSendOtp(options: {
   email: string
   purpose: OtpPurpose
   challengeToken?: string | null
+  /** Fresh login on phone step — allow a new code even if a recent challenge exists. */
+  freshRequest?: boolean
   metadata?: Record<string, unknown>
   deliveryEmail?: string
   buildMailContent?: (code: string) => { subject: string; html: string; text: string }
@@ -62,6 +64,7 @@ export async function createAndSendOtp(options: {
     email,
     purpose: options.purpose,
     existingToken: options.challengeToken,
+    freshRequest: options.freshRequest,
   })
   if (!resendCheck.allowed) {
     throw createError({

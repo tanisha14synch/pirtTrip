@@ -121,8 +121,12 @@ export function useAdminAuth() {
     }
   }
 
+  function normalizedLoginPhone(): string {
+    return loginPhone.value.replace(/\D/g, '').slice(-10)
+  }
+
   async function requestOtp() {
-    const localPhone = loginPhone.value.replace(/\D/g, '').slice(-10)
+    const localPhone = normalizedLoginPhone()
     if (!/^\d{10}$/.test(localPhone)) {
       errorMessage.value = 'Enter a valid 10-digit mobile number'
       return
@@ -134,12 +138,13 @@ export function useAdminAuth() {
 
     loading.value = true
     errorMessage.value = null
+    const isResend = step.value === 'otp' && Boolean(challengeToken.value)
     try {
       const response = await $fetch<OtpSendResponse>(apiUrl('/api/admin/auth/login-request'), {
         method: 'POST',
         body: {
-          phone: loginPhone.value.trim(),
-          challengeToken: challengeToken.value ?? undefined,
+          phone: localPhone,
+          challengeToken: isResend ? challengeToken.value ?? undefined : undefined,
         },
       })
       challengeToken.value = response.challengeToken
@@ -157,11 +162,16 @@ export function useAdminAuth() {
   }
 
   async function verifyOtp() {
-    const localPhone = loginPhone.value.replace(/\D/g, '').slice(-10)
+    const localPhone = normalizedLoginPhone()
     if (!isAllowedAdminPhone(localPhone)) {
       errorMessage.value = ADMIN_NOT_REGISTERED_MESSAGE
       step.value = 'phone'
       challengeToken.value = null
+      return
+    }
+    if (!challengeToken.value) {
+      errorMessage.value = 'Verification session expired. Request a new code.'
+      step.value = 'phone'
       return
     }
 
@@ -177,7 +187,7 @@ export function useAdminAuth() {
       }>(apiUrl('/api/admin/auth/login-verify'), {
         method: 'POST',
         body: {
-          phone: loginPhone.value.trim(),
+          phone: localPhone,
           code,
           challengeToken: challengeToken.value,
         },
@@ -220,12 +230,20 @@ export function useAdminAuth() {
 
   function parseError(err: unknown): string {
     const e = err as {
-      data?: { statusMessage?: string; code?: string }
+      data?: { statusMessage?: string; code?: string; waitSeconds?: number }
       statusMessage?: string
       message?: string
     }
     if (e?.data?.code === 'ADMIN_NOT_AUTHORIZED') {
       return ADMIN_NOT_REGISTERED_MESSAGE
+    }
+    if (e?.data?.code === 'OTP_RATE_LIMITED' && e.data.waitSeconds) {
+      const wait = e.data.waitSeconds
+      if (wait >= 60) {
+        const mins = Math.ceil(wait / 60)
+        return `Too many OTP requests. Please wait ${mins} minute(s) and try again.`
+      }
+      return `Too many OTP requests. Please wait ${wait} seconds and try again.`
     }
     return e?.data?.statusMessage || e?.statusMessage || e?.message || 'Something went wrong'
   }

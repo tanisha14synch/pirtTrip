@@ -66,12 +66,28 @@ export async function proxyApiToBackend(event: H3Event) {
       status?: number
       statusMessage?: string
       message?: string
-      data?: unknown
+      data?: {
+        statusMessage?: string
+        message?: string
+        data?: Record<string, unknown>
+        code?: string
+        waitSeconds?: number
+      }
     }
+    const body = err.data
+    const statusMessage =
+      body?.statusMessage
+      || body?.message
+      || err.statusMessage
+      || err.message
+      || 'Backend API request failed'
+    const payload = body?.data ?? (body?.code || body?.waitSeconds
+      ? { code: body.code, waitSeconds: body.waitSeconds, ...body?.data }
+      : body)
     throw createError({
       statusCode: err.statusCode || err.status || 502,
-      statusMessage: err.statusMessage || err.message || 'Backend API request failed',
-      data: err.data,
+      statusMessage,
+      data: payload,
     })
   }
 }

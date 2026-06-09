@@ -97,8 +97,19 @@ export async function validateResendForEmail(options: {
   email: string
   purpose: OtpPurpose
   existingToken?: string | null
+  freshRequest?: boolean
 }) {
   let challenge: OtpChallengeRow | null = null
+
+  if (options.freshRequest && !options.existingToken) {
+    challenge = await getLatestActiveChallenge(options.email, options.purpose)
+    return {
+      allowed: true as const,
+      waitSeconds: 0,
+      resendCount: challenge?.resend_count ?? 0,
+      challenge,
+    }
+  }
 
   if (options.existingToken) {
     const tokenPayload = parseChallengeToken(options.existingToken)

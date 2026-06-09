@@ -4,8 +4,8 @@ import { getOtpSigningSecret } from './runtime-env'
 const OTP_LENGTH = 6
 const OTP_TTL_MS = 10 * 60 * 1000 // 10 minutes (default)
 const RESEND_COOLDOWN_MS = 60 * 1000 // 60 seconds (default)
-const ADMIN_OTP_TTL_MS = 5 * 60 * 1000 // 5 minutes
-const ADMIN_RESEND_COOLDOWN_MS = 5 * 60 * 1000 // 5 minutes
+const ADMIN_OTP_TTL_MS = 10 * 60 * 1000 // 10 minutes — matches AquaSMS template text
+const ADMIN_RESEND_COOLDOWN_MS = 60 * 1000 // 60 seconds between resends on OTP step
 const PARTNER_OTP_WINDOW_MS = 10 * 60 * 1000 // 10 minutes — expiry and resend use the same window
 const MAX_RESENDS_PER_WINDOW = 5
 const RESEND_WINDOW_MS = 15 * 60 * 1000

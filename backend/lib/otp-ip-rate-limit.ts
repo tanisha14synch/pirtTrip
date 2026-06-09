@@ -3,6 +3,7 @@ import { getRequestIP } from 'h3'
 
 const WINDOW_MS = 15 * 60 * 1000
 const MAX_SENDS_PER_WINDOW = 10
+const MAX_ADMIN_SENDS_PER_WINDOW = 30
 
 type Bucket = {
   count: number
@@ -25,7 +26,10 @@ function cleanupBuckets(now: number) {
 
 export function assertOtpSendRateLimit(event: H3Event, phone?: string) {
   const ip = getRequestIP(event, { xForwardedFor: true }) || 'unknown'
-  const key = `${ip}:${phone?.replace(/\D/g, '').slice(-10) || 'unknown'}`
+  const isAdminScope = phone?.startsWith('admin:') ?? false
+  const phoneSuffix = phone?.replace(/^admin:/, '').replace(/\D/g, '').slice(-10) || 'unknown'
+  const key = `${ip}:${isAdminScope ? `admin:${phoneSuffix}` : phoneSuffix}`
+  const maxSends = isAdminScope ? MAX_ADMIN_SENDS_PER_WINDOW : MAX_SENDS_PER_WINDOW
   const now = Date.now()
   cleanupBuckets(now)
 
@@ -35,7 +39,7 @@ export function assertOtpSendRateLimit(event: H3Event, phone?: string) {
     return
   }
 
-  if (bucket.count >= MAX_SENDS_PER_WINDOW) {
+  if (bucket.count >= maxSends) {
     const waitSeconds = Math.ceil((WINDOW_MS - (now - bucket.windowStart)) / 1000)
     throw createError({
       statusCode: 429,

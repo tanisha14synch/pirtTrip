@@ -334,6 +334,7 @@ export async function sendAdminPhoneOtp(options: {
     email: challengeEmail,
     purpose: 'admin_login',
     challengeToken: options.challengeToken,
+    freshRequest: !options.challengeToken,
     metadata: { phone: normalized },
     smsDelivery: {
       phone: normalized,
