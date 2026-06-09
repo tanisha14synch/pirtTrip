@@ -5,7 +5,6 @@
 NODE_VERSION = "22"
 NIXPACKS_NODE_VERSION = "22"
 API_URL = "https://api.pirttrip.com"
-NUXT_PUBLIC_SUPABASE_URL = "https://fvkwophzzyaukacuiszv.supabase.co"
 
 [phases.install]
 cmds = ["npm ci"]
