@@ -20,6 +20,13 @@ const {
   resetLoginForm,
 } = useAdminAuth()
 
+const otpStepActive = computed(() => step.value === 'otp')
+const { otpAutofillRef, onOtpAutofillInput } = useOtpAutofill({
+  otpDigits,
+  active: otpStepActive,
+  enableWebOtp: true,
+})
+
 function onPhoneInput(event: Event) {
   const target = event.target as HTMLInputElement
   loginPhone.value = target.value.replace(/\D/g, '').slice(0, 10)
@@ -169,7 +176,18 @@ onMounted(() => {
         </form>
 
         <!-- Step 2: OTP -->
-        <form v-else @submit.prevent="onOtpSubmit">
+        <form v-else class="relative" @submit.prevent="onOtpSubmit">
+          <input
+            ref="otpAutofillRef"
+            type="text"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            class="pointer-events-none absolute h-px w-px opacity-0"
+            tabindex="-1"
+            aria-hidden="true"
+            @input="onOtpAutofillInput"
+          >
+
           <button
             type="button"
             class="mb-6 flex items-center gap-1 text-sm font-medium text-black/50 hover:text-black"
@@ -216,7 +234,7 @@ onMounted(() => {
               type="text"
               inputmode="numeric"
               maxlength="1"
-              autocomplete="one-time-code"
+              autocomplete="off"
               class="h-[52px] w-full max-w-[52px] rounded-xl border border-black/15 text-center text-xl font-bold text-black outline-none focus:border-brand-primary focus:ring-2 focus:ring-orange-100"
               @input="onOtpInput(index, $event)"
               @keydown="handleOtpKeydown(index, $event)"

@@ -19,6 +19,13 @@ const {
   handleOtpPaste,
 } = useWaitlistRegistration()
 
+const otpStepActive = computed(() => otpEnabled && step.value === 'otp')
+const { otpAutofillRef, onOtpAutofillInput } = useOtpAutofill({
+  otpDigits,
+  active: otpStepActive,
+  enableWebOtp: false,
+})
+
 function close() {
   open.value = false
   reset()
@@ -141,9 +148,20 @@ function onOtpInput(index, event) {
             <!-- OTP step disabled until email provider is configured -->
             <form
               v-else-if="otpEnabled && step === 'otp'"
-              class="mt-6"
+              class="relative mt-6"
               @submit.prevent="onEnterOtp"
             >
+              <input
+                ref="otpAutofillRef"
+                type="text"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                class="pointer-events-none absolute h-px w-px opacity-0"
+                tabindex="-1"
+                aria-hidden="true"
+                @input="onOtpAutofillInput"
+              >
+
               <p class="mb-2 font-plein text-[14px] text-white/70">
                 Enter the 6-digit code sent to <span class="text-white">{{ email }}</span>
               </p>
@@ -172,7 +190,7 @@ function onOtpInput(index, event) {
                   type="text"
                   inputmode="numeric"
                   maxlength="1"
-                  autocomplete="one-time-code"
+                  autocomplete="off"
                   class="h-[52px] w-full max-w-[52px] rounded-[10px] border border-white/15 bg-black/35 text-center font-plein text-[20px] font-bold text-white outline-none transition-colors focus:border-[#F3A81A]/70"
                   @input="onOtpInput(index, $event)"
                   @keydown="handleOtpKeydown(index, $event)"

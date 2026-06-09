@@ -15,6 +15,10 @@ type AquaSmsConfig = {
 const PARTNER_OTP_SMS_TEMPLATE =
   'Your login verification OTP For PirtTrip is {code}. This code is valid for 10 minutes. MARTYRS SERVICES Website : business.pirttrip.com'
 
+/**
+ * DLT-registered SMS body only — do not append extra lines unless a matching
+ * template is approved with your SMS provider (AquaSMS will reject mismatches).
+ */
 export function buildPartnerOtpSmsMessage(code: string): string {
   return PARTNER_OTP_SMS_TEMPLATE.replace('{code}', code)
 }

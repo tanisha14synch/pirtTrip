@@ -12,6 +12,13 @@ const localError = ref(null)
 
 const otpCode = computed(() => otpDigits.value.join(''))
 
+const otpStepActive = computed(() => auth.loginStep.value === 'otp' || auth.needsAdmin2fa.value)
+const { otpAutofillRef, onOtpAutofillInput } = useOtpAutofill({
+  otpDigits,
+  active: otpStepActive,
+  enableWebOtp: false,
+})
+
 watch(
   () => auth.needsAdmin2fa.value,
   (needs) => {
@@ -139,9 +146,20 @@ async function backToCredentials() {
 
     <form
       v-else
-      class="w-full max-w-md rounded-[14px] border border-white/10 bg-[#1e1b18] p-8"
+      class="relative w-full max-w-md rounded-[14px] border border-white/10 bg-[#1e1b18] p-8"
       @submit.prevent="onOtpSubmit"
     >
+      <input
+        ref="otpAutofillRef"
+        type="text"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        class="pointer-events-none absolute h-px w-px opacity-0"
+        tabindex="-1"
+        aria-hidden="true"
+        @input="onOtpAutofillInput"
+      >
+
       <h1 class="font-plein text-2xl font-bold text-white">
         Verify your email
       </h1>
@@ -183,7 +201,7 @@ async function backToCredentials() {
           type="text"
           inputmode="numeric"
           maxlength="1"
-          autocomplete="one-time-code"
+          autocomplete="off"
           class="h-12 w-full max-w-[52px] rounded-lg border border-[#3a3530] bg-black/40 text-center font-plein text-xl font-bold text-white outline-none focus:border-[#F3A81A]"
           @input="setOtpDigit(index, $event.target.value)"
           @keydown="handleOtpKeydown(index, $event)"

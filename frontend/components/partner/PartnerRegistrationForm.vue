@@ -24,6 +24,13 @@ const {
   reset,
 } = usePartnerRegistration()
 
+const otpStepActive = computed(() => step.value === 'otp')
+const { otpAutofillRef, onOtpAutofillInput } = useOtpAutofill({
+  otpDigits,
+  active: otpStepActive,
+  enableWebOtp: true,
+})
+
 const connectsHelpOpen = ref(false)
 const connectsHelpRef = ref(null)
 
@@ -413,9 +420,20 @@ function onOtpInput(index, event) {
 
       <form
         v-else-if="step === 'otp'"
-        class="mt-6 space-y-3"
+        class="relative mt-6 space-y-3"
         @submit.prevent="onSubmitOtp"
       >
+        <input
+          ref="otpAutofillRef"
+          type="text"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          class="pointer-events-none absolute h-px w-px opacity-0"
+          tabindex="-1"
+          aria-hidden="true"
+          @input="onOtpAutofillInput"
+        >
+
         <h2 class="font-plein text-[17px] font-bold leading-[125%] text-white md:text-[20px]">
           Verify your registration
         </h2>
@@ -449,7 +467,7 @@ function onOtpInput(index, event) {
             type="text"
             inputmode="numeric"
             maxlength="1"
-            autocomplete="one-time-code"
+            autocomplete="off"
             class="h-[52px] w-full max-w-[52px] rounded-[8px] border border-[#3a3530] bg-[#1e1b18] text-center font-plein text-[20px] font-bold text-white outline-none focus:border-[#F3A81A]/70"
             @input="onOtpInput(index, $event)"
             @keydown="handleOtpKeydown(index, $event)"
